@@ -16,9 +16,9 @@ export function ParticipantDetailsForm({
   onSubmit, 
   onBack 
 }: ParticipantDetailsFormProps) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState('Pedro Peralta Pereira');
+  const [email, setEmail] = useState('PePePe@gmail.com');
+  const [phone, setPhone] = useState('3123456789');
   const [showPayment, setShowPayment] = useState(false);
 
   const formattedPrice = new Intl.NumberFormat('es-CO', {
@@ -123,7 +123,7 @@ export function ParticipantDetailsForm({
         </button>
       ) : (
         <PaymentButton
-          title={`Raffle Tickets (${selectedNumbers.length})`}
+          title={`Compra de Tickets (${selectedNumbers.length})`}
           price={totalPrice}
           quantity={1}
           name={name}

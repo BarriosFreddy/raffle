@@ -106,15 +106,6 @@ export default function App() {
                 Raffle
               </h1>
             </div>
-            {!showCreateForm && !selectedRaffle && (
-              <button
-                onClick={() => setShowCreateForm(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Create Raffle
-              </button>
-            )}
           </div>
         </div>
       </header>
@@ -157,9 +148,6 @@ export default function App() {
                 <h3 className="text-lg font-medium text-gray-900">
                   No raffles yet
                 </h3>
-                <p className="mt-1 text-gray-500">
-                  Get started by creating your first raffle!
-                </p>
               </div>
             )}
           </div>
