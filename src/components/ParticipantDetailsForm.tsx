@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { PaymentButton } from './PaymentButton';
-import { formatTicketNumber } from '../utils/formatNumber';
 
 interface ParticipantDetailsFormProps {
-  selectedNumbers: number[];
-  totalPrice: number;
+  quantity: number;
+  ticketPrice: number;
   onSubmit: (name: string, email: string, phone: string) => void;
   onBack: () => void;
+  onPaymentSuccess: (participantId: string, quantity: number) => void;
 }
 
 export function ParticipantDetailsForm({ 
-  selectedNumbers, 
-  totalPrice, 
-  onSubmit, 
-  onBack 
+  quantity,
+  ticketPrice,
+  onSubmit,
+  onBack,
+  onPaymentSuccess
 }: ParticipantDetailsFormProps) {
-  const [name, setName] = useState('Pedro Peralta Pereira');
-  const [email, setEmail] = useState('PePePe@gmail.com');
-  const [phone, setPhone] = useState('3123456789');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [showPayment, setShowPayment] = useState(false);
 
+  const totalPrice = quantity * ticketPrice;
   const formattedPrice = new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP'
@@ -28,11 +30,8 @@ export function ParticipantDetailsForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setShowPayment(true);
-  };
-
-  const handlePaymentSuccess = () => {
     onSubmit(name, email, phone);
+    setShowPayment(true);
   };
 
   return (
@@ -57,16 +56,9 @@ export function ParticipantDetailsForm({
           </div>
           <span className="text-lg font-bold text-blue-600">{formattedPrice}</span>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {selectedNumbers.sort((a, b) => a - b).map(number => (
-            <span
-              key={number}
-              className="inline-flex items-center px-3 py-1 rounded-lg text-sm bg-blue-100 text-blue-800"
-            >
-              {formatTicketNumber(number, Math.max(...selectedNumbers))}
-            </span>
-          ))}
-        </div>
+        <p className="text-gray-600">
+          {quantity} tickets will be randomly assigned after payment
+        </p>
       </div>
 
       <div>
@@ -123,13 +115,13 @@ export function ParticipantDetailsForm({
         </button>
       ) : (
         <PaymentButton
-          title={`Compra de Tickets (${selectedNumbers.length})`}
+          title={`Compra de ${quantity} Tickets`}
           price={totalPrice}
           quantity={1}
           name={name}
           email={email}
           phone={phone}
-          onSuccess={handlePaymentSuccess}
+          onSuccess={() => onPaymentSuccess(crypto.randomUUID(), quantity)}
         />
       )}
     </form>

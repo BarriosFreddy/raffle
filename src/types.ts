@@ -4,6 +4,7 @@ export interface Participant {
   email: string;
   phone: string;
   ticketNumbers: number[];
+  paymentStatus: 'pending' | 'completed';
 }
 
 export interface Raffle {

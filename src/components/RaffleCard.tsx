@@ -6,9 +6,10 @@ import { formatTicketNumber } from '../utils/formatNumber';
 interface RaffleCardProps {
   raffle: Raffle;
   onDrawWinner: (raffleId: string) => void;
+  isAdmin: boolean;
 }
 
-export function RaffleCard({ raffle, onDrawWinner }: RaffleCardProps) {
+export function RaffleCard({ raffle, onDrawWinner, isAdmin }: RaffleCardProps) {
   const isActive = raffle.status === 'active';
   const totalTickets = raffle.maxNumber - raffle.minNumber + 1;
   const soldTickets = raffle.selectedNumbers.length;
@@ -61,7 +62,7 @@ export function RaffleCard({ raffle, onDrawWinner }: RaffleCardProps) {
         )}
       </div>
       
-      {isActive && raffle.selectedNumbers.length > 0 && (
+      {isAdmin && isActive && raffle.selectedNumbers.length > 0 && (
         <button
           onClick={(e) => {
             e.stopPropagation();
