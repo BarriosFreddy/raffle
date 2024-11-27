@@ -1,47 +1,62 @@
-import React, { useState } from 'react';
-import { ShoppingCart, AlertCircle, Gift } from 'lucide-react';
-import type { Participant, Raffle } from '../types';
-import { ParticipantDetailsForm } from './ParticipantDetailsForm';
+import React, { useState } from "react";
+import { ShoppingCart, AlertCircle, Gift } from "lucide-react";
+import type { Participant, Raffle } from "../types";
+import type { ParticipantFormData } from "../types/forms";
+import { ParticipantDetailsForm } from "./ParticipantDetailsForm";
+import { RaffleDetails } from "./RaffleDetails";
 
 interface AddParticipantFormProps {
   raffle: Raffle;
-  onAdd: (participant: Omit<Participant, 'id' | 'paymentStatus'>) => void;
+  onAdd: (participant: Omit<Participant, "id" | "paymentStatus">) => void;
   onPaymentSuccess: (participantId: string, quantity: number) => void;
 }
 
 const TICKET_PACKAGES = [
-  { amount: 2, label: 'X2' },
-  { amount: 3, label: 'X3' },
-  { amount: 5, label: 'X5' },
-  { amount: 6, label: 'X6' },
-  { amount: 8, label: 'X8' },
-  { amount: 10, label: 'X10' },
+  { amount: 2, label: "X2" },
+  { amount: 3, label: "X3" },
+  { amount: 5, label: "X5" },
+  { amount: 6, label: "X6" },
+  { amount: 8, label: "X8" },
+  { amount: 10, label: "X10" },
 ];
 
 // Mapping of prize keywords to relevant Unsplash images
 const PRIZE_IMAGES: Record<string, string> = {
-  'IPHONE': 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80',
-  'MACBOOK': 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80',
-  'PLAYSTATION': 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800&q=80',
-  'XBOX': 'https://images.unsplash.com/photo-1621259182978-fbf93132d53d?auto=format&fit=crop&w=800&q=80',
-  'TV': 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80'
+  IPHONE:
+    "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80",
+  MACBOOK:
+    "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
+  PLAYSTATION:
+    "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800&q=80",
+  XBOX: "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?auto=format&fit=crop&w=800&q=80",
+  TV: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80",
 };
 
-export function AddParticipantForm({ raffle, onAdd, onPaymentSuccess }: AddParticipantFormProps) {
+export function AddParticipantForm({
+  raffle,
+  onAdd,
+  onPaymentSuccess,
+}: AddParticipantFormProps) {
   const [selectedPackage, setSelectedPackage] = useState<number>(0);
   const [showDetails, setShowDetails] = useState(false);
 
-  const prizeImage = PRIZE_IMAGES[raffle.prize.toUpperCase()] || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80';
-  const formattedTicketPrice = new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP'
+  const totalTickets = raffle.maxNumber - raffle.minNumber + 1;
+  const soldTickets = raffle.selectedNumbers.length;
+  const prizeImage =
+    PRIZE_IMAGES[raffle.prize.toUpperCase()] ||
+    "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80";
+  const formattedTicketPrice = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
   }).format(raffle.ticketPrice);
 
-  const handleSubmitDetails = (name: string, email: string, phone: string) => {
+  const handleSubmitDetails = (formData: ParticipantFormData) => {
     onAdd({
-      name,
-      email,
-      phone,
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      instagram: formData.instagram,
+      nationalId: formData.nationalId,
       ticketNumbers: [], // Numbers will be assigned after payment
     });
   };
@@ -61,8 +76,8 @@ export function AddParticipantForm({ raffle, onAdd, onPaymentSuccess }: AddParti
   return (
     <div className="space-y-6">
       <div className="relative rounded-xl overflow-hidden bg-white shadow-lg">
-        <img 
-          src={prizeImage} 
+        <img
+          src={prizeImage}
           alt={raffle.prize}
           className="w-full h-64 object-cover"
         />
@@ -82,9 +97,9 @@ export function AddParticipantForm({ raffle, onAdd, onPaymentSuccess }: AddParti
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {TICKET_PACKAGES.map(({ amount, label }) => {
           const packagePrice = amount * raffle.ticketPrice;
-          const formattedPackagePrice = new Intl.NumberFormat('es-CO', {
-            style: 'currency',
-            currency: 'COP'
+          const formattedPackagePrice = new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: "COP",
           }).format(packagePrice);
 
           return (
@@ -92,12 +107,14 @@ export function AddParticipantForm({ raffle, onAdd, onPaymentSuccess }: AddParti
               key={amount}
               onClick={() => setSelectedPackage(amount)}
               className={`flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border-2 ${
-                selectedPackage === amount 
-                  ? 'border-blue-500' 
-                  : 'border-transparent hover:border-blue-500'
+                selectedPackage === amount
+                  ? "border-blue-500"
+                  : "border-transparent hover:border-blue-500"
               }`}
             >
-              <span className="text-2xl font-bold text-blue-600 mb-2">{label}</span>
+              <span className="text-2xl font-bold text-blue-600 mb-2">
+                {label}
+              </span>
               <span className="text-sm text-gray-600 text-center mb-1">
                 Compra {amount} oportunidades
               </span>

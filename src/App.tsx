@@ -1,25 +1,27 @@
-import React, { useState } from 'react';
-import { Plus, Ticket, Lock } from 'lucide-react';
-import type { Raffle, Participant } from './types';
-import { RaffleCard } from './components/RaffleCard';
-import { CreateRaffleForm } from './components/CreateRaffleForm';
-import { AddParticipantForm } from './components/AddParticipantForm';
-import { PurchaseSearch } from './components/PurchaseSearch';
-import { AdminLogin } from './components/AdminLogin';
+import React, { useState } from "react";
+import { Plus, Ticket, Lock } from "lucide-react";
+import type { Raffle, Participant } from "./types";
+import { RaffleCard } from "./components/RaffleCard";
+import { CreateRaffleForm } from "./components/CreateRaffleForm";
+import { AddParticipantForm } from "./components/AddParticipantForm";
+import { PurchaseSearch } from "./components/PurchaseSearch";
+import { AdminLogin } from "./components/AdminLogin";
+import { AdminPanel } from "./components/admin/AdminPanel";
+import { Link } from "react-router-dom";
 
 export default function App() {
   const [raffles, setRaffles] = useState<Raffle[]>([
     {
-      title: 'Rifa 1',
-      description: 'Description of the Raffle',
-      prize: 'IPHONE',
+      title: "Rifa 1",
+      description: "Description of the Raffle",
+      prize: "IPHONE",
       minNumber: 1,
       maxNumber: 10000,
       ticketPrice: 3000,
-      id: '4612dbce-7d42-4c09-aee4-a82dc8a676d1',
+      id: "4612dbce-7d42-4c09-aee4-a82dc8a676d1",
       participants: [],
       winners: [],
-      status: 'active',
+      status: "active",
       selectedNumbers: [],
     },
   ]);
@@ -28,35 +30,43 @@ export default function App() {
   const [showPurchaseSearch, setShowPurchaseSearch] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   const handleCreateRaffle = (
     raffleData: Omit<
       Raffle,
-      'id' | 'participants' | 'winners' | 'status' | 'selectedNumbers' | 'ticketPrice'
+      | "id"
+      | "participants"
+      | "winners"
+      | "status"
+      | "selectedNumbers"
+      | "ticketPrice"
     >
   ) => {
     if (!isAdmin) return;
-    
+
     const newRaffle: Raffle = {
       ...raffleData,
       ticketPrice: 3000,
       id: crypto.randomUUID(),
       participants: [],
       winners: [],
-      status: 'active',
+      status: "active",
       selectedNumbers: [],
     };
     setRaffles((prev) => [...prev, newRaffle]);
     setShowCreateForm(false);
   };
 
-  const handleAddParticipant = (participantData: Omit<Participant, 'id' | 'paymentStatus'>) => {
+  const handleAddParticipant = (
+    participantData: Omit<Participant, "id" | "paymentStatus">
+  ) => {
     if (!selectedRaffle) return;
 
     const newParticipant: Participant = {
       ...participantData,
       id: crypto.randomUUID(),
-      paymentStatus: 'pending',
+      paymentStatus: "pending",
       ticketNumbers: [], // Numbers will be assigned after payment
     };
 
@@ -73,7 +83,11 @@ export default function App() {
     setSelectedRaffle(null);
   };
 
-  const handlePaymentSuccess = (raffleId: string, participantId: string, quantity: number) => {
+  const handlePaymentSuccess = (
+    raffleId: string,
+    participantId: string,
+    quantity: number
+  ) => {
     setRaffles((prev) =>
       prev.map((raffle) => {
         if (raffle.id !== raffleId) return raffle;
@@ -85,7 +99,9 @@ export default function App() {
 
         const selectedNumbers: number[] = [];
         for (let i = 0; i < quantity; i++) {
-          const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+          const randomIndex = Math.floor(
+            Math.random() * availableNumbers.length
+          );
           selectedNumbers.push(availableNumbers[randomIndex]);
           availableNumbers.splice(randomIndex, 1);
         }
@@ -96,7 +112,7 @@ export default function App() {
             participant.id === participantId
               ? {
                   ...participant,
-                  paymentStatus: 'completed',
+                  paymentStatus: "completed",
                   ticketNumbers: selectedNumbers,
                 }
               : participant
@@ -113,7 +129,7 @@ export default function App() {
         if (raffle.id !== raffleId) return raffle;
 
         const completedParticipants = raffle.participants.filter(
-          (p) => p.paymentStatus === 'completed'
+          (p) => p.paymentStatus === "completed"
         );
 
         const allPaidTickets = completedParticipants.flatMap(
@@ -132,7 +148,7 @@ export default function App() {
         return {
           ...raffle,
           winners: [winner],
-          status: 'completed',
+          status: "completed",
         };
       })
     );
@@ -142,20 +158,19 @@ export default function App() {
     setIsAdmin(success);
     setShowAdminLogin(false);
     if (success) {
-      setShowCreateForm(true);
+      setShowAdminPanel(true);
     }
   };
 
   const handleLogout = () => {
     setIsAdmin(false);
     setShowCreateForm(false);
+    setShowAdminPanel(false);
   };
-
-  const selectedRaffleData = raffles.find((r) => r.id === selectedRaffle);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+      {/*  <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center">
@@ -166,7 +181,11 @@ export default function App() {
             </div>
             <div className="flex gap-4">
               <button
-                onClick={() => setShowPurchaseSearch(!showPurchaseSearch)}
+                onClick={() => {
+                  setShowPurchaseSearch(!showPurchaseSearch);
+                  setShowAdminPanel(false);
+                  setShowCreateForm(false);
+                }}
                 className="py-2 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-colors"
               >
                 Search My Tickets
@@ -177,11 +196,22 @@ export default function App() {
                     onClick={() => {
                       setShowCreateForm(true);
                       setShowPurchaseSearch(false);
+                      setShowAdminPanel(false);
                     }}
                     className="flex items-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 transition-colors"
                   >
                     <Plus className="h-5 w-5 mr-1" />
                     Create Raffle
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAdminPanel(true);
+                      setShowPurchaseSearch(false);
+                      setShowCreateForm(false);
+                    }}
+                    className="py-2 px-4 rounded-lg bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 transition-colors"
+                  >
+                    Admin Panel
                   </button>
                   <button
                     onClick={handleLogout}
@@ -202,7 +232,7 @@ export default function App() {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         {showAdminLogin ? (
@@ -220,14 +250,16 @@ export default function App() {
               Cancel
             </button>
           </div>
-        ) : selectedRaffle && selectedRaffleData ? (
+        ) : showAdminPanel ? (
+          <AdminPanel raffles={raffles} />
+        ) : selectedRaffle && raffles.find((r) => r.id === selectedRaffle) ? (
           <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg">
             <h2 className="text-xl font-bold mb-4">Add Participant</h2>
             <AddParticipantForm
-              raffle={selectedRaffleData}
+              raffle={raffles.find((r) => r.id === selectedRaffle)!}
               onAdd={handleAddParticipant}
-              onPaymentSuccess={(participantId, quantity) => 
-                handlePaymentSuccess(selectedRaffleData.id, participantId, quantity)
+              onPaymentSuccess={(participantId, quantity) =>
+                handlePaymentSuccess(selectedRaffle, participantId, quantity)
               }
             />
           </div>
@@ -238,19 +270,17 @@ export default function App() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {raffles.map((raffle) => (
-              <div
-                key={raffle.id}
-                onClick={() =>
-                  raffle.status === 'active' && setSelectedRaffle(raffle.id)
-                }
-                className="cursor-pointer touch-manipulation"
-              >
-                <RaffleCard 
-                  raffle={raffle} 
-                  onDrawWinner={handleDrawWinner}
-                  isAdmin={isAdmin} 
-                />
-              </div>
+              <Link key={raffle.id} to={"raffle/" + raffle.id}>
+                <div
+                  className="cursor-pointer touch-manipulation"
+                >
+                  <RaffleCard
+                    raffle={raffle}
+                    onDrawWinner={handleDrawWinner}
+                    isAdmin={isAdmin}
+                  />
+                </div>
+              </Link>
             ))}
             {raffles.length === 0 && (
               <div className="col-span-full text-center py-12">

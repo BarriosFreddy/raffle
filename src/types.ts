@@ -3,6 +3,8 @@ export interface Participant {
   name: string;
   email: string;
   phone: string;
+  instagram: string;
+  nationalId: string;
   ticketNumbers: number[];
   paymentStatus: 'pending' | 'completed';
 }

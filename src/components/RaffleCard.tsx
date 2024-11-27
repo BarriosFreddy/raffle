@@ -37,15 +37,6 @@ export function RaffleCard({ raffle, onDrawWinner, isAdmin }: RaffleCardProps) {
           <span className="text-base">{raffle.prize}</span>
         </div>
         
-        <div className="flex items-center text-gray-700">
-          <Users className="w-6 h-6 mr-3" />
-          <span className="text-base">{raffle.participants.length} Participants</span>
-        </div>
-
-        <div className="flex items-center text-gray-700">
-          <Hash className="w-6 h-6 mr-3" />
-          <span className="text-base">Numbers: {soldTickets}/{totalTickets} sold</span>
-        </div>
 
         <div className="flex items-center text-gray-700">
           <CreditCard className="w-6 h-6 mr-3" />

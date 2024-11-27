@@ -49,6 +49,14 @@ app.post("/create-preference", async (req, res) => {
     const body = {
       payer,
       items,
+      payment_methods: {
+        excluded_payment_types: [
+          {
+            id: "ticket"
+          }
+        ],
+        installments: 1
+      },
       back_urls: {
         success: `${process.env.FRONTEND_URL}/success`,
         failure: `${process.env.FRONTEND_URL}/failure`,

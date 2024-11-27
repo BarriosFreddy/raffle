@@ -1,10 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-if (!API_URL) {
-  throw new Error('Missing API URL configuration');
-}
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export interface CreatePreferenceData {
   items: Array<{
