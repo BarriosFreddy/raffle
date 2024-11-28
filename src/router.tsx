@@ -5,7 +5,7 @@ import { PaymentFailure } from './pages/PaymentFailure';
 import { PaymentPending } from './pages/PaymentPending';
 import { RaffleView } from './pages/RaffleView';
 import { RaffleLayout } from './layouts/RaffleLayout';
-import { PurchaseSearch } from './components/PurchaseSearch';
+import { PurchaseSearch } from './pages/PurchaseSearch';
 import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminLogin } from './components/AdminLogin';
 

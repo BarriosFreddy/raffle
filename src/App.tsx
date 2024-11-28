@@ -4,7 +4,7 @@ import type { Raffle, Participant } from "./types";
 import { RaffleCard } from "./components/RaffleCard";
 import { CreateRaffleForm } from "./components/CreateRaffleForm";
 import { AddParticipantForm } from "./components/AddParticipantForm";
-import { PurchaseSearch } from "./components/PurchaseSearch";
+import { PurchaseSearch } from "./pages/PurchaseSearch";
 import { AdminLogin } from "./components/AdminLogin";
 import { AdminPanel } from "./components/admin/AdminPanel";
 import { Link } from "react-router-dom";
@@ -12,13 +12,13 @@ import { Link } from "react-router-dom";
 export default function App() {
   const [raffles, setRaffles] = useState<Raffle[]>([
     {
-      title: "Rifa 1",
+      title: "Rifa Navideña",
       description: "Description of the Raffle",
       prize: "IPHONE",
       minNumber: 1,
       maxNumber: 10000,
       ticketPrice: 3000,
-      id: "4612dbce-7d42-4c09-aee4-a82dc8a676d1",
+      id: "6747912cd96b74b06aa5f4b9",
       participants: [],
       winners: [],
       status: "active",
@@ -170,70 +170,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/*  <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center">
-              <Ticket className="h-8 w-8 text-blue-600" />
-              <h1 className="ml-2 text-2xl font-bold text-gray-900">
-                Raffle
-              </h1>
-            </div>
-            <div className="flex gap-4">
-              <button
-                onClick={() => {
-                  setShowPurchaseSearch(!showPurchaseSearch);
-                  setShowAdminPanel(false);
-                  setShowCreateForm(false);
-                }}
-                className="py-2 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-colors"
-              >
-                Search My Tickets
-              </button>
-              {isAdmin ? (
-                <>
-                  <button
-                    onClick={() => {
-                      setShowCreateForm(true);
-                      setShowPurchaseSearch(false);
-                      setShowAdminPanel(false);
-                    }}
-                    className="flex items-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 transition-colors"
-                  >
-                    <Plus className="h-5 w-5 mr-1" />
-                    Create Raffle
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowAdminPanel(true);
-                      setShowPurchaseSearch(false);
-                      setShowCreateForm(false);
-                    }}
-                    className="py-2 px-4 rounded-lg bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 transition-colors"
-                  >
-                    Admin Panel
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="py-2 px-4 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300 transition-colors"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setShowAdminLogin(true)}
-                  className="flex items-center py-2 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-colors"
-                >
-                  <Lock className="h-5 w-5 mr-1" />
-                  Admin Login
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header> */}
-
       <main className="max-w-7xl mx-auto px-4 py-6">
         {showAdminLogin ? (
           <div className="max-w-lg mx-auto">

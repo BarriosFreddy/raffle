@@ -19,7 +19,7 @@ export interface CreatePreferenceData {
 
 export async function createPreference(data: CreatePreferenceData) {
   try {
-    const response = await axios.post(`${API_URL}/create-preference`, data, {
+    const response = await axios.post(`${API_URL}/api/create-preference`, data, {
       headers: {
         'Content-Type': 'application/json'
       }

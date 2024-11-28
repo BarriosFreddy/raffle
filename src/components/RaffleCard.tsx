@@ -15,7 +15,9 @@ export function RaffleCard({ raffle, onDrawWinner, isAdmin }: RaffleCardProps) {
   const soldTickets = raffle.selectedNumbers.length;
   const formattedPrice = new Intl.NumberFormat('es-CO', {
     style: 'currency',
-    currency: 'COP'
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(raffle.ticketPrice);
   
   return (

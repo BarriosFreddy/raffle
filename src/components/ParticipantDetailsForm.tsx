@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   ArrowLeft,
   ShoppingCart,
-  Instagram,
   UserSquare2,
   Smartphone,
   User,
@@ -11,10 +10,14 @@ import {
 } from "lucide-react";
 import { PaymentButton } from "./PaymentButton";
 import type { ParticipantFormData } from "../types/forms";
+import { createPreference } from "@/services/mercadopago";
+import { createPayment } from "@/services/payments.service";
+import { formatMoney } from "@/utils/formatNumber";
 
 interface ParticipantDetailsFormProps {
   quantity: number;
   ticketPrice: number;
+  raffleId: string;
   onSubmit: (formData: ParticipantFormData) => void;
   onBack: () => void;
   onPaymentSuccess: (participantId: string, quantity: number) => void;
@@ -23,10 +26,12 @@ interface ParticipantDetailsFormProps {
 export function ParticipantDetailsForm({
   quantity,
   ticketPrice,
+  raffleId,
   onSubmit,
   onBack,
   onPaymentSuccess,
 }: ParticipantDetailsFormProps) {
+  const [preferenceId, setPreferenceId] = useState("");
   const [formData, setFormData] = useState<ParticipantFormData>({
     name: "",
     email: "",
@@ -37,15 +42,44 @@ export function ParticipantDetailsForm({
   const [showPayment, setShowPayment] = useState(false);
 
   const totalPrice = quantity * ticketPrice;
-  const formattedPrice = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-  }).format(totalPrice);
+  const formattedPrice = formatMoney(totalPrice);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
     setShowPayment(true);
+    const { name, email, phone, instagram } = formData;
+    const preference = await createPreference({
+      items: [
+        {
+          title: `Compra de ${quantity} Tickets`,
+          unit_price: ticketPrice,
+          quantity,
+        },
+      ],
+      payer: {
+        name,
+        email,
+        phone: {
+          number: phone,
+        },
+      },
+    });
+
+    const payment = await createPayment({
+      raffleId,
+      preferenceId: preference.id,
+      amount: totalPrice,
+      quantity,
+      payer: {
+        name,
+        email,
+        phone,
+        instagram,
+      },
+    });
+
+    setPreferenceId(payment.preferenceId);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +88,7 @@ export function ParticipantDetailsForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <section className="space-y-6">
       <div className="flex items-center gap-4 text-gray-800 mb-6">
         <button
           type="button"
@@ -79,9 +113,7 @@ export function ParticipantDetailsForm({
             {formattedPrice}
           </span>
         </div>
-        <p className="text-gray-600">
-          {quantity} oportunidades de ganar
-        </p>
+        <p className="text-gray-600">{quantity} oportunidades para ganar</p>
       </div>
 
       <div>
@@ -208,22 +240,15 @@ export function ParticipantDetailsForm({
 
       {!showPayment ? (
         <button
-          type="submit"
+          type="button"
+          onClick={handleSubmit}
           className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
         >
           Continuar con el pago ({formattedPrice})
         </button>
       ) : (
-        <PaymentButton
-          title={`Compra de ${quantity} Tickets`}
-          price={totalPrice}
-          quantity={1}
-          name={formData.name}
-          email={formData.email}
-          phone={formData.phone}
-          onSuccess={() => onPaymentSuccess(crypto.randomUUID(), quantity)}
-        />
+        <PaymentButton preferenceId={preferenceId} />
       )}
-    </form>
+    </section>
   );
 }

@@ -4,6 +4,7 @@ import type { Participant, Raffle } from "../types";
 import type { ParticipantFormData } from "../types/forms";
 import { ParticipantDetailsForm } from "./ParticipantDetailsForm";
 import { RaffleDetails } from "./RaffleDetails";
+import { formatMoney } from "@/utils/formatNumber";
 
 interface AddParticipantFormProps {
   raffle: Raffle;
@@ -45,10 +46,7 @@ export function AddParticipantForm({
   const prizeImage =
     PRIZE_IMAGES[raffle.prize.toUpperCase()] ||
     "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80";
-  const formattedTicketPrice = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-  }).format(raffle.ticketPrice);
+  const formattedTicketPrice = formatMoney(raffle.ticketPrice);
 
   const handleSubmitDetails = (formData: ParticipantFormData) => {
     onAdd({
@@ -64,6 +62,7 @@ export function AddParticipantForm({
   if (showDetails) {
     return (
       <ParticipantDetailsForm
+        raffleId={raffle.id}
         quantity={selectedPackage}
         ticketPrice={raffle.ticketPrice}
         onSubmit={handleSubmitDetails}
@@ -88,7 +87,7 @@ export function AddParticipantForm({
               <h3 className="text-2xl font-bold text-white">{raffle.prize}</h3>
             </div>
             <p className="text-lg font-semibold text-white">
-              Ticket Price: {formattedTicketPrice}
+              Valor del tiquete: {formattedTicketPrice}
             </p>
           </div>
         </div>
@@ -97,10 +96,7 @@ export function AddParticipantForm({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {TICKET_PACKAGES.map(({ amount, label }) => {
           const packagePrice = amount * raffle.ticketPrice;
-          const formattedPackagePrice = new Intl.NumberFormat("es-CO", {
-            style: "currency",
-            currency: "COP",
-          }).format(packagePrice);
+          const formattedPackagePrice = formatMoney(packagePrice);
 
           return (
             <button
@@ -141,7 +137,7 @@ export function AddParticipantForm({
         onClick={() => setShowDetails(true)}
         className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:bg-gray-400"
       >
-        Continue with {selectedPackage} tickets
+        Continuar con {selectedPackage} oportunidades
       </button>
     </div>
   );

@@ -27,7 +27,7 @@ export function Header() {
           <div className="flex gap-4">
             <Link
               to="/search"
-              className="inline-flex items-center py-2 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-colors"
+              className="inline-flex items-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-500 active:bg-blue-300 transition-colors"
             >
               <Search className="h-5 w-5 mr-1" />
               Mis Compras

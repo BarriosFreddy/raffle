@@ -18,7 +18,7 @@ export const useRaffleStore = create<RaffleStore>((set) => ({
       minNumber: 1,
       maxNumber: 10000,
       ticketPrice: 3000,
-      id: '4612dbce-7d42-4c09-aee4-a82dc8a676d1',
+      id: '6747912cd96b74b06aa5f4b9',
       participants: [],
       winners: [],
       status: 'active',

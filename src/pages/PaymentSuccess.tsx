@@ -1,13 +1,33 @@
-import React from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Home } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { CheckCircle, Home, Ticket } from "lucide-react";
+import { processPaymentResponse, assignTicketNumbers } from "@/services/payments.service";
+import { TicketContainer } from "@/components/TicketContainer";
 
 export function PaymentSuccess() {
+  const [paymentData, setPaymentData] = useState(null);
   const [searchParams] = useSearchParams();
 
-  const queryParams = Object.fromEntries(  
-    new URLSearchParams(searchParams)
-  )
+  const paymentResponse = Object.fromEntries(new URLSearchParams(searchParams));
+
+  useEffect(() => {
+    ;(async () => {
+      const paymentDataResponse =  await processPaymentResponse(paymentResponse);
+      setPaymentData(paymentDataResponse);
+    })()
+  }, [])
+
+  const ticketNumbers: Array<number> = paymentData
+    ? paymentData.ticketNumbers
+    : [];
+
+  const handleShowNumbers = async () => {
+    if (paymentResponse && paymentData) {
+      const paymentDataResponse = await assignTicketNumbers(paymentData.preferenceId);
+      setPaymentData(paymentDataResponse);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
@@ -15,21 +35,34 @@ export function PaymentSuccess() {
           <CheckCircle className="h-16 w-16 text-green-500" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          Payment Successful!
+          Pago Exitoso!
         </h1>
         <p className="text-gray-600 mb-8">
-          Thank you for your purchase. Your raffle tickets have been successfully assigned.
-          You can check your tickets in the "Search My Tickets" section.
-          {
-            JSON.stringify(queryParams, null, 2)
-          }
+          Gracias por tu compra.
+          Por favor, Cliquea el botón que está abajo para ver tus números.
+          También puedes consultar tus números en la sección de Mis Compras
         </p>
+
+        {ticketNumbers.length === 0 && (
+          <button
+            onClick={handleShowNumbers}
+            className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
+          >
+            <Ticket className="h-5 w-5 mr-2" />
+            Quiero ver mis números
+          </button>
+        )}
+        <section className="grid grid-cols-2 gap-4">
+          {ticketNumbers.map((number) => (
+            <TicketContainer key={number} ticketNumber={number} />
+          ))}
+        </section>
+
         <Link
           to="/"
-          className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
+          className="mt-3 inline-flex items-center justify-center w-full py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 hover:text-white active:bg-blue-800 transition-colors"
         >
-          <Home className="h-5 w-5 mr-2" />
-          Return to Home
+          Seguir comprando
         </Link>
       </div>
     </div>

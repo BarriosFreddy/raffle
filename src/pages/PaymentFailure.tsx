@@ -1,17 +1,22 @@
-import React from 'react';
-import { Link, useSearchParams,useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { XCircle, Home } from 'lucide-react';
+import { processPaymentResponse } from '@/services/payments.service';
 
 export function PaymentFailure() {
-  let location = useLocation();
   const [searchParams] = useSearchParams();
 
-  const queryParams = Object.fromEntries(  
-    new URLSearchParams(searchParams)
-  )
+  const paymentResponse = Object.fromEntries(new URLSearchParams(searchParams));
 
-  console.log(JSON.stringify({queryParams}, null, 2));
-  
+  console.log(JSON.stringify(paymentResponse, null, 2));
+
+  useEffect(() => {
+    (async () => {
+      if (paymentResponse) {
+        await processPaymentResponse(paymentResponse);
+      }
+    })();
+  }, [paymentResponse]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -21,13 +26,10 @@ export function PaymentFailure() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           Payment Failed
+          Su pago no fué exitoso!
         </h1>
         <p className="text-gray-600 mb-8">
-          We're sorry, but your payment could not be processed. Please try again or contact
-          support if the problem persists.
-          {
-            JSON.stringify(queryParams, null, 2)
-          }
+          Lo sentimos, pero su pago no pudo ser procesado. Por favor, intenta nuevamente o contacta a soporte si persiste el inconveniente.
         </p>
         <Link
           to="/"
