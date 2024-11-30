@@ -78,7 +78,7 @@ export function ParticipantDetailsForm({
           </div>
           <span className="text-lg font-bold text-blue-600">{formattedPrice}</span>
         </div>
-        <p className="text-gray-600">{quantity} oportunidades para ganar</p>
+        <p className="text-gray-600">{quantity} Números</p>
       </div>
 
       {/* Form Fields */}

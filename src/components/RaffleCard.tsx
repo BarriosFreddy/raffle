@@ -39,7 +39,7 @@ export function RaffleCard({ raffle, onDrawWinner, isAdmin }: RaffleCardProps) {
 
         <div className="flex items-center text-gray-700">
           <CreditCard className="w-6 h-6 mr-3" />
-          <span className="text-base">Price per ticket: {formattedPrice}</span>
+          <span className="text-base">Valor del número: {formattedPrice}</span>
         </div>
       </div>
     </div>

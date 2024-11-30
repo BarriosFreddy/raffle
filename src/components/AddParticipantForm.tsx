@@ -71,7 +71,7 @@ export function AddParticipantForm({
               <h3 className="text-2xl font-bold text-white">{raffle.prize}</h3>
             </div>
             <p className="text-lg font-semibold text-white">
-              Valor del tiquete: {formattedTicketPrice}
+              Valor del número: {formattedTicketPrice}
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@ export function AddParticipantForm({
                 {label}
               </span>
               <span className="text-sm text-gray-600 text-center mb-1">
-                Compra {amount} oportunidades
+                Compra {amount} números
               </span>
               <span className="text-lg font-semibold text-gray-900">
                 {formattedPackagePrice}
@@ -129,7 +129,7 @@ export function AddParticipantForm({
         onClick={() => setShowDetails(true)}
         className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:bg-gray-400"
       >
-        Continuar con {selectedPackage} oportunidades
+        Continuar con {selectedPackage} números
       </button>
     </div>
   );
