@@ -1,16 +1,79 @@
-import { ApiError } from '../utils/ApiError.js';
+import mongoose from "mongoose";
+import { ApiError } from "../utils/ApiError.js";
+import { AvailableNumber } from "../models/availableNumbers.js";
+import { PaymentService } from "./payment.service.js";
+import { Raffle } from "../models/raffle.js";
 
+const TAKEN_STATUS = "taken";
+const AVAILABLE_STATUS = "available";
 export class TicketService {
+  static async assignTicketNumbers(paymentId, quantity) {
+    const session = await mongoose.startSession();
+    try {
+      session.startTransaction();
+      let selectedNumbers = [];
+      const payment = await PaymentService.findOne({
+        _id: paymentId,
+      });
+      const raffle = await Raffle.findOne({
+        _id: payment.raffleId,
+      });
+
+      const availableNumbers = await AvailableNumber.find(
+        { status: AVAILABLE_STATUS },
+        null,
+        {
+          limit: quantity,
+        }
+      ).exec();
+
+      selectedNumbers = availableNumbers.map(({ number }) => number);
+      const availableNumberIds = availableNumbers.map(({ _id }) => _id);
+      await AvailableNumber.updateMany(
+        { _id: { $in: availableNumberIds } },
+        { $set: { status: TAKEN_STATUS } },
+        { session }
+      );
+
+      payment.ticketNumbers = selectedNumbers;
+      await payment.save({ session });
+      raffle.selectedNumbersQuantity =
+        raffle.selectedNumbersQuantity + quantity;
+      await raffle.save({ session });
+
+      if (availableNumbers.length < quantity) {
+        throw new ApiError(
+          400,
+          "There are not sufficient available numbers to assign. Currently, there are " +
+            availableNumbers.length +
+            " available"
+        );
+      }
+      session.commitTransaction();
+      return payment;
+    } catch (e) {
+      console.error("Making rollback...", e);
+      session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
+  }
   static validateTicketRange(minNumber, maxNumber) {
     if (minNumber >= maxNumber) {
-      throw new ApiError(400, 'Invalid ticket range: minimum number must be less than maximum number');
+      throw new ApiError(
+        400,
+        "Invalid ticket range: minimum number must be less than maximum number"
+      );
     }
     if (minNumber < 0) {
-      throw new ApiError(400, 'Invalid ticket range: minimum number cannot be negative');
+      throw new ApiError(
+        400,
+        "Invalid ticket range: minimum number cannot be negative"
+      );
     }
   }
 
-  static getAvailableNumbers(minNumber, maxNumber, selectedNumbers = []) {
+  /*   static getAvailableNumbers(minNumber, maxNumber, selectedNumbers = []) {
     this.validateTicketRange(minNumber, maxNumber);
     
     const allNumbers = Array.from(
@@ -19,11 +82,14 @@ export class TicketService {
     );
     
     return allNumbers.filter(num => !selectedNumbers.includes(num));
-  }
+  } */
 
   static selectRandomNumbers(availableNumbers, quantity) {
     if (availableNumbers.length < quantity) {
-      throw new ApiError(400, 'Not enough available numbers for the requested quantity');
+      throw new ApiError(
+        400,
+        "Not enough available numbers for the requested quantity"
+      );
     }
 
     const selectedNumbers = [];
@@ -37,16 +103,5 @@ export class TicketService {
     }
 
     return selectedNumbers.sort((a, b) => a - b);
-  }
-
-  static async assignTicketNumbers(raffle, quantity) {
-    const availableNumbers = this.getAvailableNumbers(
-      raffle.minNumber,
-      raffle.maxNumber,
-      raffle.selectedNumbers
-    );
-
-    const selectedNumbers = this.selectRandomNumbers(availableNumbers, quantity);
-    return selectedNumbers;
   }
 }

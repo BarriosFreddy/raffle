@@ -12,7 +12,11 @@ const raffleSchema = new mongoose.Schema({
     enum: ['active', 'completed'],
     default: 'active'
   },
-  selectedNumbers: [{ type: Number }],
+  selectedNumbers: [{ type: Number }], //deprecated
+  selectedNumbersQuantity: {
+    type: Number,
+    default: 0
+  } 
 }, { timestamps: true });
 
 export const Raffle = mongoose.model('Raffle', raffleSchema);

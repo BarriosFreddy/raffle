@@ -1,20 +1,55 @@
-import { Raffle } from '../models/raffle.js';
-import { ApiError } from '../utils/ApiError.js';
-import { TicketService } from '../services/ticket.service.js';
+import { Raffle } from "../models/raffle.js";
+import { ApiError } from "../utils/ApiError.js";
+import { TicketService } from "../services/ticket.service.js";
+import { AvailableNumbersService } from "../services/availableNumber.service.js";
 
 export const raffleController = {
   async createRaffle(req, res, next) {
     try {
       const raffleData = req.body;
-      
+
       // Validate ticket range
-      TicketService.validateTicketRange(raffleData.minNumber, raffleData.maxNumber);
-      
+      TicketService.validateTicketRange(
+        raffleData.minNumber,
+        raffleData.maxNumber
+      );
+
       const raffle = new Raffle(raffleData);
       await raffle.save();
       res.status(201).json(raffle);
     } catch (error) {
-      next(error instanceof ApiError ? error : new ApiError(400, 'Failed to create raffle'));
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(400, "Failed to create raffle")
+      );
+    }
+  },
+  async saveAvailableNumbers(req, res, next) {
+    try {
+      const { min, max, raffleId } = req.body;
+      const raffle = await Raffle.findById(raffleId);
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+
+      // Validate ticket range
+      TicketService.validateTicketRange(min, max);
+      const shuffledNumbers = await AvailableNumbersService.populateAndShuffleNumbers(
+        min,
+        max
+      );
+      const availableNumbersdocs = await AvailableNumbersService.generateAvailableNumberDocs(shuffledNumbers, raffleId)
+      const response =   await AvailableNumbersService.bulkInsert(availableNumbersdocs)
+
+      res.status(201).json(response);
+    } catch (error) {
+      console.error(error);
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(400, "Failed to create raffle")
+      );
     }
   },
 
@@ -23,7 +58,7 @@ export const raffleController = {
       const raffles = await Raffle.find();
       res.json(raffles);
     } catch (error) {
-      next(new ApiError(500, 'Failed to fetch raffles'));
+      next(new ApiError(500, "Failed to fetch raffles"));
     }
   },
 
@@ -31,11 +66,11 @@ export const raffleController = {
     try {
       const raffle = await Raffle.findById(req.params.id);
       if (!raffle) {
-        return next(new ApiError(404, 'Raffle not found'));
+        return next(new ApiError(404, "Raffle not found"));
       }
       res.json(raffle);
     } catch (error) {
-      next(new ApiError(500, 'Failed to fetch raffle'));
+      next(new ApiError(500, "Failed to fetch raffle"));
     }
   },
 
@@ -43,15 +78,15 @@ export const raffleController = {
     try {
       const raffle = await Raffle.findById(req.params.id);
       if (!raffle) {
-        return next(new ApiError(404, 'Raffle not found'));
+        return next(new ApiError(404, "Raffle not found"));
       }
-      
+
       raffle.participants.push(req.body);
       await raffle.save();
-      
+
       res.json(raffle);
     } catch (error) {
-      next(new ApiError(400, 'Failed to add participant'));
+      next(new ApiError(400, "Failed to add participant"));
     }
   },
 
@@ -62,7 +97,7 @@ export const raffleController = {
 
       const raffle = await Raffle.findById(raffleId);
       if (!raffle) {
-        return next(new ApiError(404, 'Raffle not found'));
+        return next(new ApiError(404, "Raffle not found"));
       }
 
       const selectedNumbers = await TicketService.assignTicketNumbers(
@@ -74,7 +109,11 @@ export const raffleController = {
       await raffle.save();
       res.json({ raffle, selectedNumbers });
     } catch (error) {
-      next(error instanceof ApiError ? error : new ApiError(400, 'Failed to update payment status'));
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(400, "Failed to update payment status")
+      );
     }
   },
 
@@ -82,34 +121,39 @@ export const raffleController = {
     try {
       const raffle = await Raffle.findById(req.params.id);
       if (!raffle) {
-        return next(new ApiError(404, 'Raffle not found'));
+        return next(new ApiError(404, "Raffle not found"));
       }
 
       const completedParticipants = raffle.participants.filter(
-        p => p.paymentStatus === 'completed'
+        (p) => p.paymentStatus === "completed"
       );
 
       if (completedParticipants.length === 0) {
-        return next(new ApiError(400, 'No eligible participants'));
+        return next(new ApiError(400, "No eligible participants"));
       }
 
-      const allPaidTickets = completedParticipants.flatMap(p => p.ticketNumbers);
-      const winningNumber = TicketService.selectRandomNumbers(allPaidTickets, 1)[0];
-      const winner = completedParticipants.find(p => 
+      const allPaidTickets = completedParticipants.flatMap(
+        (p) => p.ticketNumbers
+      );
+      const winningNumber = TicketService.selectRandomNumbers(
+        allPaidTickets,
+        1
+      )[0];
+      const winner = completedParticipants.find((p) =>
         p.ticketNumbers.includes(winningNumber)
       );
 
       raffle.winners = [winner];
-      raffle.status = 'completed';
+      raffle.status = "completed";
       await raffle.save();
 
       res.json({
         raffle,
         winningNumber,
-        winner
+        winner,
       });
     } catch (error) {
-      next(new ApiError(400, 'Failed to draw winner'));
+      next(new ApiError(400, "Failed to draw winner"));
     }
-  }
+  },
 };

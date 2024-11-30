@@ -66,7 +66,7 @@ export const paymentController = {
   async handleAssignTicketNumbers(req, res, next) {
     try {
       const { preferenceId } = req.params;
-      const payment = await PaymentService.findOne({
+      let payment = await PaymentService.findOne({
         preferenceId,
       });
       if (!payment) {
@@ -75,24 +75,23 @@ export const paymentController = {
 
       // If payment is approved, assign ticket numbers
       if (payment.status === APPROVED && !payment.ticketNumbers?.length) {
-        const raffle = await Raffle.findById(payment.raffleId);
-        if (!raffle) {
-          return next(new ApiError(404, "Raffle not found"));
-        }
-        const selectedNumbers = await TicketService.assignTicketNumbers(
-          raffle,
+        payment = await TicketService.assignTicketNumbers(
+          payment._id,
           payment.quantity
         );
-        payment.ticketNumbers = selectedNumbers
-        raffle.selectedNumbers = [...raffle.selectedNumbers, ...selectedNumbers];
-        await raffle.save();
-        await payment.save();
+        if (!payment) {
+          res.status(400).json({
+            error: {
+              message: "There was not possible to assign the ticket numbers. Maybe there are not sufficient available numbers to assign."
+            }
+          });
+        }
       }
 
       res.json(payment);
     } catch (e) {
       console.error(e);
-      next(new ApiError(400, "Failed to process payment webhook"));
+      next(new ApiError(500, e));
     }
   },
 

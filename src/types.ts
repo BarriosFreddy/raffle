@@ -21,4 +21,5 @@ export interface Raffle {
   winners: Participant[];
   status: 'active' | 'completed';
   selectedNumbers: number[];
+  selectedNumbersQuantity: number;
 }

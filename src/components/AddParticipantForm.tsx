@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { ShoppingCart, AlertCircle, Gift } from "lucide-react";
+import { AlertCircle, Gift } from "lucide-react";
 import type { Participant, Raffle } from "../types";
 import type { ParticipantFormData } from "../types/forms";
 import { ParticipantDetailsForm } from "./ParticipantDetailsForm";
-import { RaffleDetails } from "./RaffleDetails";
 import { formatMoney } from "@/utils/formatNumber";
 
 interface AddParticipantFormProps {
@@ -40,9 +39,10 @@ export function AddParticipantForm({
 }: AddParticipantFormProps) {
   const [selectedPackage, setSelectedPackage] = useState<number>(0);
   const [showDetails, setShowDetails] = useState(false);
-
-  const totalTickets = raffle.maxNumber - raffle.minNumber + 1;
-  const soldTickets = raffle.selectedNumbers.length;
+  const { maxNumber, selectedNumbersQuantity  } = raffle
+  const soldTicketsPercentage = Math.floor(selectedNumbersQuantity * 100 / maxNumber)
+  
+  const leftNumbers = maxNumber - selectedNumbersQuantity 
   const prizeImage =
     PRIZE_IMAGES[raffle.prize.toUpperCase()] ||
     "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80";
@@ -92,9 +92,17 @@ export function AddParticipantForm({
           </div>
         </div>
       </div>
+      <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+        <div
+          className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+          style={{width: `${soldTicketsPercentage}%`}}
+        >
+          {soldTicketsPercentage}%
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {TICKET_PACKAGES.map(({ amount, label }) => {
+        {TICKET_PACKAGES.filter(({ amount }) => amount <= leftNumbers).map(({ amount, label }) => {
           const packagePrice = amount * raffle.ticketPrice;
           const formattedPackagePrice = formatMoney(packagePrice);
 
