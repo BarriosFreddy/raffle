@@ -5,6 +5,7 @@ interface RaffleStore {
   raffles: Raffle[];
   raffle: Raffle | null;
   setRaffle: (raffle: Raffle) => void;
+  setRaffles: (raffle: Raffle[]) => void;
   addRaffle: (
     raffle: Omit<
       Raffle,
@@ -24,26 +25,15 @@ interface RaffleStore {
 }
 
 export const useRaffleStore = create<RaffleStore>((set) => ({
-  raffles: [
-    {
-      title: "Rifa 1",
-      description: "Description of the Raffle",
-      prize: "IPHONE",
-      minNumber: 1,
-      maxNumber: 10000,
-      ticketPrice: 3000,
-      id: "6747912cd96b74b06aa5f4b9",
-      participants: [],
-      winners: [],
-      status: "active",
-      selectedNumbers: [],
-      selectedNumbersQuantity: 0,
-    },
-  ],
+  raffles: [],
   raffle: null,
   setRaffle: (raffleData) =>
     set((state) => ({
       raffle: raffleData,
+    })),
+  setRaffles: (raffleData) =>
+    set((state) => ({
+      raffles: raffleData,
     })),
   addRaffle: (raffleData) =>
     set((state) => ({

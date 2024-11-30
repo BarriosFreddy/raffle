@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Ticket, Lock } from "lucide-react";
 import type { Raffle, Participant } from "./types";
 import { RaffleCard } from "./components/RaffleCard";
@@ -8,29 +8,25 @@ import { PurchaseSearch } from "./pages/PurchaseSearch";
 import { AdminLogin } from "./components/AdminLogin";
 import { AdminPanel } from "./components/admin/AdminPanel";
 import { Link } from "react-router-dom";
+import { getRaffles } from "./services/raffle.service";
+import { useRaffleStore } from "./store/raffleStore";
 
 export default function App() {
-  const [raffles, setRaffles] = useState<Raffle[]>([
-    {
-      title: "Rifa Navideña",
-      description: "Description of the Raffle",
-      prize: "IPHONE",
-      minNumber: 1,
-      maxNumber: 10000,
-      ticketPrice: 3000,
-      id: "6747912cd96b74b06aa5f4b9",
-      participants: [],
-      winners: [],
-      status: "active",
-      selectedNumbers: [],
-    },
-  ]);
+  const { raffles, setRaffles  } = useRaffleStore();
+  
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedRaffle, setSelectedRaffle] = useState<string | null>(null);
   const [showPurchaseSearch, setShowPurchaseSearch] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+
+  useEffect(() => {
+    (async ()=> {
+     const rafflesData = await getRaffles()
+     setRaffles(rafflesData)
+    })()
+  }, [])
 
   const handleCreateRaffle = (
     raffleData: Omit<
@@ -54,7 +50,6 @@ export default function App() {
       status: "active",
       selectedNumbers: [],
     };
-    setRaffles((prev) => [...prev, newRaffle]);
     setShowCreateForm(false);
   };
 
@@ -69,17 +64,6 @@ export default function App() {
       paymentStatus: "pending",
       ticketNumbers: [], // Numbers will be assigned after payment
     };
-
-    setRaffles((prev) =>
-      prev.map((raffle) =>
-        raffle.id === selectedRaffle
-          ? {
-              ...raffle,
-              participants: [...raffle.participants, newParticipant],
-            }
-          : raffle
-      )
-    );
     setSelectedRaffle(null);
   };
 
@@ -88,70 +72,10 @@ export default function App() {
     participantId: string,
     quantity: number
   ) => {
-    setRaffles((prev) =>
-      prev.map((raffle) => {
-        if (raffle.id !== raffleId) return raffle;
 
-        const availableNumbers = Array.from(
-          { length: raffle.maxNumber - raffle.minNumber + 1 },
-          (_, i) => i + raffle.minNumber
-        ).filter((num) => !raffle.selectedNumbers.includes(num));
-
-        const selectedNumbers: number[] = [];
-        for (let i = 0; i < quantity; i++) {
-          const randomIndex = Math.floor(
-            Math.random() * availableNumbers.length
-          );
-          selectedNumbers.push(availableNumbers[randomIndex]);
-          availableNumbers.splice(randomIndex, 1);
-        }
-
-        return {
-          ...raffle,
-          participants: raffle.participants.map((participant) =>
-            participant.id === participantId
-              ? {
-                  ...participant,
-                  paymentStatus: "completed",
-                  ticketNumbers: selectedNumbers,
-                }
-              : participant
-          ),
-          selectedNumbers: [...raffle.selectedNumbers, ...selectedNumbers],
-        };
-      })
-    );
   };
 
   const handleDrawWinner = (raffleId: string) => {
-    setRaffles((prev) =>
-      prev.map((raffle) => {
-        if (raffle.id !== raffleId) return raffle;
-
-        const completedParticipants = raffle.participants.filter(
-          (p) => p.paymentStatus === "completed"
-        );
-
-        const allPaidTickets = completedParticipants.flatMap(
-          (p) => p.ticketNumbers
-        );
-
-        const winningNumber =
-          allPaidTickets[Math.floor(Math.random() * allPaidTickets.length)];
-
-        const winner = completedParticipants.find((participant) =>
-          participant.ticketNumbers.includes(winningNumber)
-        );
-
-        if (!winner) return raffle;
-
-        return {
-          ...raffle,
-          winners: [winner],
-          status: "completed",
-        };
-      })
-    );
   };
 
   const handleAdminLogin = (success: boolean) => {
@@ -206,7 +130,7 @@ export default function App() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {raffles.map((raffle) => (
-              <Link key={raffle.id} to={"raffle/" + raffle.id}>
+              <Link key={raffle.id} to={"raffle/" + raffle._id}>
                 <div
                   className="cursor-pointer touch-manipulation"
                 >

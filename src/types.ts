@@ -10,6 +10,7 @@ export interface Participant {
 }
 
 export interface Raffle {
+  _id:  string;
   id: string;
   title: string;
   description: string;

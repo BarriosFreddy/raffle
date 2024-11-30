@@ -22,3 +22,18 @@ export async function getRaffleById(raffleId: string) {
     throw new Error("Failed to get raffle");
   }
 }
+export async function getRaffles() {
+  try {
+    const response = await axios.get(`${API_URL}/api/raffles`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get raffle: ${error.message}`);
+    }
+    throw new Error("Failed to get raffle");
+  }
+}

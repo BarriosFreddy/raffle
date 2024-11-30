@@ -1,7 +1,6 @@
 import React from 'react';
 import { Gift, Users, Trophy, Hash, CreditCard } from 'lucide-react';
 import type { Raffle } from '../types';
-import { formatTicketNumber } from '../utils/formatNumber';
 
 interface RaffleCardProps {
   raffle: Raffle;
@@ -11,8 +10,6 @@ interface RaffleCardProps {
 
 export function RaffleCard({ raffle, onDrawWinner, isAdmin }: RaffleCardProps) {
   const isActive = raffle.status === 'active';
-  const totalTickets = raffle.maxNumber - raffle.minNumber + 1;
-  const soldTickets = raffle.selectedNumbers.length;
   const formattedPrice = new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
@@ -44,28 +41,7 @@ export function RaffleCard({ raffle, onDrawWinner, isAdmin }: RaffleCardProps) {
           <CreditCard className="w-6 h-6 mr-3" />
           <span className="text-base">Price per ticket: {formattedPrice}</span>
         </div>
-        
-        {raffle.winners.length > 0 && (
-          <div className="flex items-center text-gray-700">
-            <Trophy className="w-6 h-6 mr-3" />
-            <span className="text-base">
-              Winner: {raffle.winners[0].name} (Number: {formatTicketNumber(raffle.winners[0].ticketNumbers[0], raffle.maxNumber)})
-            </span>
-          </div>
-        )}
       </div>
-      
-      {isAdmin && isActive && raffle.selectedNumbers.length > 0 && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDrawWinner(raffle.id);
-          }}
-          className="mt-6 w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
-        >
-          Draw Winner
-        </button>
-      )}
     </div>
   );
 }
