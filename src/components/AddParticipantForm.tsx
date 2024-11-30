@@ -7,8 +7,6 @@ import { formatMoney } from "@/utils/formatNumber";
 
 interface AddParticipantFormProps {
   raffle: Raffle;
-  onAdd: (participant: Omit<Participant, "id" | "paymentStatus">) => void;
-  onPaymentSuccess: (participantId: string, quantity: number) => void;
 }
 
 const TICKET_PACKAGES = [
@@ -34,8 +32,6 @@ const PRIZE_IMAGES: Record<string, string> = {
 
 export function AddParticipantForm({
   raffle,
-  onAdd,
-  onPaymentSuccess,
 }: AddParticipantFormProps) {
   const [selectedPackage, setSelectedPackage] = useState<number>(0);
   const [showDetails, setShowDetails] = useState(false);
@@ -48,26 +44,14 @@ export function AddParticipantForm({
     "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80";
   const formattedTicketPrice = formatMoney(raffle.ticketPrice);
 
-  const handleSubmitDetails = (formData: ParticipantFormData) => {
-    onAdd({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      instagram: formData.instagram,
-      nationalId: formData.nationalId,
-      ticketNumbers: [], // Numbers will be assigned after payment
-    });
-  };
 
   if (showDetails) {
     return (
       <ParticipantDetailsForm
-        raffleId={raffle.id}
+        raffleId={raffle._id}
         quantity={selectedPackage}
         ticketPrice={raffle.ticketPrice}
-        onSubmit={handleSubmitDetails}
         onBack={() => setShowDetails(false)}
-        onPaymentSuccess={onPaymentSuccess}
       />
     );
   }

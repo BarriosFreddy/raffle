@@ -25,7 +25,6 @@ export function PaymentFailure() {
           <XCircle className="h-16 w-16 text-red-500" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          Payment Failed
           Su pago no fué exitoso!
         </h1>
         <p className="text-gray-600 mb-8">
