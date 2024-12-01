@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_TOKEN = import.meta.env.VITE_API_TOKEN
+
 
 export interface CreatePreferenceData {
   items: Array<{
@@ -21,7 +23,8 @@ export async function createPreference(data: CreatePreferenceData) {
   try {
     const response = await axios.post(`${API_URL}/api/create-preference`, data, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_TOKEN}`,
       }
     });
     

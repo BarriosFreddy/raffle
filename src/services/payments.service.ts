@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_TOKEN = import.meta.env.VITE_API_TOKEN
 
 interface PaymentData {
   raffleId: string;
@@ -35,6 +36,7 @@ export async function createPayment(data: PaymentData) {
     const response = await axios.post(`${API_URL}/api/payments`, data, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
       },
     });
 
@@ -56,6 +58,7 @@ export async function processPaymentResponse(data: { [k: string]: string }) {
     const response = await axios.post(`${API_URL}/api/payments/webhook`, data, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
       },
     });
 
@@ -78,6 +81,7 @@ export async function findByEmail(email: string) {
     const response = await axios.get(`${API_URL}/api/payments/email/${email}`, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
       },
     });
 
@@ -96,6 +100,7 @@ export async function assignTicketNumbers(preferenceId: string) {
     const response = await axios.post(`${API_URL}/api/payments/${preferenceId}`, {}, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
       },
     });
 

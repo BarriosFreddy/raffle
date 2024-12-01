@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import { paymentController } from '../controllers/payment.controller.js';
 import { validatePaymentWebhook } from '../middleware/validate.js';
+import { isAuthenticated } from '../middleware/authenticate.middleware.js';
 
 const router = Router();
 
-router.post('/payments', paymentController.createPayment);
-router.get('/payments/email/:email', paymentController.findByEmail);
-router.post('/payments/webhook', validatePaymentWebhook, paymentController.handlePaymentWebhook);
-router.post('/payments/:preferenceId', paymentController.handleAssignTicketNumbers);
-router.get('/payments/:preferenceId/status', paymentController.getPaymentStatus);
+router.post('/payments', isAuthenticated, paymentController.createPayment);
+router.get('/payments/email/:email', isAuthenticated, paymentController.findByEmail);
+router.post('/payments/webhook', isAuthenticated, validatePaymentWebhook, paymentController.handlePaymentWebhook);
+router.post('/payments/:preferenceId', isAuthenticated, paymentController.handleAssignTicketNumbers);
+router.get('/payments/:preferenceId/status', isAuthenticated, paymentController.getPaymentStatus);
 
 export const paymentRoutes = router;

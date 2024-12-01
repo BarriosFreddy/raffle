@@ -13,7 +13,7 @@ export function createApp() {
   app.use(cors({
     origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST', 'PATCH'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   }));
 
   app.use(express.json());
