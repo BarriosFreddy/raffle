@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { AlertCircle, Gift } from "lucide-react";
-import type { Participant, Raffle } from "../types";
-import type { ParticipantFormData } from "../types/forms";
+import type { Raffle } from "../types";
 import { ParticipantDetailsForm } from "./ParticipantDetailsForm";
 import { formatMoney } from "@/utils/formatNumber";
 
@@ -10,9 +9,9 @@ interface AddParticipantFormProps {
 }
 
 const TICKET_PACKAGES = [
+  { amount: 1, label: "X1" },
   { amount: 2, label: "X2" },
-  { amount: 3, label: "X3" },
-  { amount: 5, label: "X5" },
+  { amount: 4, label: "X4" },
   { amount: 6, label: "X6" },
   { amount: 8, label: "X8" },
   { amount: 10, label: "X10" },

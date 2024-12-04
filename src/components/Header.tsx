@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Ticket, Lock, Plus, Search } from "lucide-react";
 import { AdminLogin } from "./AdminLogin";
+import Logo from '@/assets/images/logo_celumoviljp.webp';
 
 export function Header() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -17,12 +18,11 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-10">
+    <header className="bg-red-900 shadow-sm sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <Link to="/" className="flex items-center">
-            <Ticket className="h-8 w-8 text-blue-600" />
-            <h1 className="ml-2 text-2xl font-bold text-gray-900">Raffle</h1>
+            <img width={70} src={Logo} alt="Logo image"/>
           </Link>
           <div className="flex gap-4">
             <Link

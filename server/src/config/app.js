@@ -25,6 +25,12 @@ export function createApp() {
   });
 
   // Routes
+  app.get('/', (_, res) => {
+    res.status(200).json({
+      app: "Raffle",
+      version: "0.0.1"
+    })
+  });
   app.use('/api', raffleRoutes);
   app.use('/api', paymentRoutes);
   app.use('/api', mercadoPagoRoutes);
