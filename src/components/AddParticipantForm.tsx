@@ -95,17 +95,17 @@ export function AddParticipantForm({
               onClick={() => setSelectedPackage(amount)}
               className={`flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border-2 ${
                 selectedPackage === amount
-                  ? "border-blue-500"
-                  : "border-transparent hover:border-blue-500"
+                  ? "border-red-500"
+                  : "border-transparent hover:border-red-500"
               }`}
             >
-              <span className="text-2xl font-bold text-blue-600 mb-2">
+              <span className="text-2xl font-bold text-red-600 mb-2">
                 {label}
               </span>
               <span className="text-sm text-gray-600 text-center mb-1">
                 Compra {amount} números
               </span>
-              <span className="text-lg font-semibold text-gray-900">
+              <span className="text-lg font-semibold text-red-600">
                 {formattedPackagePrice}
               </span>
             </button>
@@ -126,7 +126,7 @@ export function AddParticipantForm({
         type="button"
         disabled={selectedPackage === 0}
         onClick={() => setShowDetails(true)}
-        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:bg-gray-400"
+        className="w-full bg-red-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-red-700 active:bg-red-800 transition-colors disabled:bg-gray-400"
       >
         Continuar con {selectedPackage} números
       </button>
