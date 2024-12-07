@@ -61,9 +61,9 @@ export function AddParticipantForm({
         <img
           src={prizeImage}
           alt={raffle.prize}
-          className="w-full h-64 object-cover"
+          className="w-full h-128 object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+        {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
           <div className="p-6 w-full">
             <div className="flex items-center gap-2 mb-2">
               <Gift className="h-6 w-6 text-white" />
@@ -73,7 +73,7 @@ export function AddParticipantForm({
               Valor del número: {formattedTicketPrice}
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
         <div
