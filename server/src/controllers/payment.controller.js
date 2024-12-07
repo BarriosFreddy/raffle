@@ -101,10 +101,10 @@ export const paymentController = {
     try {
       const { preferenceId } = req.params;
       let payment = await PaymentService.findByPreferenceId(preferenceId);
-      console.log({ preferenceId, payment });
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }
+      console.log({ preferenceId, payment });
 
       // If payment is approved, assign ticket numbers
       if (payment.status === APPROVED && !payment.ticketNumbers?.length) {
