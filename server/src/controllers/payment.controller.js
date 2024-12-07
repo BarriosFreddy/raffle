@@ -69,7 +69,7 @@ export const paymentController = {
           });
           newStatus = APPROVED;
           paymentDetails = mpPayment;
-          mpPaymentId.mpPaymentId = mpPaymentId.toString();
+          payment.mpPaymentId = mpPaymentId.toString();
         }
       } else if (preference_id) {
         payment = await PaymentService.findOne({
