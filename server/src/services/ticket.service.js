@@ -8,7 +8,12 @@ const TAKEN_STATUS = "taken";
 const AVAILABLE_STATUS = "available";
 export class TicketService {
   static async assignTicketNumbers(paymentId, quantity) {
+    if (mongoose.connection.readyState !== 1) {
+      console.log('Reconnecting mongodb');
+      await mongoose.connect(process.env.MONGODB_URI);
+    }
     const session = await mongoose.startSession();
+
     let transactionInProgress = false; // State tracker
     try {
       session.startTransaction();
@@ -117,3 +122,4 @@ export class TicketService {
     return selectedNumbers.sort((a, b) => a - b);
   }
 }
+

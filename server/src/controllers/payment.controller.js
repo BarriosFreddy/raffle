@@ -108,12 +108,10 @@ export const paymentController = {
       // If payment is approved, assign ticket numbers
       console.log({ preferenceId, ticketNumbers: payment.ticketNumbers });
       if (payment.status === APPROVED && !payment.ticketNumbers?.length) {
-        console.log('IN the conditional');
         payment = await TicketService.assignTicketNumbers(
           payment._id,
           payment.quantity
         );
-      console.log({ preferenceId, ticketNumbers: payment.ticketNumbers });
         if (!payment) {
           res.status(400).json({
             error: {
