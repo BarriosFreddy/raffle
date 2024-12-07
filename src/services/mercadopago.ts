@@ -16,6 +16,9 @@ export interface CreatePreferenceData {
     phone: {
       number: string;
     };
+    identification: {
+      number: string;
+    };
   };
 }
 

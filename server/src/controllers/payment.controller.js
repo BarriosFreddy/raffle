@@ -2,9 +2,11 @@ import { Raffle } from "../models/raffle.js";
 import { ApiError } from "../utils/ApiError.js";
 import { TicketService } from "../services/ticket.service.js";
 import { PaymentService } from "../services/payment.service.js";
+import { MercadoPagoService } from "../services/mercadopago.service.js";
 
 const APPROVED = "approved";
 const REJECTED = "rejected";
+const PENDING = "pending";
 
 export const paymentController = {
   async createPayment(req, res, next) {
@@ -41,11 +43,26 @@ export const paymentController = {
   async handlePaymentWebhook(req, res, next) {
     try {
       const paymentInfo = req.body;
-      const { preference_id } = paymentInfo;
+      const { preference_id, payment_id } = paymentInfo;
+      let payment;
 
-      const payment = await PaymentService.findOne({
-        preferenceId: preference_id,
-      });
+      if (payment_id && !preference_id) {
+        console.log({ payment_id });
+        const mpPayment = await MercadoPagoService.findPaymentById(payment_id);
+        const {
+          phone: { number: phoneNumber },
+          identification: { number: identificationNumber } = {},
+        } = mpPayment.additional_info.payer;
+        payment = await PaymentService.findOne({
+          "payer.phone": phoneNumber,
+          //"payer.nationalId": identificationNumber,
+          status: PENDING,
+        });
+      } else if (preference_id) {
+        payment = await PaymentService.findOne({
+          preferenceId: preference_id,
+        });
+      }
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }
@@ -82,8 +99,9 @@ export const paymentController = {
         if (!payment) {
           res.status(400).json({
             error: {
-              message: "There was not possible to assign the ticket numbers. Maybe there are not sufficient available numbers to assign."
-            }
+              message:
+                "There was not possible to assign the ticket numbers. Maybe there are not sufficient available numbers to assign.",
+            },
           });
         }
       }

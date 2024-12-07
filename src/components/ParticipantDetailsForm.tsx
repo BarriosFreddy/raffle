@@ -41,13 +41,12 @@ export function ParticipantDetailsForm({
   const formattedPrice = formatMoney(totalPrice);
 
   const onFormSubmit = async (formData: ParticipantFormData) => {
-    setShowPayment(true);
-
+    
     const preference = await createPreference({
       items: [{ title: `Compra de ${quantity} Tickets`, unit_price: ticketPrice, quantity }],
-      payer: { name: formData.name, email: formData.email, phone: { number: formData.phone } },
+      payer: { name: formData.name, email: formData.email, phone: { number: formData.phone.trim() }, identification: { number: formData.nationalId } },
     });
-
+    
     const payment = await createPayment({
       raffleId,
       preferenceId: preference.id,
@@ -55,8 +54,9 @@ export function ParticipantDetailsForm({
       quantity,
       payer: formData,
     });
-
+    
     setPreferenceId(payment.preferenceId);
+    setShowPayment(true);
   };
 
   return (

@@ -13,10 +13,7 @@ export class Validators {
 
   static validatePaymentWebhook(payload) {
     const requiredFields = [
-      'preference_id',
-      'status',
-      'processing_mode',
-      'site_id'
+      'payment_id',
     ];
 
     const missingFields = requiredFields.filter(field => !payload[field]);

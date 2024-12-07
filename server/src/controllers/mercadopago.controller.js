@@ -20,5 +20,15 @@ export const mercadoPagoController = {
       console.error(error);
       next(error);
     }
-  }
+  },
+  async getPaymentById(req, res, next) {
+    try {
+      const { paymentId } = req.params;
+      const result = await MercadoPagoService.findPaymentById(paymentId);
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  },
 };

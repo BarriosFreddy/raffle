@@ -9,12 +9,16 @@ const AVAILABLE_STATUS = "available";
 export class TicketService {
   static async assignTicketNumbers(paymentId, quantity) {
     const session = await mongoose.startSession();
+    let transactionInProgress = false; // State tracker
     try {
       session.startTransaction();
+      transactionInProgress = true;
+
       let selectedNumbers = [];
       const payment = await PaymentService.findOne({
         _id: paymentId,
       });
+
       const raffle = await Raffle.findOne({
         _id: payment.raffleId,
       });
@@ -49,15 +53,23 @@ export class TicketService {
             " available"
         );
       }
-      session.commitTransaction();
+
+      console.log("Transaction is in progress:", transactionInProgress);
+      await session.commitTransaction();
+      transactionInProgress = false; // Transaction successfully committed
+      console.log("Transaction committed successfully.");
       return payment;
     } catch (e) {
-      console.error("Making rollback...", e);
-      session.abortTransaction();
+      if (transactionInProgress) {
+        await session.abortTransaction();
+        console.error("Transaction aborted due to error:", e);
+      }
     } finally {
       session.endSession();
+      console.log("Session ended.");
     }
   }
+
   static validateTicketRange(minNumber, maxNumber) {
     if (minNumber >= maxNumber) {
       throw new ApiError(

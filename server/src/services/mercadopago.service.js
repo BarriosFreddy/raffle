@@ -1,4 +1,4 @@
-import { MercadoPagoConfig, Preference } from "mercadopago";
+import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 import { ApiError } from '../utils/ApiError.js';
 
 export class MercadoPagoService {
@@ -40,6 +40,24 @@ export class MercadoPagoService {
       throw new ApiError(
         500,
         `Failed to create MercadoPago preference: ${error.message}`
+      );
+    }
+  }
+  static async findPaymentById(paymentId) {
+    try {
+
+      const client = new MercadoPagoConfig({
+        accessToken: process.env.MP_ACCESS_TOKEN,
+      });
+      
+      const payment = new Payment(client);
+
+      const result = await payment.get({ id: paymentId });
+      return result;
+    } catch (error) {
+      throw new ApiError(
+        500,
+        `Failed to get MercadoPago payment: ${error.message}`
       );
     }
   }
