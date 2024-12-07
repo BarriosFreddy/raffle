@@ -104,7 +104,6 @@ export const paymentController = {
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }
-      console.log({ preferenceId, payment });
 
       // If payment is approved, assign ticket numbers
       if (payment.status === APPROVED && !payment.ticketNumbers?.length) {
@@ -112,6 +111,7 @@ export const paymentController = {
           payment._id,
           payment.quantity
         );
+        console.log({ preferenceId, payment });
         if (!payment) {
           res.status(400).json({
             error: {
