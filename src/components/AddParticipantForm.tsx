@@ -3,6 +3,7 @@ import { AlertCircle, Gift } from "lucide-react";
 import type { Raffle } from "../types";
 import { ParticipantDetailsForm } from "./ParticipantDetailsForm";
 import { formatMoney } from "@/utils/formatNumber";
+import RaffleCover from '@/assets/images/raffle1.webp';
 
 interface AddParticipantFormProps {
   raffle: Raffle;
@@ -38,10 +39,6 @@ export function AddParticipantForm({
   const soldTicketsPercentage = Math.floor(selectedNumbersQuantity * 100 / maxNumber)
   
   const leftNumbers = maxNumber - selectedNumbersQuantity 
-  const prizeImage =
-    PRIZE_IMAGES[raffle.prize.toUpperCase()] ||
-    "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80";
-  const formattedTicketPrice = formatMoney(raffle.ticketPrice);
 
 
   if (showDetails) {
@@ -59,7 +56,7 @@ export function AddParticipantForm({
     <div className="space-y-6">
       <div className="relative rounded-xl overflow-hidden bg-white shadow-lg">
         <img
-          src={prizeImage}
+          src={RaffleCover}
           alt={raffle.prize}
           className="w-full h-128 object-cover"
         />
