@@ -51,7 +51,7 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your registered email"
+            placeholder="Ingresa el correo electrónico registrado"
             className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
@@ -81,7 +81,7 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
                 </p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
                 <p className="text-gray-900">
-                  {quantity} Oportunidades para ganar
+                  {quantity} Números
                 </p>
                 <div className="space-y-2 mt-2">
                   {ticketNumbers.length === 0 && status === APPROVED && (
