@@ -64,12 +64,12 @@ export const paymentController = {
           payment = await PaymentService.findOne({
             $or: [
               { "payer.phone": phoneNumber, status: PENDING },
-              { mpPaymentId },
+              { mpPaymentId: mpPaymentId.toString() },
             ],
           });
           newStatus = APPROVED;
           paymentDetails = mpPayment;
-          mpPaymentId.mpPaymentId = mpPaymentId;
+          mpPaymentId.mpPaymentId = mpPaymentId.toString();
         }
       } else if (preference_id) {
         payment = await PaymentService.findOne({
