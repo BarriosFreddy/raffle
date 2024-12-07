@@ -45,23 +45,35 @@ export const paymentController = {
       const paymentInfo = req.body;
       const { preference_id, payment_id } = paymentInfo;
       let payment;
+      let newStatus;
+      let paymentDetails;
 
       if (payment_id && !preference_id) {
-        console.log({ payment_id });
         const mpPayment = await MercadoPagoService.findPaymentById(payment_id);
         const {
-          phone: { number: phoneNumber },
-          identification: { number: identificationNumber } = {},
-        } = mpPayment.additional_info.payer;
-        payment = await PaymentService.findOne({
-          "payer.phone": phoneNumber,
-          //"payer.nationalId": identificationNumber,
-          status: PENDING,
-        });
+          status,
+          additional_info: {
+            payer: {
+              phone: { number: phoneNumber },
+              identification: { number: identificationNumber } = {},
+            } = {},
+          } = {},
+        } = mpPayment || {};
+        if (status === APPROVED) {
+          payment = await PaymentService.findOne({
+            "payer.phone": phoneNumber,
+            //"payer.nationalId": identificationNumber,
+            status: PENDING,
+          });
+          newStatus = APPROVED;
+          paymentDetails = mpPayment;
+        }
       } else if (preference_id) {
         payment = await PaymentService.findOne({
           preferenceId: preference_id,
         });
+        newStatus = paymentInfo.status;
+        paymentDetails = paymentInfo
       }
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
@@ -70,10 +82,12 @@ export const paymentController = {
         console.info("El pago ya fue procesado!");
         return res.status(200).json(payment);
       }
-      // Update payment details
-      payment.paymentDetails = paymentInfo;
-      payment.status = paymentInfo.status === APPROVED ? APPROVED : REJECTED;
-      await payment.save();
+      if (newStatus && paymentDetails) {
+        // Update payment details
+        payment.paymentDetails = paymentDetails;
+        payment.status = newStatus === APPROVED ? APPROVED : REJECTED;
+        await payment.save();
+      }
       res.json(payment);
     } catch (e) {
       console.error(e);

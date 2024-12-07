@@ -9,6 +9,7 @@ export class MercadoPagoService {
       }
       const client = new MercadoPagoConfig({
         accessToken: process.env.MP_ACCESS_TOKEN,
+        options: { timeout: 10000 }
       });
       
       const preference = new Preference(client);
@@ -48,10 +49,10 @@ export class MercadoPagoService {
 
       const client = new MercadoPagoConfig({
         accessToken: process.env.MP_ACCESS_TOKEN,
+        options: { timeout: 10000 }
       });
       
       const payment = new Payment(client);
-
       const result = await payment.get({ id: paymentId });
       return result;
     } catch (error) {
@@ -66,6 +67,7 @@ export class MercadoPagoService {
 
       const client = new MercadoPagoConfig({
         accessToken: process.env.MP_ACCESS_TOKEN,
+        options: { timeout: 10000 }
       });
       
       const preference = new Preference(client);
