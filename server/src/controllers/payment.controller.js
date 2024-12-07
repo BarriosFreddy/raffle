@@ -51,6 +51,7 @@ export const paymentController = {
       if (payment_id && !preference_id) {
         const mpPayment = await MercadoPagoService.findPaymentById(payment_id);
         const {
+          id: mpPaymentId,
           status,
           additional_info: {
             payer: {
@@ -61,19 +62,21 @@ export const paymentController = {
         } = mpPayment || {};
         if (status === APPROVED) {
           payment = await PaymentService.findOne({
-            "payer.phone": phoneNumber,
-            //"payer.nationalId": identificationNumber,
-            status: PENDING,
+            $or: [
+              { "payer.phone": phoneNumber, status: PENDING },
+              { mpPaymentId },
+            ],
           });
           newStatus = APPROVED;
           paymentDetails = mpPayment;
+          mpPaymentId.mpPaymentId = mpPaymentId;
         }
       } else if (preference_id) {
         payment = await PaymentService.findOne({
           preferenceId: preference_id,
         });
         newStatus = paymentInfo.status;
-        paymentDetails = paymentInfo
+        paymentDetails = paymentInfo;
       }
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
@@ -97,9 +100,8 @@ export const paymentController = {
   async handleAssignTicketNumbers(req, res, next) {
     try {
       const { preferenceId } = req.params;
-      let payment = await PaymentService.findOne({
-        preferenceId,
-      });
+      let payment = await PaymentService.findByPreferenceId(preferenceId);
+      console.log({ preferenceId });
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }

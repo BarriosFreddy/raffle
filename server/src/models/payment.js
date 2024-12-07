@@ -29,6 +29,9 @@ const paymentSchema = new mongoose.Schema({
   paymentDetails: {
     type: mongoose.Schema.Types.Mixed,
   },
+  mpPaymentId: {
+    type: String,
+  },
   amount: {
     type: Number,
     required: true
