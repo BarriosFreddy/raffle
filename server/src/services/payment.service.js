@@ -7,7 +7,7 @@ export class PaymentService {
     return paymentSaved;
   }
   static async findByPreferenceId(preferenceId) {
-    const payment = await Payment.findOne({ preferenceId });
+    const payment = await Payment.findOne({ preferenceId }).exec();
     return payment;
   }
   static async findByEmail(email) {
@@ -17,7 +17,7 @@ export class PaymentService {
     return payments;
   }
   static async findOne(params) {
-    const payment = await Payment.findOne(params);
+    const payment = await Payment.findOne(params).exec();
     return payment;
   }
 }

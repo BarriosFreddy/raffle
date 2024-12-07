@@ -21,7 +21,7 @@ export class TicketService {
 
       const raffle = await Raffle.findOne({
         _id: payment.raffleId,
-      });
+      }).exec();
 
       const availableNumbers = await AvailableNumber.find(
         { status: AVAILABLE_STATUS },
