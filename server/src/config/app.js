@@ -11,7 +11,7 @@ export function createApp() {
 
   // Middleware
   app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.FRONTEND_URL_DEFAULT, process.env.FRONTEND_URL],
     methods: ['GET', 'POST', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
