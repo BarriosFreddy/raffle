@@ -94,6 +94,25 @@ export async function findByEmail(email: string) {
   }
 }
 
+export async function findAll(params: {[key: string]: any}) {
+  try {
+    const response = await axios.get(`${API_URL}/api/payments`, {
+      params,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to save payment response: ${error.message}`);
+    }
+    throw new Error("Failed to save payment response");
+  }
+}
+
 export async function assignTicketNumbers(preferenceId: string) {
   try {
     if (!preferenceId) return null
