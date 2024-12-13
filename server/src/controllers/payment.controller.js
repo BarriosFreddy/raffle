@@ -29,6 +29,21 @@ export const paymentController = {
       next(new ApiError(400, "Failed to create payment record"));
     }
   },
+  async findAll(req, res, next) {
+    try {
+      const { email, status, page = 1, size = 10 } = req.query;
+      const payments = await PaymentService.findAll({
+        email,
+        status,
+        page,
+        size,
+      });
+      res.status(200).json(payments);
+    } catch (error) {
+      console.error(error);
+      next(new ApiError(400, "Failed to fetch payment record"));
+    }
+  },
   async findByEmail(req, res, next) {
     try {
       const { email } = req.params;

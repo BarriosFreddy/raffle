@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Search, Ticket } from "lucide-react";
 import type { Participant, Raffle } from "../types";
-import { formatMoney, formatTicketNumber } from "../utils/formatNumber";
-import { assignTicketNumbers, findByEmail } from "@/services/payments.service";
+import { formatMoney } from "../utils/formatNumber";
+import { assignTicketNumbers, findAll } from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
+import PaymentStatus from "@/enums/PaymentStatus.enum";
 
 interface PurchaseSearchProps {
   raffles: Raffle[];
@@ -26,7 +27,7 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setFetching(true);
-    const payments = await findByEmail(email);
+    const payments = await findAll({email, status: PaymentStatus.APPROVED});
     setSearchResults(payments);
     setFetching(false);
     setSend(true);
