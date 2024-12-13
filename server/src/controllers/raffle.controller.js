@@ -2,6 +2,7 @@ import { Raffle } from "../models/raffle.js";
 import { ApiError } from "../utils/ApiError.js";
 import { TicketService } from "../services/ticket.service.js";
 import { AvailableNumbersService } from "../services/availableNumber.service.js";
+import cacheService, { CACHE_KEYS } from "../services/cache.service.js";
 
 export const raffleController = {
   async createRaffle(req, res, next) {
@@ -35,12 +36,16 @@ export const raffleController = {
 
       // Validate ticket range
       TicketService.validateTicketRange(min, max);
-      const shuffledNumbers = await AvailableNumbersService.populateAndShuffleNumbers(
-        min,
-        max
+      const shuffledNumbers =
+        await AvailableNumbersService.populateAndShuffleNumbers(min, max);
+      const availableNumbersdocs =
+        await AvailableNumbersService.generateAvailableNumberDocs(
+          shuffledNumbers,
+          raffleId
+        );
+      const response = await AvailableNumbersService.bulkInsert(
+        availableNumbersdocs
       );
-      const availableNumbersdocs = await AvailableNumbersService.generateAvailableNumberDocs(shuffledNumbers, raffleId)
-      const response =   await AvailableNumbersService.bulkInsert(availableNumbersdocs)
 
       res.status(201).json(response);
     } catch (error) {
@@ -55,9 +60,20 @@ export const raffleController = {
 
   async getRaffles(req, res, next) {
     try {
-      const raffles = await Raffle.find();
+      let raffles = [];
+      const cachedData = cacheService.get(CACHE_KEYS.RAFFLES);
+      if (cachedData) {
+        raffles = cachedData;
+        res.json(raffles);
+        return;
+      }
+      raffles = await Raffle.find();
+      if (Array.isArray(raffles) && raffles.length > 0) {
+        cacheService.set(CACHE_KEYS.RAFFLES, raffles);
+      }
       res.json(raffles);
     } catch (error) {
+      console.error(error);
       next(new ApiError(500, "Failed to fetch raffles"));
     }
   },
