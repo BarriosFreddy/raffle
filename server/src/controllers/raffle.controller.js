@@ -80,9 +80,20 @@ export const raffleController = {
 
   async getRaffleById(req, res, next) {
     try {
-      const raffle = await Raffle.findById(req.params.id);
+      let raffle = null;
+      const raffleId = req.params.id
+      const cachedData = cacheService.get(raffleId);
+      if (cachedData) {
+        raffle = cachedData;
+        res.json(raffle);
+        return;
+      }
+      raffle = await Raffle.findById(raffleId);
       if (!raffle) {
         return next(new ApiError(404, "Raffle not found"));
+      }
+      if (raffle) {
+        cacheService.set(raffleId, raffle);
       }
       res.json(raffle);
     } catch (error) {

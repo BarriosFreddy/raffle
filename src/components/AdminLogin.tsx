@@ -12,7 +12,7 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real application, this should be a secure authentication process
-    if (password === 'admin123') {
+    if (password === 'raffle321') {
       onLogin(true);
     } else {
       setError('Invalid password');

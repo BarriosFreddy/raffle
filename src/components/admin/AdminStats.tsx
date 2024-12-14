@@ -1,12 +1,12 @@
-import React from 'react';
-import { DollarSign, Users, Ticket, Trophy } from 'lucide-react';
-import type { Raffle } from '../../types';
+import React from "react";
+import { DollarSign, Users, Ticket, Trophy } from "lucide-react";
+import type { Raffle } from "../../types";
 
-interface AdminStatsProps {
-  raffles: Raffle[];
-}
+interface AdminStatsProps {}
 
-export function AdminStats({ raffles }: AdminStatsProps) {
+export function AdminStats({}: AdminStatsProps) {
+  const raffles: Raffle[] = [];
+
   const totalParticipants = raffles.reduce(
     (acc, raffle) => acc + raffle.participants.length,
     0
@@ -18,47 +18,35 @@ export function AdminStats({ raffles }: AdminStatsProps) {
   );
 
   const totalRevenue = raffles.reduce(
-    (acc, raffle) => acc + (raffle.selectedNumbers.length * raffle.ticketPrice),
-    0
-  );
-
-  const totalWinners = raffles.reduce(
-    (acc, raffle) => acc + raffle.winners.length,
+    (acc, raffle) => acc + raffle.selectedNumbers.length * raffle.ticketPrice,
     0
   );
 
   const stats = [
     {
-      label: 'Total Revenue',
-      value: new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP'
+      label: "Total Revenue",
+      value: new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
       }).format(totalRevenue),
       icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100'
+      color: "text-green-600",
+      bgColor: "bg-green-100",
     },
     {
-      label: 'Total Participants',
+      label: "Total Participants",
       value: totalParticipants,
       icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100'
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
     },
     {
-      label: 'Tickets Sold',
+      label: "Tickets Sold",
       value: totalTicketsSold,
       icon: Ticket,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100'
+      color: "text-purple-600",
+      bgColor: "bg-purple-100",
     },
-    {
-      label: 'Winners Drawn',
-      value: totalWinners,
-      icon: Trophy,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100'
-    }
   ];
 
   return (

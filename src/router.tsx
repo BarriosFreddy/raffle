@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <AdminPanel raffles={[]} />,
+        element: <AdminPanel />,
       },
       {
         path: 'raffle/:raffleId',
