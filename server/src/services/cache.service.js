@@ -1,5 +1,7 @@
 import NodeCache from "node-cache";
-const myCache = new NodeCache({ stdTTL: 100, checkperiod: 60 * 60 * 12 });
+
+const CACHE_TIME = 60 * 60 * 12 // 12 hpurs
+const myCache = new NodeCache({ stdTTL: CACHE_TIME });
 
 class CacheService {
   constructor() {}
