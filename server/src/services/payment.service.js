@@ -23,6 +23,7 @@ export class PaymentService {
     if (query.email) queryParams["payer.email"] = query.email;
     if (query.status) queryParams.status = query.status;
     const payments = await Payment.find(queryParams)
+      .sort({ _id: -1 })
       .skip((page - 1) * size)
       .limit(size)
       .exec();
