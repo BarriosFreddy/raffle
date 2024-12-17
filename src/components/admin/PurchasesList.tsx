@@ -32,7 +32,6 @@ export function PurchasesList({ payments }: PurchasesListProps) {
     <div className="space-y-4">
       {payments.map(payment => {
         const isExpanded = expandedPurchase === payment._id;
-        const totalAmount = payment.quantity * payment.amount;
         return (
           <div
             key={payment._id}
@@ -55,7 +54,7 @@ export function PurchasesList({ payments }: PurchasesListProps) {
                     {new Intl.NumberFormat('es-CO', {
                       style: 'currency',
                       currency: 'COP'
-                    }).format(totalAmount)}
+                    }).format(payment.amount)}
                   </span>
                 </div>
               </div>
