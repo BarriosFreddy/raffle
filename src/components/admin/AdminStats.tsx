@@ -1,26 +1,17 @@
 import React from "react";
 import { DollarSign, Users, Ticket, Trophy } from "lucide-react";
 import type { Raffle } from "../../types";
+import { RaffleProgress } from "./RaffleProgress";
 
-interface AdminStatsProps {}
+interface AdminStatsProps {
+  raffle: Raffle | undefined;
+}
 
-export function AdminStats({}: AdminStatsProps) {
-  const raffles: Raffle[] = [];
+export function AdminStats({ raffle }: AdminStatsProps) {
+  const totalTicketsSold = raffle?.selectedNumbersQuantity || 0;
 
-  const totalParticipants = raffles.reduce(
-    (acc, raffle) => acc + raffle.participants.length,
-    0
-  );
-
-  const totalTicketsSold = raffles.reduce(
-    (acc, raffle) => acc + raffle.selectedNumbers.length,
-    0
-  );
-
-  const totalRevenue = raffles.reduce(
-    (acc, raffle) => acc + raffle.selectedNumbers.length * raffle.ticketPrice,
-    0
-  );
+  const totalRevenue =
+    (raffle?.selectedNumbersQuantity || 0) * (raffle?.ticketPrice || 0);
 
   const stats = [
     {
@@ -34,13 +25,6 @@ export function AdminStats({}: AdminStatsProps) {
       bgColor: "bg-green-100",
     },
     {
-      label: "Total Participants",
-      value: totalParticipants,
-      icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
-    },
-    {
       label: "Tickets Sold",
       value: totalTicketsSold,
       icon: Ticket,
@@ -50,7 +34,7 @@ export function AdminStats({}: AdminStatsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
       {stats.map(({ label, value, icon: Icon, color, bgColor }) => (
         <div key={label} className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
@@ -64,6 +48,9 @@ export function AdminStats({}: AdminStatsProps) {
           </div>
         </div>
       ))}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <RaffleProgress raffle={raffle} />
+      </div>
     </div>
   );
 }
