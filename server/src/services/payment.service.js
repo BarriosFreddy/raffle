@@ -13,7 +13,7 @@ export class PaymentService {
   static async findOneByEmail(email) {
     const payments = await Payment.findOne({
       "payer.email": email,
-    }).exec();
+    }).sort({ _id: -1 }).exec();
     return payments;
   }
   static async findAll(queryData) {
