@@ -47,7 +47,7 @@ export const paymentController = {
   async findByEmail(req, res, next) {
     try {
       const { email } = req.params;
-      const payments = await PaymentService.findByEmail(email);
+      const payments = await PaymentService.findAll({email});
       res.status(200).json(payments);
     } catch (error) {
       console.error(error);
@@ -93,7 +93,7 @@ export const paymentController = {
         newStatus = paymentInfo.status;
         paymentDetails = paymentInfo;
       } else if (x_customer_email) {
-        payment = await PaymentService.findByEmail(x_customer_email);
+        payment = await PaymentService.findOneByEmail(x_customer_email);
         newStatus = paymentInfo.x_cod_response === 1 ? APPROVED : REJECTED;
         paymentDetails = paymentInfo;
       }
