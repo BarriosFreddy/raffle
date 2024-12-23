@@ -15,7 +15,9 @@ export function PaymentResponse() {
     ;(async () => {
       const paymentDataResponse =  await processPaymentEPayco(refPayco);
       console.log({ refPayco, paymentDataResponse });
-      //setPaymentData(paymentDataResponse);
+      const { data } = paymentDataResponse
+      const paymentData = await processPaymentResponse(data)
+      setPaymentData(paymentData);
     })()
   }, [])
 

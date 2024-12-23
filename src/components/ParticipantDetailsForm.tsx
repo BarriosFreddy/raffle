@@ -27,6 +27,7 @@ interface ParticipantDetailsFormProps {
 export function ParticipantDetailsForm({
   quantity,
   ticketPrice,
+  raffleId,
   onBack,
 }: ParticipantDetailsFormProps) {
   const [paymentData, setPaymentData] = useState<PaymentDataDTO>();
@@ -67,6 +68,15 @@ export function ParticipantDetailsForm({
       ],
     };
     setPaymentData(data);
+    
+    await createPayment({
+      raffleId,
+      preferenceId: '',
+      amount: totalPrice,
+      quantity,
+      payer: formData,
+    });
+
   };
 
   return (
