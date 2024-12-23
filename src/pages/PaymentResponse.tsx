@@ -14,7 +14,6 @@ export function PaymentResponse() {
   useEffect(() => {
     ;(async () => {
       const paymentDataResponse =  await processPaymentEPayco(refPayco);
-      console.log({ refPayco, paymentDataResponse });
       const { data } = paymentDataResponse
       const paymentData = await processPaymentResponse(data)
       setPaymentData(paymentData);
@@ -22,11 +21,12 @@ export function PaymentResponse() {
   }, [])
 
   const ticketNumbers: Array<number> = paymentData
-    ? paymentData.ticketNumbers
-    : [];
+  ? paymentData.ticketNumbers
+  : [];
 
   const handleShowNumbers = async () => {
-    if (paymentResponse && paymentData) {
+    console.log({ paymentData });
+    if (paymentData) {
       const paymentDataResponse = await assignTicketNumbers({email: paymentData.payer.email});
       setPaymentData(paymentDataResponse);
     }
