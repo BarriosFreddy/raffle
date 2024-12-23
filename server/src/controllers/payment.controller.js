@@ -47,7 +47,7 @@ export const paymentController = {
   async findByEmail(req, res, next) {
     try {
       const { email } = req.params;
-      const payments = await PaymentService.findAll({email});
+      const payments = await PaymentService.findAll({ email });
       res.status(200).json(payments);
     } catch (error) {
       console.error(error);
@@ -118,8 +118,10 @@ export const paymentController = {
   },
   async handleAssignTicketNumbers(req, res, next) {
     try {
-      const { preferenceId } = req.params;
-      let payment = await PaymentService.findByPreferenceId(preferenceId);
+      const { preferenceId, email } = req.query;
+      let payment =
+        preferenceId && (await PaymentService.findByPreferenceId(preferenceId));
+      if (email) payment = await PaymentService.findOneByEmail(email);
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }
