@@ -75,6 +75,23 @@ export async function processPaymentResponse(data: { [k: string]: string }) {
   }
 }
 
+export async function processPaymentEPayco(refPayco: string) {
+  try {
+    const response = await axios.get(`https://secure.epayco.co/validation/v1/reference/${refPayco}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to save payment response: ${error.message}`);
+    }
+    throw new Error("Failed to save payment response");
+  }
+}
+
 export async function findByEmail(email: string) {
   try {
     if (!email) return []
