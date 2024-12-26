@@ -28,6 +28,10 @@ export const router = createBrowserRouter([
         element: <AdminLogin onLogin={() => {}} />,
       },
       {
+        path: 'dashboard/:raffleId',
+        element: <AdminPanel />,
+      },
+      {
         path: 'dashboard',
         element: <AdminPanel />,
       },

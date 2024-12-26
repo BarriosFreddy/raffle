@@ -5,6 +5,7 @@ import { AdminStats } from "./AdminStats";
 import type { Raffle } from "../../types";
 import { findAll } from "@/services/payments.service";
 import { getRaffleById } from "@/services/raffle.service";
+import { useParams } from "react-router-dom";
 
 const RAFFLE_ID = "6747912cd96b74b06aa5f4b9";
 const APPROVED = "approved";
@@ -12,6 +13,7 @@ const APPROVED = "approved";
 interface AdminPanelProps {}
 
 export function AdminPanel({}: AdminPanelProps) {
+  const { raffleId =  RAFFLE_ID } = useParams<{ raffleId: string }>();
   const [page, setPage] = useState(1);
   const [payments, setPayments] = useState([]);
   const [raffle, setRaffle] = useState();
@@ -20,10 +22,11 @@ export function AdminPanel({}: AdminPanelProps) {
     (async () => {
       const paymentsData = await findAll({
         status: APPROVED,
+        raffleId,
         page,
       });
       setPayments(paymentsData);
-      const raffle = await getRaffleById(RAFFLE_ID);
+      const raffle = await getRaffleById(raffleId);
       setRaffle(raffle);
     })();
   }, []);
