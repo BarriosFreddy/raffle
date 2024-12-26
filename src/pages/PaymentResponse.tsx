@@ -1,33 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle, Home, Ticket } from "lucide-react";
-import { processPaymentResponse, assignTicketNumbers, processPaymentEPayco } from "@/services/payments.service";
+import {
+  processPaymentResponse,
+  assignTicketNumbers,
+  processPaymentEPayco,
+} from "@/services/payments.service";
 import { TicketContainer } from "@/components/TicketContainer";
+import PaymentStatus from "@/enums/PaymentStatus.enum";
 
 export function PaymentResponse() {
   const [paymentData, setPaymentData] = useState(null);
   const [searchParams] = useSearchParams();
 
   const paymentResponse = Object.fromEntries(new URLSearchParams(searchParams));
-  const refPayco = paymentResponse.ref_payco
-  
+  const refPayco = paymentResponse.ref_payco;
+
   useEffect(() => {
-    ;(async () => {
-      const paymentDataResponse =  await processPaymentEPayco(refPayco);
-      const { data } = paymentDataResponse
-      const paymentData = await processPaymentResponse(data)
-      setPaymentData(paymentData);
-    })()
-  }, [])
+    (async () => {
+      const paymentEpaycoResponse = await processPaymentEPayco(refPayco);
+      const { data } = paymentEpaycoResponse;
+      const paymentDataRes = await processPaymentResponse(data);
+      setPaymentData(paymentDataRes);
+    })();
+  }, []);
 
   const ticketNumbers: Array<number> = paymentData
-  ? paymentData.ticketNumbers
-  : [];
+    ? paymentData.ticketNumbers
+    : [];
 
   const handleShowNumbers = async () => {
     console.log({ paymentData });
     if (paymentData) {
-      const paymentDataResponse = await assignTicketNumbers({email: paymentData.payer.email});
+      const paymentDataResponse = await assignTicketNumbers({
+        email: paymentData.payer.email,
+      });
       setPaymentData(paymentDataResponse);
     }
   };
@@ -39,12 +46,17 @@ export function PaymentResponse() {
           <CheckCircle className="h-16 w-16 text-green-500" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          Pago Exitoso!
+          {paymentData?.status === PaymentStatus.APPROVED
+            ? "Pago Exitoso!"
+            : "Su pago no fué exitoso o valide más tarde"}
         </h1>
         <p className="text-gray-600 mb-8">
-          Gracias por tu compra.
+          {paymentData?.status === PaymentStatus.APPROVED
+            ? `Gracias por tu compra.
           Por favor, Cliquea el botón que está abajo para ver tus números.
-          También puedes consultar tus números en la sección de Mis Compras
+          También puedes consultar tus números en la sección de Mis Compras`
+            : `Lo sentimos, pero su pago no pudo ser procesado. 
+          Por favor, intenta nuevamente o contacta a soporte si persiste el inconveniente.`}
         </p>
 
         {ticketNumbers.length === 0 && (

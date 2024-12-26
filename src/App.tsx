@@ -23,8 +23,8 @@ export default function App() {
 
   useEffect(() => {
     (async ()=> {
-     const rafflesData = await getRaffles()
-     setRaffles(rafflesData)
+     //const rafflesData = await getRaffles()
+     setRaffles([])
     })()
   }, [])
 
@@ -41,15 +41,6 @@ export default function App() {
   ) => {
     if (!isAdmin) return;
 
-    const newRaffle: Raffle = {
-      ...raffleData,
-      ticketPrice: 3000,
-      id: crypto.randomUUID(),
-      participants: [],
-      winners: [],
-      status: "active",
-      selectedNumbers: [],
-    };
     setShowCreateForm(false);
   };
 
@@ -145,7 +136,7 @@ export default function App() {
             {raffles.length === 0 && (
               <div className="col-span-full text-center py-12">
                 <h3 className="text-lg font-medium text-gray-900">
-                  No raffles yet
+                  RAFFLES
                 </h3>
               </div>
             )}

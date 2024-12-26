@@ -44,9 +44,8 @@ export function AddParticipantForm({
   if (showDetails) {
     return (
       <ParticipantDetailsForm
-        raffleId={raffle._id}
+        raffle={raffle}
         quantity={selectedPackage}
-        ticketPrice={raffle.ticketPrice}
         onBack={() => setShowDetails(false)}
       />
     );
@@ -56,7 +55,7 @@ export function AddParticipantForm({
     <div className="space-y-6">
       <div className="relative rounded-xl overflow-hidden bg-white shadow-lg">
         <img
-          src={RaffleCover}
+          src={raffle.coverUrl || RaffleCover}
           alt={raffle.prize}
           className="w-full h-128 object-cover"
         />
