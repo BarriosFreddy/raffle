@@ -35,7 +35,7 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
 
   const handleShowNumbers = async (preferenceId: string) => {
     if (preferenceId) {
-      await assignTicketNumbers(preferenceId);
+      await assignTicketNumbers({ preferenceId });
       await handleSearch()
     }
   };

@@ -138,15 +138,14 @@ export async function assignTicketNumbers({
   email,
 }: AssignTicketParams) {
   try {
-    const params: AssignTicketParams = {};
-    if (preferenceId) params.preferenceId = preferenceId;
-    if (email) params.email = email;
+    const data: AssignTicketParams = {};
+    if (preferenceId) data.preferenceId = preferenceId;
+    if (email) data.email = email;
 
     const response = await axios.post(
       `${API_URL}/api/payments/assign`,
-      {},
+      data,
       {
-        params,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${API_TOKEN}`,

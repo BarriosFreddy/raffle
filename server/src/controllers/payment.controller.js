@@ -119,7 +119,7 @@ export const paymentController = {
   },
   async handleAssignTicketNumbers(req, res, next) {
     try {
-      const { preferenceId, email } = req.query;
+      const { preferenceId, email } = req.body;
       let payment =
         preferenceId && (await PaymentService.findByPreferenceId(preferenceId));
       if (email) payment = await PaymentService.findOneByEmail(email);
