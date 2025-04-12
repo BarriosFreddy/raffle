@@ -36,9 +36,9 @@ export async function getRaffles() {
     return response.data;
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to get raffle: ${error.message}`);
+      throw new Error(`Failed to get raffles: ${error.message}`);
     }
-    throw new Error("Failed to get raffle");
+    throw new Error("Failed to get raffles");
   }
 }
 

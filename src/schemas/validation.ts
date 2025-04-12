@@ -10,7 +10,8 @@ export const raffleSchema = z.object({
   description: z.string().min(1, 'La descripción es requerida'),
   minNumber: z.number().int().min(1, 'El número mínimo debe ser al menos 1'),
   maxNumber: z.number().int().min(1, 'El número máximo debe ser al menos 1'),
-  ticketPrice: z.number().min(0, 'El precio del boleto debe ser positivo'),
+  prize: z.string().min(1, 'El premio es requerida'),
+  ticketPrice: z.number().int().min(1, 'El precio del ticket debe ser al menos 1'),
 }).refine(data => data.maxNumber > data.minNumber, {
   message: "El número máximo debe ser mayor que el número mínimo",
   path: ["maxNumber"],

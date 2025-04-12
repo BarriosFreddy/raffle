@@ -19,6 +19,7 @@ export const raffleController = {
       await raffle.save();
       res.status(201).json(raffle);
     } catch (error) {
+      console.error("Error saving raffle", error)
       next(
         error instanceof ApiError
           ? error
