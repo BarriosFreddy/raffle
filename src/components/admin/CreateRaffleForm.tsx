@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import type { Raffle } from '../../types';
+import { saveRaffle } from '@/services/raffle.service';
+import { useRaffleStore } from '@/store/raffleStore';
 
-export function CreateRaffleForm() {
+type CreateRaffleFormProps = {
+  onSave: () => void
+} 
+ 
+export function CreateRaffleForm({ onSave }: CreateRaffleFormProps) {
+  const { raffles, setRaffles } = useRaffleStore();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -9,17 +16,37 @@ export function CreateRaffleForm() {
     minNumber: 1,
     maxNumber: 100
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleCreateRaffle = (
-  ) => {
-    const newRaffle: Raffle = {
-      ...formData,
-      ticketPrice: 3000,
-      id: crypto.randomUUID(),
-      status: "active",
-      selectedNumbers: [],
-    };
-    console.log({ newRaffle });
+  const handleCreateRaffle = async () => {
+    try {
+      setIsLoading(true);
+      const newRaffle: Raffle = {
+        ...formData,
+        ticketPrice: 3000,
+        id: crypto.randomUUID(),
+        status: "active",
+        selectedNumbers: [],
+      };
+      
+      const savedRaffle = await saveRaffle(newRaffle);
+      setRaffles([...raffles, savedRaffle]);
+      
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        prize: '',
+        minNumber: 1,
+        maxNumber: 100
+      });
+      if(onSave) onSave()
+    } catch (error) {
+      console.error('Error creating raffle:', error);
+      // Here you could add a toast notification for error handling
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -104,9 +131,10 @@ export function CreateRaffleForm() {
         <button
           onClick={handleCreateRaffle}
           type="button"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={isLoading}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
         >
-          CREAR RIFA
+          {isLoading ? 'CREANDO...' : 'CREAR RIFA'}
         </button>
       </div>
     </div>

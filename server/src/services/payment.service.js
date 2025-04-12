@@ -22,6 +22,7 @@ export class PaymentService {
     const queryParams = {};
     if (query.email) queryParams["payer.email"] = query.email;
     if (query.status) queryParams.status = query.status;
+    if (query.raffleId) queryParams.raffleId = query.raffleId;
     const payments = await Payment.find(queryParams)
       .sort({ _id: -1 })
       .skip((page - 1) * size)

@@ -69,6 +69,10 @@ export function AdminPanel() {
     setShowForm(false)
   }
 
+  const handleSave = () => {
+    handleBack()
+  }
+
   if (!showAdminPanel)
     return <AdminLogin onLogin={handleAdminLogin} />
 
@@ -91,7 +95,7 @@ export function AdminPanel() {
           <ArrowLeft className="h-5 w-5 mr-1" />
           REGRESAR
         </button>}
-        {!selectedRaffle && showForm && <CreateRaffleForm />}
+        {!selectedRaffle && showForm && <CreateRaffleForm onSave={handleSave} />}
         {!selectedRaffle && !showForm && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {raffles.map((raffle) => (
             <div

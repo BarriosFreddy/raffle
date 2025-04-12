@@ -31,8 +31,9 @@ export const paymentController = {
   },
   async findAll(req, res, next) {
     try {
-      const { email, status, page = 1, size = 10 } = req.query;
+      const { email, status, page = 1, size = 10, raffleId } = req.query;
       const payments = await PaymentService.findAll({
+        raffleId,
         email,
         status,
         page,
