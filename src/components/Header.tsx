@@ -1,16 +1,17 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
 
 const EXCLUDED_PAGES = ["search", "admin"];
 
 export function Header() {
 
-  const location =  useLocation()
+  const location = useLocation()
 
-  console.log({ location });
-  
   const isNotExcludedPage = !EXCLUDED_PAGES.some((page) => location?.pathname.includes(page));
+
+  const handleLogout = () => {//TODO
+  };
 
   return (
     <header
@@ -30,6 +31,13 @@ export function Header() {
               <Search className="h-5 w-5 mr-1" />
               Mis Compras
             </Link>}
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center py-2 px-4 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300 transition-colors"
+            >
+              <LogOut className="h-5 w-5 mr-1" />
+              CERRAR SESIÓN
+            </button>
           </div>
         </div>
       </div>

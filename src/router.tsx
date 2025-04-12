@@ -26,10 +26,6 @@ export const router = createBrowserRouter([
         element: <AdminPanel/>,
       },
       {
-        path: 'dashboard',
-        element: <AdminPanel />,
-      },
-      {
         path: 'raffle/:raffleId',
         element: <RaffleView />,
       },
