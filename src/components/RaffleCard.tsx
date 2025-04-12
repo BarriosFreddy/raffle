@@ -4,11 +4,9 @@ import type { Raffle } from '../types';
 
 interface RaffleCardProps {
   raffle: Raffle;
-  onDrawWinner: (raffleId: string) => void;
-  isAdmin: boolean;
 }
 
-export function RaffleCard({ raffle, onDrawWinner, isAdmin }: RaffleCardProps) {
+export function RaffleCard({ raffle }: RaffleCardProps) {
   const isActive = raffle.status === 'active';
   const formattedPrice = new Intl.NumberFormat('es-CO', {
     style: 'currency',

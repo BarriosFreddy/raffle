@@ -6,13 +6,9 @@ import { assignTicketNumbers, findAll } from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
 
-interface PurchaseSearchProps {
-  raffles: Raffle[];
-}
-
 const APPROVED = 'approved'
 
-export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
+export function PurchaseSearch() {
   const [email, setEmail] = useState("");
   const [fetching, setFetching] = useState(false);
   const [send, setSend] = useState(false);
@@ -27,7 +23,7 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setFetching(true);
-    const payments = await findAll({email, status: PaymentStatus.APPROVED});
+    const payments = await findAll({ email, status: PaymentStatus.APPROVED });
     setSearchResults(payments);
     setFetching(false);
     setSend(true);
@@ -60,6 +56,7 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
         </div>
 
         <button
+          disabled={fetching}
           type="submit"
           className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
         >

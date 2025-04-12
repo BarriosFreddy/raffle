@@ -18,8 +18,6 @@ export interface Raffle {
   minNumber: number;
   maxNumber: number;
   ticketPrice: number;
-  participants: Participant[];
-  winners: Participant[];
   status: 'active' | 'completed';
   selectedNumbers: number[];
   selectedNumbersQuantity: number;

@@ -7,7 +7,6 @@ import { RaffleView } from './pages/RaffleView';
 import { RaffleLayout } from './layouts/RaffleLayout';
 import { PurchaseSearch } from './pages/PurchaseSearch';
 import { AdminPanel } from './components/admin/AdminPanel';
-import { AdminLogin } from './components/AdminLogin';
 
 export const router = createBrowserRouter([
   {
@@ -20,11 +19,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'search',
-        element: <PurchaseSearch raffles={[]} />,
+        element: <PurchaseSearch />,
       },
       {
         path: 'admin',
-        element: <AdminLogin onLogin={() => {}} />,
+        element: <AdminPanel/>,
       },
       {
         path: 'dashboard',
