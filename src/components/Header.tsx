@@ -3,14 +3,13 @@ import { Link, useLocation } from "react-router-dom";
 import { LogOut, Search } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-const EXCLUDED_PAGES = ["search", "admin"];
-
 export function Header() {
   const { logout, isAuthenticated } = useAuth()
 
   const location = useLocation()
 
-  const isNotExcludedPage = !EXCLUDED_PAGES.some((page) => location?.pathname.includes(page));
+  const isPublicPage = location?.pathname === "/"
+  const isAdminPage = location?.pathname === "/admin"
 
   const handleLogout = async () => {
     await logout()
@@ -28,14 +27,14 @@ export function Header() {
             <span className="text-white text-2xl font-bold">Eventos</span>
           </Link>
           <div className="flex gap-4">
-            {isNotExcludedPage && <Link
+            {isPublicPage && <Link
               to="/search"
               className="inline-flex items-center py-2 px-4 rounded-lg bg-white text-black hover:bg-gray-200 active:bg-gray-300 transition-colors"
             >
               <Search className="h-5 w-5 mr-1" />
               Mis Compras
             </Link>}
-            {isAuthenticated && <button
+            {isAuthenticated && isAdminPage && <button
               onClick={handleLogout}
               className="inline-flex items-center py-2 px-4 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300 transition-colors"
             >
