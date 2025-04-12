@@ -114,7 +114,7 @@ export function AddParticipantForm({
         <div className="flex items-center space-x-3 text-amber-600 bg-amber-50 p-4 rounded-lg">
           <AlertCircle className="h-6 w-6 flex-shrink-0" />
           <span className="text-base">
-            Please select a ticket package to continue
+            Por favor, selecciona el paquete de tickets para continuar
           </span>
         </div>
       )}
