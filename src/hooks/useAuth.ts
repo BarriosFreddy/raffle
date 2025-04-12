@@ -5,18 +5,12 @@ import { notify } from '../services/notifications';
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const TOKEN_KEY = 'raffle_auth_token';
 
-interface AuthResponse {
+export interface AuthResponse {
   token: string;
-  user: {
-    _id: string;
-    username: string;
-    role: string;
-  };
 }
 
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<AuthResponse['user'] | null>(null);
 
   // Check for existing token on mount
   useEffect(() => {
@@ -29,11 +23,11 @@ export const useAuth = () => {
     }
   }, []);
 
-  const login = useCallback(async (username: string, password: string) => {
+  const login = useCallback(async (password: string): Promise<{ token: string }> => {
     try {
       const response = await axios.post<AuthResponse>(
         `${API_URL}/api/auth/login`,
-        { username, password },
+        { password },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -41,15 +35,15 @@ export const useAuth = () => {
         }
       );
 
-      const { token, user } = response.data;
+      const { token } = response.data;
       
       // Set token in localStorage and axios defaults
       localStorage.setItem(TOKEN_KEY, token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       setIsAuthenticated(true);
-      setUser(user);
       notify.success('Login successful');
+      return { token }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message || 'Authentication failed';
@@ -63,13 +57,11 @@ export const useAuth = () => {
     localStorage.removeItem(TOKEN_KEY);
     delete axios.defaults.headers.common['Authorization'];
     setIsAuthenticated(false);
-    setUser(null);
     notify.info('Logged out successfully');
   }, []);
 
   return {
     isAuthenticated,
-    user,
     login,
     logout,
   };

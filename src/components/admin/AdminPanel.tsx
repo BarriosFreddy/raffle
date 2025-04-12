@@ -4,22 +4,23 @@ import { AdminStats } from "./AdminStats";
 import { findAll } from "@/services/payments.service";
 import { getRaffles } from "@/services/raffle.service";
 import { AdminLogin } from "../AdminLogin";
-import { Link } from "react-router-dom";
-import { ArrowLeft, LogOut, Plus, Search } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useRaffleStore } from "@/store/raffleStore";
 import { RaffleCard } from "../RaffleCard";
 import { Raffle } from "@/types";
 import { CreateRaffleForm } from "./CreateRaffleForm";
+import { useAuth } from "@/hooks/useAuth";
 
 const APPROVED = "approved";
 
 export function AdminPanel() {
+  const { isAuthenticated } = useAuth()
   const { raffles, setRaffles } = useRaffleStore();
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [payments, setPayments] = useState([]);
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle>();
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -27,6 +28,10 @@ export function AdminPanel() {
       setRaffles(rafflesData)
     })()
   }, [])
+
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated)
+  }, [isAuthenticated])
 
   useEffect(() => {
     (async () => {
@@ -39,10 +44,6 @@ export function AdminPanel() {
       setPayments(paymentsData);
     })();
   }, [selectedRaffle]);
-
-  const handleAdminLogin = (success: boolean) => {
-    setShowAdminPanel(success);
-  };
 
   const handlePrevPage = async () => {
     const prev = page === 1 ? 1 : page - 1;
@@ -73,10 +74,14 @@ export function AdminPanel() {
     handleBack()
   }
 
-  if (!showAdminPanel)
-    return <AdminLogin onLogin={handleAdminLogin} />
+  const handleLogin = (success: boolean) => {
+    setIsLoggedIn(success)
+  }
 
-  if (showAdminPanel)
+  if (!isLoggedIn)
+    return <AdminLogin onLogin={handleLogin} />
+
+  if (isLoggedIn)
     return (
       <div className="space-y-6">
         {!selectedRaffle && !showForm && <div className="flex justify-between">

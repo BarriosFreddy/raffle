@@ -5,6 +5,7 @@ import { raffleRoutes } from '../routes/raffle.routes.js';
 import { paymentRoutes } from '../routes/payment.routes.js';
 import { mercadoPagoRoutes } from '../routes/mercadopago.routes.js';
 import { logger } from '../utils/logger.js';
+import { authRoutes } from '../routes/auth.routes.js';
 
 export function createApp() {
   const app = express();
@@ -34,6 +35,7 @@ export function createApp() {
   app.use('/api', raffleRoutes);
   app.use('/api', paymentRoutes);
   app.use('/api', mercadoPagoRoutes);
+  app.use('/api/auth', authRoutes);
 
   // Error handling
   app.use(notFound);
