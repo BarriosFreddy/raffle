@@ -61,6 +61,7 @@ export const raffleController = {
 
   async getRaffles(req, res, next) {
     try {
+      const { status = "active" } = req.query;
       let raffles = [];
       const cachedData = cacheService.get(CACHE_KEYS.RAFFLES);
       if (cachedData) {
@@ -68,7 +69,9 @@ export const raffleController = {
         res.json(raffles);
         return;
       }
-      raffles = await Raffle.find();
+      raffles = await Raffle.find({
+        status,
+      });
       if (Array.isArray(raffles) && raffles.length > 0) {
         cacheService.set(CACHE_KEYS.RAFFLES, raffles);
       }
