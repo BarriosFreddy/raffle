@@ -34,7 +34,7 @@ export function PaymentButton({ paymentData, paymentGateway = EPAYCO_GATEWAY, pr
       <button
         onClick={handleEPayco}
         type="button"
-        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
+        className="w-full bg-slate-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-slate-700 active:bg-slate-800 transition-colors"
       >
         Pagar con EPayCo
       </button>

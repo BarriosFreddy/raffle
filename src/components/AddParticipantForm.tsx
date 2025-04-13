@@ -104,17 +104,17 @@ export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
                 onClick={() => setSelectedPackage(amount)}
                 className={`flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border-2 ${
                   selectedPackage === amount
-                    ? "border-red-500"
-                    : "border-transparent hover:border-red-500"
+                    ? "border-indigo-500"
+                    : "border-transparent hover:border-indigo-500"
                 }`}
               >
-                <span className="text-2xl font-bold text-red-600 mb-2">
+                <span className="text-2xl font-bold text-indigo-600 mb-2">
                   {label}
                 </span>
                 <span className="text-sm text-gray-600 text-center mb-1">
                   Compra {amount} números
                 </span>
-                <span className="text-lg font-semibold text-red-600">
+                <span className="text-lg font-semibold text-indigo-600">
                   {formattedPackagePrice}
                 </span>
               </button>
@@ -180,7 +180,7 @@ export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
         type="button"
         disabled={selectedPackage === 0}
         onClick={() => setShowDetails(true)}
-        className="w-full bg-red-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-red-700 active:bg-red-800 transition-colors disabled:bg-gray-400"
+        className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:bg-gray-400"
       >
         Continuar con {selectedPackage} números
       </button>

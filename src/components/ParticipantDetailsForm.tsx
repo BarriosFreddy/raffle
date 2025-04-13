@@ -111,12 +111,12 @@ export function ParticipantDetailsForm({
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <ShoppingCart className="h-6 w-6 text-red-600 mr-2" />
+            <ShoppingCart className="h-6 w-6 text-indigo-600 mr-2" />
             <h3 className="text-lg font-semibold text-gray-900">
               Resumen de la compra
             </h3>
           </div>
-          <span className="text-lg font-bold text-red-600">
+          <span className="text-lg font-bold text-indigo-600">
             {formattedPrice}
           </span>
         </div>
@@ -271,7 +271,7 @@ export function ParticipantDetailsForm({
         <button
           onClick={handleSubmit(onFormSubmit)}
           type="submit"
-          className="w-full bg-red-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-red-700 active:bg-red-800 transition-colors"
+          className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-indigo-700 active:bg-indigo-800 transition-colors"
         >
           Continuar con el pago ({formattedPrice})
         </button>
