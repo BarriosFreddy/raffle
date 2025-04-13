@@ -16,8 +16,7 @@ const paymentSchema = new mongoose.Schema({
     required: true
   },
   preferenceId: {
-    type: String,
-    required: true
+    type: String
   },
   payer: payerSchema,
   ticketNumbers: [{ type: Number }],

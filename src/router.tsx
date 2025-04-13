@@ -7,6 +7,7 @@ import { RaffleView } from './pages/RaffleView';
 import { RaffleLayout } from './layouts/RaffleLayout';
 import { PurchaseSearch } from './pages/PurchaseSearch';
 import { AdminPanel } from './components/admin/AdminPanel';
+import { PaymentResponse } from './pages/PaymentResponse';
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
       {
         path: 'pending',
         element: <PaymentPending />,
+      },
+      {
+        path: 'response',
+        element: <PaymentResponse />,
       },
     ],
   },

@@ -21,4 +21,6 @@ export interface Raffle {
   status: 'active' | 'completed';
   selectedNumbers: number[];
   selectedNumbersQuantity: number;
+  paymentGateway: string;
+  coverUrl: string;
 }

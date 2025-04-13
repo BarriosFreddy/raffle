@@ -10,10 +10,10 @@ export class PaymentService {
     const payment = await Payment.findOne({ preferenceId }).exec();
     return payment;
   }
-  static async findByEmail(email) {
-    const payments = await Payment.find({
+  static async findOneByEmail(email) {
+    const payments = await Payment.findOne({
       "payer.email": email,
-    }).exec();
+    }).sort({ _id: -1 }).exec();
     return payments;
   }
   static async findAll(queryData) {
