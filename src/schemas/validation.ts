@@ -12,6 +12,16 @@ export const raffleSchema = z.object({
   maxNumber: z.number().int().min(1, 'El número máximo debe ser al menos 1'),
   prize: z.string().min(1, 'El premio es requerida'),
   ticketPrice: z.number().int().min(1, 'El precio del ticket debe ser al menos 1'),
+  coverUrl: z.string()
+    .url('La URL de la imagen debe ser válida')
+/*     .refine(
+      (url) => {
+        const extension = url.toLowerCase().split('.').pop();
+        return ['png', 'jpg', 'jpeg', 'webp'].includes(extension || '');
+      },
+      'La imagen debe ser de formato PNG, JPG, JPEG o WEBP'
+    ) */
+    .optional(),
 }).refine(data => data.maxNumber > data.minNumber, {
   message: "El número máximo debe ser mayor que el número mínimo",
   path: ["maxNumber"],

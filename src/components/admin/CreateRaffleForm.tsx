@@ -22,7 +22,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    watch,
   } = useForm<FormData>({
     resolver: zodResolver(raffleSchema),
     defaultValues: {
@@ -32,6 +33,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       maxNumber: 100,
       prize: '',
       ticketPrice: 0,
+      coverUrl: '',
     }
   });
 
@@ -44,6 +46,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       maxNumber: selectedRaffle.maxNumber,
       prize: selectedRaffle.prize,
       ticketPrice: selectedRaffle.ticketPrice,
+      coverUrl: selectedRaffle.coverUrl || '',
     })
   }, [reset, selectedRaffle])
 
@@ -57,6 +60,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
         maxNumber: data.maxNumber,
         prize: data.prize,
         ticketPrice: data.ticketPrice,
+        coverUrl: data.coverUrl,
         id: crypto.randomUUID(),
         status: "active",
       };
@@ -174,6 +178,45 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
           {errors.ticketPrice && (
             <p className="mt-1 text-sm text-red-600">{errors.ticketPrice.message}</p>
           )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          <div>
+            <label htmlFor="coverUrl" className="block text-sm font-medium text-gray-700">
+              URL de la imagen de portada
+            </label>
+            <input
+              type="url"
+              id="coverUrl"
+              {...register('coverUrl')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="https://ejemplo.com/imagen.jpg"
+            />
+            <p className="mt-1 text-xs text-gray-500">Formatos aceptados: PNG, JPG, JPEG, WEBP</p>
+            {errors.coverUrl && (
+              <p className="mt-1 text-sm text-red-600">{errors.coverUrl.message}</p>
+            )}
+          </div>
+          <div className="flex items-center justify-center">
+            {watch('coverUrl') && (
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
+                <img
+                  src={watch('coverUrl')}
+                  alt="Vista previa de la portada"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://placehold.co/600x400?text=Error+al+cargar+imagen';
+                  }}
+                />
+              </div>
+            )}
+            {!watch('coverUrl') && (
+              <div className="w-full aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
+                <span className="text-gray-400">Vista previa de la imagen</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <button
