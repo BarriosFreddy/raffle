@@ -25,9 +25,13 @@ export async function getRaffleById(raffleId: string) {
     throw new Error("Failed to get raffle");
   }
 }
-export async function getRaffles() {
+export async function getRaffles(query?: { status?: string, page?: number, size?: number }) {
   try {
-    const response = await axios.get(`${API_URL}/api/raffles`, {
+    const params: Record<string, string> = {}
+    if (query?.size) params.size = query.size.toString();
+    if (query?.page) params.page = query.page.toString();
+    if (query?.status) params.status = query.status.toString();
+    const response = await axios.get(`${API_URL}/api/raffles${query ? `?${new URLSearchParams(params).toString()}` : ""}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${API_TOKEN}`,
@@ -61,5 +65,27 @@ export async function saveRaffle(raffle: Raffle) {
       throw new Error(`Failed to save raffle: ${error.message}`);
     }
     throw new Error("Failed to save raffle");
+  }
+}
+
+export async function updateRaffle(raffleId: string, raffle: Partial<Raffle>) {
+  try {
+    const response = await axios.put(`${API_URL}/api/raffles/${raffleId}`, raffle, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    if (!response.data || !response.data._id) {
+      throw new Error("Invalid raffle response");
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to update raffle: ${error.message}`);
+    }
+    throw new Error("Failed to update raffle");
   }
 }

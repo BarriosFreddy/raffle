@@ -9,19 +9,18 @@ export default function App() {
   const { raffles, setRaffles } = useRaffleStore();
   useEffect(() => {
     (async () => {
-      const rafflesData = await getRaffles()
+      const rafflesData = await getRaffles({ status: "active"})
       setRaffles(rafflesData)
     })()
   }, [])
 
   return (
     <ErrorBoundary>
-
       <div className="min-h-screen bg-gray-50">
         <main className="max-w-7xl mx-auto px-4 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {raffles.map((raffle) => (
-              <Link key={raffle.id} to={"raffle/" + raffle._id}>
+              <Link key={raffle._id} to={"raffle/" + raffle._id}>
                 <div
                   className="cursor-pointer touch-manipulation"
                 >

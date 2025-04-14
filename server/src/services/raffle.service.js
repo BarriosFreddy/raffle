@@ -30,3 +30,38 @@ export async function assignTicketNumbers(raffle, participantId, quantity) {
   await raffle.save();
   return selectedNumbers;
 }
+
+export async function createRaffle(data) {
+  const raffle = new Raffle(data);
+  try {
+    await raffle.save();
+    return raffle;
+  } catch (error) {
+    throw new ApiError(400, 'Failed to create raffle');
+  }
+}
+
+export async function getRaffles({page = 1, size = 10, ...query} = {}) {
+  const skip = (page - 1) * size;
+  return await Raffle.find(query).skip(skip).limit(size).exec();
+}
+
+export async function getRaffleById(id) {
+  return await Raffle.findById(id).exec();
+}
+
+export async function updateRaffle(id, data) {
+  const raffle = await Raffle.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+  if (!raffle) {
+    throw new ApiError(404, 'Raffle not found');
+  }
+  return raffle;
+}
+
+export async function deleteRaffle(id) {
+  const raffle = await Raffle.findByIdAndRemove(id);
+  if (!raffle) {
+    throw new ApiError(404, 'Raffle not found');
+  }
+  return raffle;
+}

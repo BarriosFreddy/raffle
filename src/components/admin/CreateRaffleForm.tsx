@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Raffle } from '../../types';
-import { saveRaffle } from '@/services/raffle.service';
+import { saveRaffle, updateRaffle } from '@/services/raffle.service';
 import { useRaffleStore } from '@/store/raffleStore';
 import { raffleSchema } from '@/schemas/validation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,11 +9,12 @@ import type { z } from 'zod';
 
 type CreateRaffleFormProps = {
   onSave: () => void
+  selectedRaffle: Raffle | undefined
 }
 
 type FormData = z.infer<typeof raffleSchema>;
 
-export function CreateRaffleForm({ onSave }: CreateRaffleFormProps) {
+export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormProps) {
   const { raffles, setRaffles } = useRaffleStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,17 +28,29 @@ export function CreateRaffleForm({ onSave }: CreateRaffleFormProps) {
     defaultValues: {
       name: '',
       description: '',
-      minNumber: 1,
+      minNumber: 0,
       maxNumber: 100,
       prize: '',
-      ticketPrice: 3000,
+      ticketPrice: 0,
     }
   });
+
+  useEffect(() => {
+    if (!selectedRaffle) return;
+    reset({
+      name: selectedRaffle.title,
+      description: selectedRaffle.description,
+      minNumber: selectedRaffle.minNumber,
+      maxNumber: selectedRaffle.maxNumber,
+      prize: selectedRaffle.prize,
+      ticketPrice: selectedRaffle.ticketPrice,
+    })
+  }, [reset, selectedRaffle])
 
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const newRaffle: Raffle = {
+      const newRaffle = {
         title: data.name,
         description: data.description,
         minNumber: data.minNumber,
@@ -46,11 +59,14 @@ export function CreateRaffleForm({ onSave }: CreateRaffleFormProps) {
         ticketPrice: data.ticketPrice,
         id: crypto.randomUUID(),
         status: "active",
-        selectedNumbers: [],
       };
 
-      const savedRaffle = await saveRaffle(newRaffle);
-      setRaffles([...raffles, savedRaffle]);
+      if (selectedRaffle) {
+        await updateRaffle(selectedRaffle._id, newRaffle as Raffle);
+      } else {
+        const savedRaffle = await saveRaffle(newRaffle as Raffle);
+        setRaffles([...raffles, savedRaffle]);
+      }
 
       // Reset form
       reset();
@@ -163,9 +179,9 @@ export function CreateRaffleForm({ onSave }: CreateRaffleFormProps) {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+          className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
         >
-          {isLoading ? 'CREANDO...' : 'CREAR RIFA'}
+          {selectedRaffle ? (isLoading ? 'EDITANDO...' : 'EDITAR RIFA') : (isLoading ? 'CREANDO...' : 'CREAR RIFA')}
         </button>
       </form>
     </div>

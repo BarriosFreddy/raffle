@@ -3,6 +3,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { TicketService } from "../services/ticket.service.js";
 import { AvailableNumbersService } from "../services/availableNumber.service.js";
 import cacheService, { CACHE_KEYS } from "../services/cache.service.js";
+import * as RaffleService from "../services/raffle.service.js";
+import { logger } from "../utils/logger.js";
 
 export const raffleController = {
   async createRaffle(req, res, next) {
@@ -15,18 +17,31 @@ export const raffleController = {
         raffleData.maxNumber
       );
 
-      const raffle = new Raffle(raffleData);
-      await raffle.save();
+      const raffle = await RaffleService.createRaffle(raffleData);
       res.status(201).json(raffle);
+      logger.info(`Raffle created with ID: ${raffle._id}`);
     } catch (error) {
-      console.error("Error saving raffle", error)
-      next(
-        error instanceof ApiError
-          ? error
-          : new ApiError(400, "Failed to create raffle")
-      );
+      logger.error("Error creating raffle:", error);
+      next(new ApiError(400, "Failed to create raffle"));
     }
   },
+  async updateRaffle(req, res, next) {
+    try {
+      const raffleId = req.params.id;
+      // Validate ticket range
+      TicketService.validateTicketRange(
+        req.body.minNumber,
+        req.body.maxNumber
+      );
+      const updatedRaffle = await RaffleService.updateRaffle(raffleId, req.body);
+      res.status(200).json(updatedRaffle);
+      logger.info(`Raffle updated with ID: ${raffleId}`);
+    } catch (error) {
+      logger.error("Error updating raffle:", error);
+      next(new ApiError(400, "Failed to update raffle"));
+    }
+  },
+
   async saveAvailableNumbers(req, res, next) {
     try {
       const { min, max, raffleId } = req.body;
@@ -61,47 +76,60 @@ export const raffleController = {
 
   async getRaffles(req, res, next) {
     try {
-      const { status = "active" } = req.query;
+      const { status = "active", page, size } = req.query;
       let raffles = [];
-      const cachedData = cacheService.get(CACHE_KEYS.RAFFLES);
+      
+      // Try to get from cache first
+      const cacheKey = `${CACHE_KEYS.RAFFLES}:${[status, page, size].join("_")}`;
+      const cachedData = cacheService.get(cacheKey);
       if (cachedData) {
         raffles = cachedData;
         res.json(raffles);
         return;
       }
-      raffles = await Raffle.find({
-        status,
-      });
+
+      // Get from database if not in cache
+      raffles = await RaffleService.getRaffles({ status, page, size });
+      
+      // Cache the results if there are any
       if (Array.isArray(raffles) && raffles.length > 0) {
-        cacheService.set(CACHE_KEYS.RAFFLES, raffles);
+        cacheService.set(cacheKey, raffles);
       }
+
       res.json(raffles);
+      logger.info(`Retrieved ${raffles.length} raffles`);
     } catch (error) {
-      console.error(error);
-      next(new ApiError(500, "Failed to fetch raffles"));
+      logger.error("Error getting raffles:", error);
+      next(new ApiError(400, "Failed to get raffles"));
     }
   },
 
   async getRaffleById(req, res, next) {
     try {
-      let raffle = null;
-      const raffleId = req.params.id
-      const cachedData = cacheService.get(raffleId);
+      const { id } = req.params;
+      
+      // Try to get from cache first
+      const cacheKey = `${CACHE_KEYS.RAFFLE}:${id}`;
+      const cachedData = cacheService.get(cacheKey);
       if (cachedData) {
-        raffle = cachedData;
-        res.json(raffle);
+        res.json(cachedData);
         return;
       }
-      raffle = await Raffle.findById(raffleId);
+
+      // Get from database if not in cache
+      const raffle = await Raffle.findById(id);
       if (!raffle) {
         return next(new ApiError(404, "Raffle not found"));
       }
-      if (raffle) {
-        cacheService.set(raffleId, raffle);
-      }
+
+      // Cache the result
+      cacheService.set(cacheKey, raffle);
+
       res.json(raffle);
+      logger.info(`Retrieved raffle with ID: ${id}`);
     } catch (error) {
-      next(new ApiError(500, "Failed to fetch raffle"));
+      logger.error(`Error getting raffle with ID ${req.params.id}:`, error);
+      next(new ApiError(400, "Failed to get raffle"));
     }
   },
 
@@ -145,46 +173,6 @@ export const raffleController = {
           ? error
           : new ApiError(400, "Failed to update payment status")
       );
-    }
-  },
-
-  async drawWinner(req, res, next) {
-    try {
-      const raffle = await Raffle.findById(req.params.id);
-      if (!raffle) {
-        return next(new ApiError(404, "Raffle not found"));
-      }
-
-      const completedParticipants = raffle.participants.filter(
-        (p) => p.paymentStatus === "completed"
-      );
-
-      if (completedParticipants.length === 0) {
-        return next(new ApiError(400, "No eligible participants"));
-      }
-
-      const allPaidTickets = completedParticipants.flatMap(
-        (p) => p.ticketNumbers
-      );
-      const winningNumber = TicketService.selectRandomNumbers(
-        allPaidTickets,
-        1
-      )[0];
-      const winner = completedParticipants.find((p) =>
-        p.ticketNumbers.includes(winningNumber)
-      );
-
-      raffle.winners = [winner];
-      raffle.status = "completed";
-      await raffle.save();
-
-      res.json({
-        raffle,
-        winningNumber,
-        winner,
-      });
-    } catch (error) {
-      next(new ApiError(400, "Failed to draw winner"));
     }
   },
 };

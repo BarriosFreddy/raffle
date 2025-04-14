@@ -24,7 +24,7 @@ export function AdminPanel() {
 
   useEffect(() => {
     (async () => {
-      const rafflesData = await getRaffles()
+      const rafflesData = await getRaffles({ status: "active" })
       setRaffles(rafflesData)
     })()
   }, [])
@@ -78,6 +78,11 @@ export function AdminPanel() {
     setIsLoggedIn(success)
   }
 
+  const handleEditRaffle = () => {
+    setShowForm(true)
+    console.log({ selectedRaffle });
+  }
+
   if (!isLoggedIn)
     return <AdminLogin onLogin={handleLogin} />
 
@@ -100,10 +105,11 @@ export function AdminPanel() {
           <ArrowLeft className="h-5 w-5 mr-1" />
           REGRESAR
         </button>}
-        {!selectedRaffle && showForm && <CreateRaffleForm onSave={handleSave} />}
+        {showForm && <CreateRaffleForm onSave={handleSave} selectedRaffle={selectedRaffle} />}
         {!selectedRaffle && !showForm && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {raffles.map((raffle) => (
             <div
+              key={raffle._id}
               onClick={() => setSelectedRaffle(raffle)}
               className="cursor-pointer touch-manipulation"
             >
@@ -122,7 +128,7 @@ export function AdminPanel() {
         </div>}
 
         {selectedRaffle && !showForm && (<>
-          <AdminStats raffle={selectedRaffle} />
+          <AdminStats raffle={selectedRaffle} onEdit={handleEditRaffle} />
           <PurchasesList payments={payments} page={page} onNext={handleNextPage} onPrev={handlePrevPage} /> </>
         )}
       </div>

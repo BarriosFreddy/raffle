@@ -24,4 +24,5 @@ export default cacheService;
 
 export const CACHE_KEYS = {
   RAFFLES: "RAFFLES",
+  RAFFLE: "RAFFLE",
 };

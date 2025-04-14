@@ -1,14 +1,16 @@
 import React from "react";
-import { DollarSign, Users, Ticket, Trophy } from "lucide-react";
+import { DollarSign, Ticket } from "lucide-react";
 import type { Raffle } from "../../types";
 import { RaffleProgress } from "./RaffleProgress";
 import { Link } from "react-router-dom";
+import { formatMoney } from '@/utils/formatNumber';
 
 interface AdminStatsProps {
   raffle: Raffle | undefined;
+  onEdit: () => void;
 }
 
-export function AdminStats({ raffle }: AdminStatsProps) {
+export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
   const totalTicketsSold = raffle?.selectedNumbersQuantity || 0;
 
   const totalRevenue =
@@ -16,7 +18,7 @@ export function AdminStats({ raffle }: AdminStatsProps) {
 
   const stats = [
     {
-      label: "Total Revenue",
+      label: "Total de Ingresos",
       value: new Intl.NumberFormat("es-CO", {
         style: "currency",
         currency: "COP",
@@ -26,7 +28,7 @@ export function AdminStats({ raffle }: AdminStatsProps) {
       bgColor: "bg-green-100",
     },
     {
-      label: "Tickets Sold",
+      label: "Tickets Vendidos",
       value: totalTicketsSold,
       icon: Ticket,
       color: "text-purple-600",
@@ -44,6 +46,25 @@ export function AdminStats({ raffle }: AdminStatsProps) {
           {"/raffle/" + raffle?._id}
         </span>
       </Link>
+    </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <div>
+        <p className="font-bold">Nombre</p>
+        <p>{raffle?.title}</p>
+      </div>
+      <div>
+        <p className="font-bold">Premio</p>
+        <p>{raffle?.prize}</p>
+      </div>
+      <div>
+        <p className="font-bold">Precio del ticket</p>
+        <p>{raffle?.ticketPrice && formatMoney(raffle?.ticketPrice)}</p>
+      </div>
+      <div className="flex items-center justify-end col-span-2">
+        <button className="bg-indigo-500 text-white px-4 py-2 rounded" onClick={() => onEdit && onEdit()}>
+          EDITAR
+        </button>
+      </div>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
       {stats.map(({ label, value, icon: Icon, color, bgColor }) => (

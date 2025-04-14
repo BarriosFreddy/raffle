@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 export const raffleSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   description: z.string().min(1, 'La descripción es requerida'),
-  minNumber: z.number().int().min(1, 'El número mínimo debe ser al menos 1'),
+  minNumber: z.number().int().min(0, 'El número mínimo debe ser al menos 0'),
   maxNumber: z.number().int().min(1, 'El número máximo debe ser al menos 1'),
   prize: z.string().min(1, 'El premio es requerida'),
   ticketPrice: z.number().int().min(1, 'El precio del ticket debe ser al menos 1'),
