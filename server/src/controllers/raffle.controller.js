@@ -44,16 +44,16 @@ export const raffleController = {
 
   async saveAvailableNumbers(req, res, next) {
     try {
-      const { min, max, raffleId } = req.body;
+      const { raffleId } = req.body;
       const raffle = await Raffle.findById(raffleId);
       if (!raffle) {
         return next(new ApiError(404, "Raffle not found"));
       }
 
       // Validate ticket range
-      TicketService.validateTicketRange(min, max);
+      TicketService.validateTicketRange(raffle.minNumber, raffle.maxNumber);
       const shuffledNumbers =
-        await AvailableNumbersService.populateAndShuffleNumbers(min, max);
+        await AvailableNumbersService.populateAndShuffleNumbers(raffle.minNumber, raffle.maxNumber);
       const availableNumbersdocs =
         await AvailableNumbersService.generateAvailableNumberDocs(
           shuffledNumbers,
@@ -173,6 +173,18 @@ export const raffleController = {
           ? error
           : new ApiError(400, "Failed to update payment status")
       );
+    }
+  },
+
+  async checkAvailableNumbers(req, res, next) {
+    try {
+      const { raffleId } = req.params;
+      const hasNumbers = await AvailableNumbersService.hasAvailableNumbers(raffleId);
+      res.json({ hasNumbers });
+      logger.info(`Checked available numbers for raffle ${raffleId}`);
+    } catch (error) {
+      logger.error("Error checking available numbers:", error);
+      next(new ApiError(400, "Failed to check available numbers"));
     }
   },
 };

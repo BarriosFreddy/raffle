@@ -89,3 +89,39 @@ export async function updateRaffle(raffleId: string, raffle: Partial<Raffle>) {
     throw new Error("Failed to update raffle");
   }
 }
+
+export async function assignAvailableNumbers(raffleId: string) {
+  try {
+    const response = await axios.post(`${API_URL}/api/raffles/numbers/assign`, { raffleId }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to assign numbers: ${error.message}`);
+    }
+    throw new Error("Failed to assign numbers");
+  }
+}
+
+export async function checkAvailableNumbers(raffleId: string): Promise<boolean> {
+  try {
+    const response = await axios.get(`${API_URL}/api/raffles/${raffleId}/available-numbers`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    return response.data.hasNumbers;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to check available numbers: ${error.message}`);
+    }
+    throw new Error("Failed to check available numbers");
+  }
+}

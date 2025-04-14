@@ -33,4 +33,8 @@ export class AvailableNumbersService {
     console.log({ shuflledNumbers });
     return shuflledNumbers;
   }
+  static async hasAvailableNumbers(raffleId) {
+    const count = await AvailableNumber.countDocuments({ raffleId });
+    return count > 0;
+  }
 }
