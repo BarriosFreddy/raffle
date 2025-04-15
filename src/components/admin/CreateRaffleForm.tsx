@@ -96,7 +96,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
             type="text"
             id="name"
             {...register('name')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className={`block w-full px-2 py-2 rounded-lg border ${errors.name ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -110,7 +111,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
           <textarea
             id="description"
             {...register('description')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className={`block w-full px-2 py-2 rounded-lg border ${errors.description ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             rows={3}
           />
           {errors.description && (
@@ -125,7 +127,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
           <textarea
             id="prize"
             {...register('prize')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className={`block w-full px-2 py-2 rounded-lg border ${errors.prize ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             rows={2}
           />
           {errors.prize && (
@@ -142,7 +145,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
               type="number"
               id="minNumber"
               {...register('minNumber', { valueAsNumber: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className={`block w-full px-2 py-2 rounded-lg border ${errors.minNumber ? "border-red-500" : "border-gray-300"
+                } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
             {errors.minNumber && (
               <p className="mt-1 text-sm text-red-600">{errors.minNumber.message}</p>
@@ -157,8 +161,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
               type="number"
               id="maxNumber"
               {...register('maxNumber', { valueAsNumber: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
+              className={`block w-full px-2 py-2 rounded-lg border ${errors.maxNumber ? "border-red-500" : "border-gray-300"
+                } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`} />
             {errors.maxNumber && (
               <p className="mt-1 text-sm text-red-600">{errors.maxNumber.message}</p>
             )}
@@ -173,7 +177,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
             type="number"
             id="ticketPrice"
             {...register('ticketPrice', { valueAsNumber: true })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className={`block w-full px-2 py-2 rounded-lg border ${errors.ticketPrice ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
           {errors.ticketPrice && (
             <p className="mt-1 text-sm text-red-600">{errors.ticketPrice.message}</p>
@@ -189,7 +194,8 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
               type="url"
               id="coverUrl"
               {...register('coverUrl')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className={`block w-full px-2 py-2 rounded-lg border ${errors.coverUrl ? "border-red-500" : "border-gray-300"
+                } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
               placeholder="https://ejemplo.com/imagen.jpg"
             />
             <p className="mt-1 text-xs text-gray-500">Formatos aceptados: PNG, JPG, JPEG, WEBP</p>
