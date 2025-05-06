@@ -12,11 +12,17 @@ const raffleSchema = new mongoose.Schema({
     enum: ['active', 'completed'],
     default: 'active'
   },
+  paymentGateway: {
+    type: String,
+    enum: ['EPAYCO', 'MP', 'BOLD'],
+    default: 'EPAYCO',
+    required: true
+  },
   selectedNumbers: [{ type: Number }], //deprecated
   selectedNumbersQuantity: {
     type: Number,
     default: 0
-  } 
+  }
 }, { timestamps: true });
 
 export const Raffle = mongoose.model('Raffle', raffleSchema);

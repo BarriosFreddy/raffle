@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Raffle } from "../types";
+import type { Raffle } from "../../../types";
 import { ParticipantDetailsForm } from "./ParticipantDetailsForm";
 import { formatMoney } from "@/utils/formatNumber";
 import RaffleCover from "@/assets/images/raffle1.webp";

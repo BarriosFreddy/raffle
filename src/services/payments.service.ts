@@ -5,7 +5,8 @@ const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
 interface PaymentData {
   raffleId: string;
-  preferenceId: string;
+  preferenceId?: string; // Mercado Pago
+  orderId?: string; // Bold
   amount: number;
   quantity: number;
   payer: {

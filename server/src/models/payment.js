@@ -18,6 +18,9 @@ const paymentSchema = new mongoose.Schema({
   preferenceId: {
     type: String
   },
+  orderId: {
+    type: String
+  },
   payer: payerSchema,
   ticketNumbers: [{ type: Number }],
   status: {

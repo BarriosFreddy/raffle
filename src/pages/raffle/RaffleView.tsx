@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useRaffleStore } from "../store/raffleStore";
-import { AddParticipantForm } from "../components/AddParticipantForm";
+import { useRaffleStore } from "../../store/raffleStore";
+import { AddParticipantForm } from "./components/AddParticipantForm";
 import { getRaffleById } from "@/services/raffle.service";
 
 export function RaffleView() {

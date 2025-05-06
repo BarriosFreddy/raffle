@@ -60,7 +60,7 @@ export const paymentController = {
   async handlePaymentWebhook(req, res, next) {
     try {
       const paymentInfo = req.body;
-      const { preference_id, payment_id, x_customer_email } = paymentInfo;
+      const { preference_id, payment_id, x_customer_email, boldOrderId, boldTXStatus } = paymentInfo;
       let payment;
       let newStatus;
       let paymentDetails;
@@ -97,6 +97,12 @@ export const paymentController = {
       } else if (x_customer_email) {
         payment = await PaymentService.findOneByEmail(x_customer_email);
         newStatus = paymentInfo.x_cod_response === 1 ? APPROVED : REJECTED;
+        paymentDetails = paymentInfo;
+      } else if (boldOrderId && boldTXStatus) {
+        payment = await PaymentService.findOne({
+          orderId: boldOrderId,
+        });
+        newStatus = boldTXStatus === "approved" ? APPROVED : REJECTED;
         paymentDetails = paymentInfo;
       }
       if (!payment) {

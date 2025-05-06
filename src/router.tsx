@@ -3,7 +3,7 @@ import App from './App';
 import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentFailure } from './pages/PaymentFailure';
 import { PaymentPending } from './pages/PaymentPending';
-import { RaffleView } from './pages/RaffleView';
+import { RaffleView } from './pages/raffle/RaffleView';
 import { RaffleLayout } from './layouts/RaffleLayout';
 import { PurchaseSearch } from './pages/PurchaseSearch';
 import { AdminPanel } from './components/admin/AdminPanel';

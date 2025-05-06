@@ -13,7 +13,7 @@ import { PaymentButton } from "./PaymentButton";
 import { createPreference } from "@/services/mercadopago";
 import { createPayment } from "@/services/payments.service";
 import { formatMoney } from "@/utils/formatNumber";
-import type { ParticipantFormData } from "../types/ParticipantFormData";
+import type { ParticipantFormData } from "../../../types/ParticipantFormData";
 import { PaymentDataDTO } from "@/types/paymentDataDTO";
 import { Raffle } from "@/types";
 import { PaymentGateway } from "@/enums/PaymentGateway.enum";
@@ -31,7 +31,6 @@ export function ParticipantDetailsForm({
   onBack,
 }: ParticipantDetailsFormProps) {
   const [paymentData, setPaymentData] = useState<PaymentDataDTO>();
-  const [preferenceId, setPreferenceId] = useState("");
 
   const {
     register,
@@ -60,6 +59,8 @@ export function ParticipantDetailsForm({
   const onFormSubmit = async (formData: ParticipantFormData) => {
     const data: PaymentDataDTO = {
       formData,
+      amount: totalPrice,
+      currency: "COP",
       items: [
         {
           title: `Compra de ${quantity} Tickets`,
@@ -68,9 +69,7 @@ export function ParticipantDetailsForm({
         },
       ],
     };
-    setPaymentData(data);
 
-    let preferenceId = "";
     if (raffle.paymentGateway === PaymentGateway.MERCADO_PAGO) {
       const preference = await createPreference({
         items: data.items,
@@ -81,13 +80,18 @@ export function ParticipantDetailsForm({
           identification: { number: formData.nationalId },
         },
       });
-      preferenceId = preference.id;
-      setPreferenceId(preferenceId);
+      data.preferenceId = preference.id;
     }
+    if (raffle.paymentGateway === PaymentGateway.BOLD) {
+      const orderId = crypto.randomUUID();
+      data.orderId = orderId;
+    }
+    setPaymentData(data);
 
     await createPayment({
       raffleId: raffle._id,
-      preferenceId,
+      preferenceId: data.preferenceId,
+      orderId: data.orderId,
       amount: totalPrice,
       quantity,
       payer: formData,
@@ -277,9 +281,8 @@ export function ParticipantDetailsForm({
         </button>
       ) : (
         <PaymentButton
-          paymentGateway={raffle.paymentGateway}
+          paymentGateway={raffle.paymentGateway as PaymentGateway}
           paymentData={paymentData}
-          preferenceId={preferenceId}
         />
       )}
     </section>
