@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Raffle } from "../../../types";
 import { ParticipantDetailsForm } from "./ParticipantDetailsForm";
 import { formatMoney } from "@/utils/formatNumber";
-import RaffleCover from "@/assets/images/raffle1.webp";
+import DefaultCover from "@/assets/images/default-cover.webp";
 
 interface AddParticipantFormProps {
   raffle: Raffle;
@@ -67,7 +67,7 @@ export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
     <div className="space-y-6">
       <div className="relative rounded-xl overflow-hidden bg-white shadow-lg">
         <img
-          src={raffle.coverUrl || RaffleCover}
+          src={raffle.coverUrl || DefaultCover}
           alt={raffle.prize}
           className="w-full h-128 object-cover"
         />
