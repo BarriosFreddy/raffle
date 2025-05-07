@@ -80,7 +80,6 @@ export function AdminPanel() {
 
   const handleEditRaffle = () => {
     setShowForm(true)
-    console.log({ selectedRaffle });
   }
 
   if (!isLoggedIn)

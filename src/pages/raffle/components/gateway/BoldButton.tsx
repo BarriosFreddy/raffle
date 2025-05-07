@@ -49,6 +49,22 @@ const BoldButton = ({ paymentData }: BoldButtonProps) => {
     };
   }, [paymentData, paymentData.amount, paymentData.currency]);
 
+  const getCustomerData = () => {
+    if (!paymentData?.formData) return;
+    const { name, email, phone, nationalId } = paymentData.formData;
+    const customerDataString = JSON.stringify({
+      fullName: name,
+      email,
+      phone,
+      documentNumber: nationalId,
+      documentType: "CC",
+    });
+    return customerDataString;
+  };
+
+  if (!hashCheckoutData) {
+    return null;
+  }
   return (
     <div className="w-full mt-4">
       <script
@@ -60,6 +76,8 @@ const BoldButton = ({ paymentData }: BoldButtonProps) => {
         data-description="Compra de números"
         data-api-key={VITE_BOLD_API_KEY}
         data-integrity-signature={hashCheckoutData?.hash}
+        data-render-mode="embedded"
+        data-customer-data={getCustomerData()}
       ></script>
     </div>
   );

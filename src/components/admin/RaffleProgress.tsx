@@ -6,7 +6,6 @@ interface RaffleProgressProps {
 }
 
 export function RaffleProgress({ raffle }: RaffleProgressProps) {
-  console.log({ raffle });
   const totalTickets = (raffle?.maxNumber || 0) - (raffle?.minNumber || 0);
   const soldTickets = raffle?.selectedNumbersQuantity;
   const progress = ((soldTickets || 0) / totalTickets) * 100;

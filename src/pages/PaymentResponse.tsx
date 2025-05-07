@@ -32,10 +32,8 @@ export function PaymentResponse() {
   useEffect(() => {
     (async () => {
       if (boldOrderId && boldTXStatus) {
-        console.log({ boldOrderId, boldTXStatus });
         const paymentDataRes = await processPaymentResponse({ boldOrderId, boldTXStatus });
         setPaymentData(paymentDataRes);
-        console.log({ paymentDataRes });
       }
     })();
   }, [boldOrderId, boldTXStatus]);
