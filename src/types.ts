@@ -25,4 +25,5 @@ export interface Raffle {
   coverUrl: string;
   themeColor?: string; // Optional theme color for UI customization
   slug: string; // URL-friendly unique identifier
+  awardedNumbers: number[]; // Numbers that have been awarded prizes
 }

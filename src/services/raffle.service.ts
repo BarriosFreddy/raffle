@@ -124,9 +124,31 @@ export async function assignAvailableNumbers(raffleId: string) {
     return response.data;
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to assign numbers: ${error.message}`);
+      throw new Error(`Failed to assign available numbers: ${error.message}`);
     }
-    throw new Error("Failed to assign numbers");
+    throw new Error("Failed to assign available numbers");
+  }
+}
+
+export async function updateAwardedNumbers(raffleId: string, awardedNumbers: number[]) {
+  try {
+    const response = await axios.put(`${API_URL}/api/raffles/${raffleId}/awarded-numbers`, { awardedNumbers }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    if (!response.data || !response.data._id) {
+      throw new Error("Invalid raffle response");
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to update awarded numbers: ${error.message}`);
+    }
+    throw new Error("Failed to update awarded numbers");
   }
 }
 

@@ -5,6 +5,7 @@ import { RaffleProgress } from "./RaffleProgress";
 import { Link } from "react-router-dom";
 import { formatMoney } from '@/utils/formatNumber';
 import { assignAvailableNumbers, checkAvailableNumbers } from "@/services/raffle.service";
+import { AwardedNumbersManager } from "./AwardedNumbersManager";
 
 interface AdminStatsProps {
   raffle: Raffle | undefined;
@@ -14,10 +15,11 @@ interface AdminStatsProps {
 export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
   const [isAssigning, setIsAssigning] = useState(false);
   const [hasNumbers, setHasNumbers] = useState(false);
-  const totalTicketsSold = raffle?.selectedNumbersQuantity || 0;
+  const [updatedRaffle, setUpdatedRaffle] = useState<Raffle | undefined>(raffle);
+  const totalTicketsSold = updatedRaffle?.selectedNumbersQuantity || 0;
 
   const totalRevenue =
-    (raffle?.selectedNumbersQuantity || 0) * (raffle?.ticketPrice || 0);
+    (updatedRaffle?.selectedNumbersQuantity || 0) * (updatedRaffle?.ticketPrice || 0);
 
   const stats = [
     {
@@ -40,23 +42,27 @@ export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
   ];
 
   useEffect(() => {
+    setUpdatedRaffle(raffle);
+  }, [raffle]);
+
+  useEffect(() => {
     const checkNumbers = async () => {
-      if (!raffle?._id) return;
+      if (!updatedRaffle?._id) return;
       try {
-        const hasAssignedNumbers = await checkAvailableNumbers(raffle._id);
+        const hasAssignedNumbers = await checkAvailableNumbers(updatedRaffle._id);
         setHasNumbers(hasAssignedNumbers);
       } catch (error) {
         console.error('Error checking available numbers:', error);
       }
     };
     checkNumbers();
-  }, [raffle?._id]);
+  }, [updatedRaffle?._id]);
 
   const handleNumberAssignment = async () => {
-    if (!raffle?._id) return;
+    if (!updatedRaffle?._id) return;
     try {
       setIsAssigning(true);
-      await assignAvailableNumbers(raffle._id);
+      await assignAvailableNumbers(updatedRaffle._id);
       setHasNumbers(true);
     } catch (error) {
       console.error('Error assigning numbers:', error);
@@ -66,29 +72,33 @@ export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
     }
   };
 
+  const handleRaffleUpdate = (updatedRaffleData: Raffle) => {
+    setUpdatedRaffle(updatedRaffleData);
+  };
+
   return (<>
     <div className="flex">
       <span className="mr-4">
         Enlace público:
       </span>
-      <Link to={"/raffle/" + raffle?.slug} target="_blank">
+      <Link to={"/raffle/" + updatedRaffle?.slug} target="_blank">
         <span className="text-blue-500">
-          {"/raffle/" + raffle?.slug}
+          {"/raffle/" + updatedRaffle?.slug}
         </span>
       </Link>
     </div>
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
       <div>
         <p className="font-bold">Nombre</p>
-        <p>{raffle?.title}</p>
+        <p>{updatedRaffle?.title}</p>
       </div>
       <div>
         <p className="font-bold">Premio</p>
-        <p>{raffle?.prize}</p>
+        <p>{updatedRaffle?.prize}</p>
       </div>
       <div>
         <p className="font-bold">Precio del ticket</p>
-        <p>{raffle?.ticketPrice && formatMoney(raffle?.ticketPrice)}</p>
+        <p>{updatedRaffle?.ticketPrice && formatMoney(updatedRaffle?.ticketPrice)}</p>
       </div>
       <div className="flex items-center justify-end col-span-2 gap-2">
         <button
@@ -119,9 +129,19 @@ export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
         </div>
       ))}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <RaffleProgress raffle={raffle} />
+        <RaffleProgress raffle={updatedRaffle} />
       </div>
     </div>
+    
+    {/* Awarded Numbers Manager */}
+    {updatedRaffle && (
+      <div className="mt-6">
+        <AwardedNumbersManager 
+          raffle={updatedRaffle} 
+          onUpdate={handleRaffleUpdate} 
+        />
+      </div>
+    )}
   </>
   );
 }

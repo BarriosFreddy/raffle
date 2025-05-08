@@ -30,6 +30,7 @@ const raffleSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  awardedNumbers: [{ type: Number }], // Numbers that have been awarded prizes
   themeColor: {
     type: String,
     default: '#4f46e5'

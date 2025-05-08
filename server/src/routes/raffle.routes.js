@@ -12,5 +12,6 @@ router.get('/raffles/:id', isAuthenticated, raffleController.getRaffleById);
 router.get('/raffles/slug/:slug', raffleController.getRaffleBySlug);
 router.get('/raffles/:raffleId/available-numbers', isAuthenticated, raffleController.checkAvailableNumbers);
 router.post('/raffles/numbers/assign', isAuthenticated, raffleController.saveAvailableNumbers);
+router.put('/raffles/:raffleId/awarded-numbers', isAuthenticated, raffleController.updateAwardedNumbers);
 
 export const raffleRoutes = router;

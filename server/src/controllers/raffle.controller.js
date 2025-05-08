@@ -215,4 +215,43 @@ export const raffleController = {
       next(new ApiError(400, "Failed to check available numbers"));
     }
   },
+
+  async updateAwardedNumbers(req, res, next) {
+    try {
+      const { raffleId } = req.params;
+      const { awardedNumbers } = req.body;
+      
+      if (!Array.isArray(awardedNumbers)) {
+        return next(new ApiError(400, "awardedNumbers must be an array of numbers"));
+      }
+
+      // Validate that all numbers are within the raffle range
+      const raffle = await Raffle.findById(raffleId);
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+
+      // Check if all numbers are in the valid range
+      const validNumbers = awardedNumbers.every(num => 
+        num >= raffle.minNumber && num <= raffle.maxNumber
+      );
+
+      if (!validNumbers) {
+        return next(new ApiError(400, "All awarded numbers must be within the raffle's number range"));
+      }
+
+      // Update the raffle with the awarded numbers
+      const updatedRaffle = await RaffleService.updateRaffle(raffleId, { awardedNumbers });
+      
+      // Clear the cache for this raffle
+      cacheService.delete(`${CACHE_KEYS.RAFFLE}:${raffleId}`);
+      cacheService.delete(`${CACHE_KEYS.RAFFLE_SLUG}:${updatedRaffle.slug}`);
+      
+      res.status(200).json(updatedRaffle);
+      logger.info(`Updated awarded numbers for raffle ${raffleId}: ${awardedNumbers.join(', ')}`);
+    } catch (error) {
+      logger.error("Error updating awarded numbers:", error);
+      next(new ApiError(400, "Failed to update awarded numbers"));
+    }
+  },
 };
