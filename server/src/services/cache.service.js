@@ -18,6 +18,9 @@ class CacheService {
     if (!key) return;
     return !!myCache.del(key);
   }
+  deleteAll() {
+    return myCache.flushAll();
+  }
 }
 const cacheService = new CacheService();
 export default cacheService;

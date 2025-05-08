@@ -18,6 +18,7 @@ export const raffleController = {
       );
 
       const raffle = await RaffleService.createRaffle(raffleData);
+      cacheService.deleteAll();
       res.status(201).json(raffle);
       logger.info(`Raffle created with ID: ${raffle._id}`);
     } catch (error) {
@@ -34,6 +35,7 @@ export const raffleController = {
         req.body.maxNumber
       );
       const updatedRaffle = await RaffleService.updateRaffle(raffleId, req.body);
+      cacheService.deleteAll();
       res.status(200).json(updatedRaffle);
       logger.info(`Raffle updated with ID: ${raffleId}`);
     } catch (error) {
