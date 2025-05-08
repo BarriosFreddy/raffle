@@ -24,4 +24,5 @@ export interface Raffle {
   paymentGateway: string;
   coverUrl: string;
   themeColor?: string; // Optional theme color for UI customization
+  slug: string; // URL-friendly unique identifier
 }

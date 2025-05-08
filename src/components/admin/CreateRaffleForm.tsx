@@ -25,6 +25,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm<FormData>({
     resolver: zodResolver(raffleSchema),
     defaultValues: {
@@ -35,9 +36,23 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       prize: '',
       ticketPrice: 0,
       coverUrl: '',
+      slug: '',
       themeColor: '#4f46e5', // Default theme color (indigo-600)
     }
   });
+  
+  // Generate slug from the name
+  const watchName = watch('name');
+  useEffect(() => {
+    if (watchName && !selectedRaffle) {
+      const generatedSlug = watchName
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      setValue('slug', generatedSlug);
+    }
+  }, [watchName, setValue, selectedRaffle]);
 
   useEffect(() => {
     if (!selectedRaffle) return;
@@ -50,6 +65,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       ticketPrice: selectedRaffle.ticketPrice,
       coverUrl: selectedRaffle.coverUrl || '',
       themeColor: selectedRaffle.themeColor || '#4f46e5',
+      slug: selectedRaffle.slug || '',
     })
   }, [reset, selectedRaffle])
 
@@ -65,6 +81,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
         ticketPrice: data.ticketPrice,
         coverUrl: data.coverUrl,
         themeColor: data.themeColor,
+        slug: data.slug,
         id: crypto.randomUUID(),
         status: "active",
       };
@@ -186,6 +203,23 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
           />
           {errors.ticketPrice && (
             <p className="mt-1 text-sm text-red-600">{errors.ticketPrice.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+            Slug (URL amigable)
+          </label>
+          <input
+            type="text"
+            id="slug"
+            {...register('slug')}
+            className={`block w-full px-2 py-2 rounded-lg border ${errors.slug ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          />
+          <p className="mt-1 text-xs text-gray-500">Solo letras, números y guiones. Debe ser único.</p>
+          {errors.slug && (
+            <p className="mt-1 text-sm text-red-600">{errors.slug.message}</p>
           )}
         </div>
 

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useRaffleStore } from "../../store/raffleStore";
 import { AddParticipantForm } from "./components/AddParticipantForm";
-import { getRaffleById } from "@/services/raffle.service";
+import { getRaffleById, getRaffleBySlug } from "@/services/raffle.service";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
@@ -13,8 +13,20 @@ export function RaffleView() {
   useEffect(() => {
     (async () => {
       if (raffleId) {
-        const raffleData = await getRaffleById(raffleId);
-        setRaffle(raffleData);
+        try {
+          // First try to get raffle by slug
+          const raffleData = await getRaffleBySlug(raffleId);
+          setRaffle(raffleData);
+        } catch (slugError) {
+          try {
+            // Fallback to get by ID for backward compatibility
+            const raffleData = await getRaffleById(raffleId);
+            setRaffle(raffleData);
+          } catch (idError) {
+            console.error("Failed to fetch raffle by ID:", idError);
+            console.error("Original slug error:", slugError);
+          }
+        }
       }
     })();
   }, [raffleId]);

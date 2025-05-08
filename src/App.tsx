@@ -23,7 +23,7 @@ export default function App() {
         <main className="max-w-7xl mx-auto px-4 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {raffles.map((raffle) => (
-              <Link key={raffle._id} to={"raffle/" + raffle._id}>
+              <Link key={raffle._id} to={"raffle/" + raffle.slug}>
                 <div
                   className="cursor-pointer touch-manipulation"
                 >

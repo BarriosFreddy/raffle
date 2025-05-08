@@ -12,6 +12,12 @@ export const raffleSchema = z.object({
   maxNumber: z.number().int().min(1, 'El número máximo debe ser al menos 1'),
   prize: z.string().min(1, 'El premio es requerida'),
   ticketPrice: z.number().int().min(1, 'El precio del ticket debe ser al menos 1'),
+  slug: z.string()
+    .min(3, 'El slug debe tener al menos 3 caracteres')
+    .regex(/^[a-zA-Z0-9-]+$/, 'El slug solo puede contener letras, números y guiones')
+    .refine(val => !val.endsWith('-') && !val.startsWith('-'), {
+      message: 'El slug no puede comenzar ni terminar con guión',
+    }),
   coverUrl: z.string()
     .url('La URL de la imagen debe ser válida')
 /*     .refine(
@@ -22,7 +28,7 @@ export const raffleSchema = z.object({
       'La imagen debe ser de formato PNG, JPG, JPEG o WEBP'
     ) */
     .optional(),
-  themeColor: z.string().regex(/^#([0-9A-F]{3}){1,2}$/i, 'El color debe ser un valor hexadecimal válido').default('#4f46e5'),
+  themeColor: z.string().regex(/^#([0-9A-F]{3}){1,2}$/i, 'El color debe ser un valor hexadecimal válido').default('#4f46e5').optional(),
 }).refine(data => data.maxNumber > data.minNumber, {
   message: "El número máximo debe ser mayor que el número mínimo",
   path: ["maxNumber"],

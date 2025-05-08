@@ -135,6 +135,32 @@ export const raffleController = {
     }
   },
 
+  async getRaffleBySlug(req, res, next) {
+    try {
+      const { slug } = req.params;
+      
+      // Try to get from cache first
+      const cacheKey = `${CACHE_KEYS.RAFFLE_SLUG}:${slug}`;
+      const cachedData = cacheService.get(cacheKey);
+      if (cachedData) {
+        res.json(cachedData);
+        return;
+      }
+
+      // Get from database if not in cache
+      const raffle = await RaffleService.getRaffleBySlug(slug);
+
+      // Cache the result
+      cacheService.set(cacheKey, raffle);
+
+      res.json(raffle);
+      logger.info(`Retrieved raffle with slug: ${slug}`);
+    } catch (error) {
+      logger.error(`Error getting raffle with slug ${req.params.slug}:`, error);
+      next(error instanceof ApiError ? error : new ApiError(400, "Failed to get raffle"));
+    }
+  },
+
   async addParticipant(req, res, next) {
     try {
       const raffle = await Raffle.findById(req.params.id);

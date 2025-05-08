@@ -7,6 +7,13 @@ const raffleSchema = new mongoose.Schema({
   minNumber: { type: Number, required: true },
   maxNumber: { type: Number, required: true },
   ticketPrice: { type: Number, required: true },
+  slug: { 
+    type: String, 
+    required: true,
+    unique: true,
+    match: /^[a-zA-Z0-9-]+$/, // Only letters, numbers and dashes allowed
+    index: true
+  },
   status: {
     type: String,
     enum: ['active', 'completed'],

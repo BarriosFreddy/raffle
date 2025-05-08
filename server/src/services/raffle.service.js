@@ -31,12 +31,37 @@ export async function assignTicketNumbers(raffle, participantId, quantity) {
   return selectedNumbers;
 }
 
+export async function isSlugUnique(slug, excludeId = null) {
+  const query = { slug };
+  if (excludeId) {
+    query._id = { $ne: excludeId };
+  }
+  const existingRaffle = await Raffle.findOne(query);
+  return !existingRaffle;
+}
+
+export async function getRaffleBySlug(slug) {
+  const raffle = await Raffle.findOne({ slug }).exec();
+  if (!raffle) {
+    throw new ApiError(404, 'Raffle not found');
+  }
+  return raffle;
+}
+
 export async function createRaffle(data) {
+  // Check if slug is unique
+  if (!await isSlugUnique(data.slug)) {
+    throw new ApiError(400, 'Slug must be unique');
+  }
+
   const raffle = new Raffle(data);
   try {
     await raffle.save();
     return raffle;
   } catch (error) {
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
+      throw new ApiError(400, 'Slug must be unique');
+    }
     throw new ApiError(400, 'Failed to create raffle');
   }
 }
@@ -51,11 +76,23 @@ export async function getRaffleById(id) {
 }
 
 export async function updateRaffle(id, data) {
-  const raffle = await Raffle.findByIdAndUpdate(id, data, { new: true, runValidators: true });
-  if (!raffle) {
-    throw new ApiError(404, 'Raffle not found');
+  // Check if slug is unique if it's being updated
+  if (data.slug && !await isSlugUnique(data.slug, id)) {
+    throw new ApiError(400, 'Slug must be unique');
   }
-  return raffle;
+
+  try {
+    const raffle = await Raffle.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+    if (!raffle) {
+      throw new ApiError(404, 'Raffle not found');
+    }
+    return raffle;
+  } catch (error) {
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
+      throw new ApiError(400, 'Slug must be unique');
+    }
+    throw error;
+  }
 }
 
 export async function deleteRaffle(id) {

@@ -4,6 +4,28 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const API_TOKEN = import.meta.env.VITE_API_TOKEN
 
+export async function getRaffleBySlug(slug: string) {
+  try {
+    const response = await axios.get(`${API_URL}/api/raffles/slug/${slug}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    if (!response.data || !response.data._id) {
+      throw new Error("Invalid raffle response");
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get raffle by slug: ${error.message}`);
+    }
+    throw new Error("Failed to get raffle by slug");
+  }
+}
+
 export async function getRaffleById(raffleId: string) {
   try {
     const response = await axios.get(`${API_URL}/api/raffles/${raffleId}`, {

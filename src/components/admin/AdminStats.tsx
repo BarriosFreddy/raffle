@@ -71,9 +71,9 @@ export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
       <span className="mr-4">
         Enlace público:
       </span>
-      <Link to={"/raffle/" + raffle?._id} target="_blank">
+      <Link to={"/raffle/" + raffle?.slug} target="_blank">
         <span className="text-blue-500">
-          {"/raffle/" + raffle?._id}
+          {"/raffle/" + raffle?.slug}
         </span>
       </Link>
     </div>
