@@ -5,6 +5,7 @@ import { getRaffles } from "./services/raffle.service";
 import { useRaffleStore } from "./store/raffleStore";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 
 export default function App() {
   const { raffles, setRaffles } = useRaffleStore();
@@ -42,6 +43,7 @@ export default function App() {
           </div>
         </main>
       </div>
+      <Footer />
     </ErrorBoundary>
   );
 }

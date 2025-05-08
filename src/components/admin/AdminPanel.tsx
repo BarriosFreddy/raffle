@@ -11,6 +11,7 @@ import { Raffle } from "@/types";
 import { CreateRaffleForm } from "./CreateRaffleForm";
 import { useAuth } from "@/hooks/useAuth";
 import { Header } from "../Header";
+import { Footer } from "../Footer";
 
 const APPROVED = "approved";
 
@@ -156,6 +157,7 @@ export function AdminPanel() {
             </div>
           </div>
         </div>
+        <Footer />
       </>
     );
 }
