@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getRaffles } from "./services/raffle.service";
 import { useRaffleStore } from "./store/raffleStore";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { Header } from "./components/Header";
 
 export default function App() {
   const { raffles, setRaffles } = useRaffleStore();
@@ -16,6 +17,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+      <Header />
       <div className="min-h-screen bg-gray-50">
         <main className="max-w-7xl mx-auto px-4 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

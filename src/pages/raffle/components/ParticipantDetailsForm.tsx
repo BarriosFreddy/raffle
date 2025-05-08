@@ -30,6 +30,7 @@ export function ParticipantDetailsForm({
   raffle,
   onBack,
 }: ParticipantDetailsFormProps) {
+  const themeColor = raffle.themeColor || '#4f46e5'; // Default to indigo if not set
   const [paymentData, setPaymentData] = useState<PaymentDataDTO>();
 
   const {
@@ -115,12 +116,12 @@ export function ParticipantDetailsForm({
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <ShoppingCart className="h-6 w-6 text-indigo-600 mr-2" />
+            <ShoppingCart className="h-6 w-6 mr-2" style={{ color: themeColor }} />
             <h3 className="text-lg font-semibold text-gray-900">
               Resumen de la compra
             </h3>
           </div>
-          <span className="text-lg font-bold text-indigo-600">
+          <span className="text-lg font-bold" style={{ color: themeColor }}>
             {formattedPrice}
           </span>
         </div>
@@ -143,7 +144,8 @@ export function ParticipantDetailsForm({
             id="name"
             className={`block w-full pl-10 px-4 py-3 rounded-lg border ${
               errors.name ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            } shadow-sm focus:ring-2 focus:border-transparent`}
+            style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
             placeholder="Nombre completo"
           />
           {errors.name && (
@@ -174,7 +176,8 @@ export function ParticipantDetailsForm({
             type="email"
             className={`block w-full pl-10 px-4 py-3 rounded-lg border ${
               errors.email ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            } shadow-sm focus:ring-2 focus:border-transparent`}
+            style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
             placeholder="usuario@dominio.com"
           />
           {errors.email && (
@@ -205,7 +208,8 @@ export function ParticipantDetailsForm({
             type="tel"
             className={`block w-full pl-10 px-4 py-3 rounded-lg border ${
               errors.phone ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            } shadow-sm focus:ring-2 focus:border-transparent`}
+            style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
             placeholder="3#########"
           />
           {errors.phone && (
@@ -231,7 +235,8 @@ export function ParticipantDetailsForm({
             id="instagram"
             className={`block w-full pl-10 px-4 py-3 rounded-lg border ${
               errors.instagram ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            } shadow-sm focus:ring-2 focus:border-transparent`}
+            style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
             placeholder="username"
           />
           {errors.instagram && (
@@ -261,7 +266,8 @@ export function ParticipantDetailsForm({
             id="nationalId"
             className={`block w-full pl-10 px-4 py-3 rounded-lg border ${
               errors.nationalId ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            } shadow-sm focus:ring-2 focus:border-transparent`}
+            style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
             placeholder="1.111.111.111"
           />
           {errors.nationalId && (
@@ -275,7 +281,8 @@ export function ParticipantDetailsForm({
         <button
           onClick={handleSubmit(onFormSubmit)}
           type="submit"
-          className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-indigo-700 active:bg-indigo-800 transition-colors"
+          className="w-full text-white py-3 px-4 rounded-lg text-base font-medium transition-colors hover:opacity-90 active:opacity-80"
+          style={{ backgroundColor: themeColor }}
         >
           Continuar con el pago ({formattedPrice})
         </button>
