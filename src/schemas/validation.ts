@@ -22,6 +22,7 @@ export const raffleSchema = z.object({
       'La imagen debe ser de formato PNG, JPG, JPEG o WEBP'
     ) */
     .optional(),
+  themeColor: z.string().regex(/^#([0-9A-F]{3}){1,2}$/i, 'El color debe ser un valor hexadecimal válido').default('#4f46e5'),
 }).refine(data => data.maxNumber > data.minNumber, {
   message: "El número máximo debe ser mayor que el número mínimo",
   path: ["maxNumber"],

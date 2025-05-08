@@ -22,6 +22,14 @@ const raffleSchema = new mongoose.Schema({
   selectedNumbersQuantity: {
     type: Number,
     default: 0
+  },
+  themeColor: {
+    type: String,
+    default: '#4f46e5'
+  },
+  coverUrl: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ColorPickerInput } from './ColorPickerInput';
 import type { Raffle } from '../../types';
 import { saveRaffle, updateRaffle } from '@/services/raffle.service';
 import { useRaffleStore } from '@/store/raffleStore';
@@ -34,6 +35,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       prize: '',
       ticketPrice: 0,
       coverUrl: '',
+      themeColor: '#4f46e5', // Default theme color (indigo-600)
     }
   });
 
@@ -47,6 +49,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       prize: selectedRaffle.prize,
       ticketPrice: selectedRaffle.ticketPrice,
       coverUrl: selectedRaffle.coverUrl || '',
+      themeColor: selectedRaffle.themeColor || '#4f46e5',
     })
   }, [reset, selectedRaffle])
 
@@ -61,6 +64,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
         prize: data.prize,
         ticketPrice: data.ticketPrice,
         coverUrl: data.coverUrl,
+        themeColor: data.themeColor,
         id: crypto.randomUUID(),
         status: "active",
       };
@@ -223,6 +227,19 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
               </div>
             )}
           </div>
+        </div>
+        
+        <div>
+          <ColorPickerInput 
+            value={watch('themeColor') || '#4f46e5'} 
+            onChange={(color) => {
+              // Use register's onChange handler
+              register('themeColor').onChange({
+                target: { value: color, name: 'themeColor' }
+              });
+            }}
+            error={errors.themeColor?.message as string | undefined}
+          />
         </div>
 
         <button

@@ -17,22 +17,13 @@ const TICKET_PACKAGES = [
   { amount: 10, label: "X10" },
 ];
 
-// Mapping of prize keywords to relevant Unsplash images
-const PRIZE_IMAGES: Record<string, string> = {
-  IPHONE:
-    "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80",
-  MACBOOK:
-    "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
-  PLAYSTATION:
-    "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800&q=80",
-  XBOX: "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?auto=format&fit=crop&w=800&q=80",
-  TV: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80",
-};
+
 
 export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
   const [selectedPackage, setSelectedPackage] = useState<number>(1);
   const [showDetails, setShowDetails] = useState(false);
   const { maxNumber, selectedNumbersQuantity } = raffle;
+  const themeColor = raffle.themeColor || '#4f46e5'; // Default to indigo if not set
   const soldTicketsPercentage = Math.floor(
     (selectedNumbersQuantity * 100) / maxNumber
   );
@@ -49,7 +40,7 @@ export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
     setSelectedPackage(next);
   };
 
-  const handleChangeQuantity = ({ target: { value } }) => {
+  const handleChangeQuantity = ({ target: { value } }: { target: { value: string } }) => {
     setSelectedPackage(+value <= 0 ? 1 : +value);
   };
 
@@ -85,8 +76,8 @@ export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
       </div>
       <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
         <div
-          className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-          style={{ width: `${soldTicketsPercentage}%` }}
+          className="text-xs font-medium text-white text-center p-0.5 leading-none rounded-full"
+          style={{ width: `${soldTicketsPercentage}%`, backgroundColor: themeColor }}
         >
           {soldTicketsPercentage}%
         </div>
@@ -102,19 +93,19 @@ export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
               <button
                 key={amount}
                 onClick={() => setSelectedPackage(amount)}
-                className={`flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border-2 ${
-                  selectedPackage === amount
-                    ? "border-indigo-500"
-                    : "border-transparent hover:border-indigo-500"
-                }`}
+                className={`flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border-2`}
+                style={{
+                  borderColor: selectedPackage === amount ? themeColor : 'transparent',
+                  borderWidth: '2px',
+                }}
               >
-                <span className="text-2xl font-bold text-indigo-600 mb-2">
+                <span className="text-2xl font-bold mb-2" style={{ color: themeColor }}>
                   {label}
                 </span>
                 <span className="text-sm text-gray-600 text-center mb-1">
                   Compra {amount} números
                 </span>
-                <span className="text-lg font-semibold text-indigo-600">
+                <span className="text-lg font-semibold" style={{ color: themeColor }}>
                   {formattedPackagePrice}
                 </span>
               </button>
@@ -180,7 +171,10 @@ export function AddParticipantForm({ raffle }: AddParticipantFormProps) {
         type="button"
         disabled={selectedPackage === 0}
         onClick={() => setShowDetails(true)}
-        className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:bg-gray-400"
+        className="w-full text-white py-3 px-4 rounded-lg text-base font-medium transition-colors disabled:bg-gray-400 hover:opacity-90 active:opacity-80"
+        style={{ 
+          backgroundColor: themeColor
+        }}
       >
         Continuar con {selectedPackage} números
       </button>

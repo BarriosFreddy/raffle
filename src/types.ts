@@ -23,4 +23,5 @@ export interface Raffle {
   selectedNumbersQuantity: number;
   paymentGateway: string;
   coverUrl: string;
+  themeColor?: string; // Optional theme color for UI customization
 }
