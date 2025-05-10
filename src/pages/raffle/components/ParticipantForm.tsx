@@ -7,7 +7,6 @@ import {
   Smartphone,
   User,
   Mail,
-  AtSign,
 } from "lucide-react";
 import { PaymentButton } from "./PaymentButton";
 import { createPreference } from "@/services/mercadopago";
@@ -47,7 +46,6 @@ export function ParticipantForm({
       reset({
         name: "Username Lastname",
         email: "username@domain.com",
-        instagram: "username",
         nationalId: "123456789",
         phone: "3211231231",
       } as ParticipantFormData);
@@ -238,32 +236,7 @@ export function ParticipantForm({
         </div>
       </div>
 
-      {/* Instagram Field */}
-      <div className="mb-3">
-        <label
-          htmlFor="instagram"
-          className="block text-base font-medium text-gray-700 mb-2"
-        >
-          Usuario de Instagram
-        </label>
-        <div className="relative">
-          <AtSign className="absolute inset-y-2 left-0 pl-3 h-8 w-8 text-gray-400" />
-          <input
-            {...register("instagram", {
-              required: "Usuario de Instagram es requerido",
-            })}
-            id="instagram"
-            className={`block w-full pl-10 px-4 py-3 rounded-lg border ${
-              errors.instagram ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:border-transparent`}
-            style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
-            placeholder="username"
-          />
-          {errors.instagram && (
-            <p className="text-red-500 text-sm">{errors.instagram.message}</p>
-          )}
-        </div>
-      </div>
+      {/* Instagram field removed as requested */}
 
       {/* National ID Field */}
       <div className="mb-3">
