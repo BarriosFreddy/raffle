@@ -48,7 +48,7 @@ export function RaffleView() {
           <PackageSelectorForm raffle={raffle} />
         </div>
       </div>
-      <Footer />
+      <Footer supportPhoneNumber={raffle.supportPhoneNumber} />
     </>
   );
 }

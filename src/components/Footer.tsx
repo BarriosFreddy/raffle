@@ -1,7 +1,11 @@
 import { Mail, Phone, Clock, Shield, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export function Footer() {
+interface FooterProps {
+  supportPhoneNumber?: string;
+}
+
+export function Footer({ supportPhoneNumber }: FooterProps) {
   return (
     <footer className="bg-gray-800 text-white pt-10 pb-6">
       <div className="max-w-7xl mx-auto px-4">
@@ -18,7 +22,7 @@ export function Footer() {
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 mr-2 text-gray-400" />
-                <span>Soporte Técnico</span>
+                <a href={`https://wa.me/${supportPhoneNumber}`} target="_blank" rel="noopener noreferrer" className="hover:text-blue-300 transition-colors">Soporte Técnico</a>
               </li>
             </ul>
           </div>
