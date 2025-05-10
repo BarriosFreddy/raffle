@@ -9,8 +9,6 @@ interface PackageSelectorFormProps {
   raffle: Raffle;
 }
 
-const MAX_TICKETS_TO_PACKAGE = 2;
-
 const TICKET_PACKAGES = [
   { amount: 1, label: "X1" },
   { amount: 2, label: "X2" },
@@ -109,7 +107,7 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
         </div>
         <div className="flex items-center my-4">
           <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
-            max. 2 números por persona
+            Máximo {raffle.maxTicketsPerUser} números por persona
           </span>
 
           <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
@@ -117,9 +115,9 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-8">
           {TICKET_PACKAGES.filter(({ amount }) => amount <= leftNumbers)
-            .filter(({ amount }) => amount <= MAX_TICKETS_TO_PACKAGE)
+            .filter(({ amount }) => amount <= raffle.maxTicketsPerUser)
             .map(({ amount, label }) => {
               const packagePrice = amount * raffle.ticketPrice;
               const formattedPackagePrice = formatMoney(packagePrice);
@@ -155,7 +153,7 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
             })}
         </div>
 
-        {MAX_TICKETS_TO_PACKAGE > getMaxTicketPackage() && (
+        {raffle.maxTicketsPerUser > getMaxTicketPackage() && (
           <div className="flex items-center justify-center gap-8 mt-4">
             <button
               onClick={handlePrevPage}
@@ -214,7 +212,7 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           type="button"
           disabled={selectedPackage === 0}
           onClick={() => setShowDetails(true)}
-          className="w-full text-white my-4 py-3 px-4 rounded-lg text-base font-medium transition-colors disabled:bg-gray-400 hover:opacity-90 active:opacity-80"
+          className="w-full text-white mt-8 py-3 px-4 rounded-lg text-base font-medium transition-colors disabled:bg-gray-400 hover:opacity-90 active:opacity-80"
           style={{
             backgroundColor: themeColor,
           }}
@@ -222,9 +220,9 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           Continuar con {selectedPackage} números
         </button>
 
-        <div className="items-center mb-4">
+        <div className="items-center mt-8">
           <p
-            className="text-center font-medium"
+            className="text-center font-medium text-lg"
             style={{
               color: themeColor,
             }}

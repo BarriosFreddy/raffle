@@ -7,6 +7,7 @@ const raffleSchema = new mongoose.Schema({
   minNumber: { type: Number, required: true },
   maxNumber: { type: Number, required: true },
   ticketPrice: { type: Number, required: true },
+  maxTicketsPerUser: { type: Number, default: 100, required: true },
   slug: { 
     type: String, 
     required: true,

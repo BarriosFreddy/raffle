@@ -39,6 +39,7 @@ export function CreateRaffleForm({
       maxNumber: 100,
       prize: "",
       ticketPrice: 0,
+      maxTicketsPerUser: 100,
       paymentGateway: PaymentGateway.BOLD,
       coverUrl: "",
       slug: "",
@@ -68,6 +69,7 @@ export function CreateRaffleForm({
       maxNumber: selectedRaffle.maxNumber,
       prize: selectedRaffle.prize,
       ticketPrice: selectedRaffle.ticketPrice,
+      maxTicketsPerUser: selectedRaffle.maxTicketsPerUser || 100,
       paymentGateway:
         (selectedRaffle.paymentGateway as PaymentGateway) ||
         PaymentGateway.BOLD,
@@ -87,6 +89,7 @@ export function CreateRaffleForm({
         maxNumber: data.maxNumber,
         prize: data.prize,
         ticketPrice: data.ticketPrice,
+        maxTicketsPerUser: data.maxTicketsPerUser,
         paymentGateway: data.paymentGateway,
         coverUrl: data.coverUrl || "",
         themeColor: data.themeColor || "#4f46e5",
@@ -226,26 +229,51 @@ export function CreateRaffleForm({
           </div>
         </div>
 
-        <div>
-          <label
-            htmlFor="ticketPrice"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Precio del Ticket
-          </label>
-          <input
-            type="number"
-            id="ticketPrice"
-            {...register("ticketPrice", { valueAsNumber: true })}
-            className={`block w-full px-2 py-2 rounded-lg border ${
-              errors.ticketPrice ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-          />
-          {errors.ticketPrice && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.ticketPrice.message}
-            </p>
-          )}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label
+              htmlFor="ticketPrice"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Precio del Ticket
+            </label>
+            <input
+              type="number"
+              id="ticketPrice"
+              {...register("ticketPrice", { valueAsNumber: true })}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.ticketPrice ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            />
+            {errors.ticketPrice && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.ticketPrice.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="maxTicketsPerUser"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Máximo tickets por usuario
+            </label>
+            <input
+              type="number"
+              id="maxTicketsPerUser"
+              min="1"
+              {...register("maxTicketsPerUser", { valueAsNumber: true })}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.maxTicketsPerUser ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            />
+            {errors.maxTicketsPerUser && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.maxTicketsPerUser.message}
+              </p>
+            )}
+          </div>
         </div>
 
         <div>

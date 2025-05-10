@@ -12,6 +12,29 @@ export const paymentController = {
   async createPayment(req, res, next) {
     try {
       const payment = req.body;
+      const { raffleId, payer, quantity } = payment;
+      
+      // Get the raffle to check maxTicketsPerUser
+      const raffle = await Raffle.findById(raffleId);
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+      
+      // Count existing tickets for this user
+      const existingTickets = await PaymentService.countUserTickets(
+        raffleId, 
+        payer.email, 
+        payer.nationalId
+      );
+      
+      // Check if user is trying to exceed maximum allowed tickets
+      const maxTicketsPerUser = raffle.maxTicketsPerUser || 100;
+      const totalTickets = existingTickets + quantity;
+      
+      if (totalTickets > maxTicketsPerUser) {
+        return next(new ApiError(400, `Excede el límite máximo de ${maxTicketsPerUser} tickets por usuario. Ya has comprado ${existingTickets} tickets.`));
+      }
+      
       const paymentSaved = await PaymentService.create(payment);
       res.status(201).json(paymentSaved);
     } catch (error) {

@@ -34,4 +34,24 @@ export class PaymentService {
     const payment = await Payment.findOne(params).exec();
     return payment;
   }
+
+  static async countUserTickets(raffleId, email, nationalId) {
+    // Look for approved payments by this user (email or nationalId) for this raffle
+    const userPayments = await Payment.find({
+      raffleId,
+      status: 'approved',
+      $or: [
+        { 'payer.email': email },
+        { 'payer.nationalId': nationalId }
+      ]
+    }).exec();
+    
+    // Calculate total tickets purchased
+    let totalTickets = 0;
+    userPayments.forEach(payment => {
+      totalTickets += payment.quantity || 0;
+    });
+    
+    return totalTickets;
+  }
 }
