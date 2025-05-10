@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ColorPickerInput } from "./ColorPickerInput";
 import type { Raffle } from "../../types";
 import { saveRaffle, updateRaffle } from "@/services/raffle.service";
@@ -43,6 +43,7 @@ export function CreateRaffleForm({
       paymentGateway: PaymentGateway.BOLD,
       coverUrl: "",
       slug: "",
+      lotteryName: "",
       themeColor: "#4f46e5", // Default theme color (indigo-600)
     },
   });
@@ -74,6 +75,7 @@ export function CreateRaffleForm({
         (selectedRaffle.paymentGateway as PaymentGateway) ||
         PaymentGateway.BOLD,
       coverUrl: selectedRaffle.coverUrl || "",
+      lotteryName: selectedRaffle.lotteryName || "",
       themeColor: selectedRaffle.themeColor || "#4f46e5",
       slug: selectedRaffle.slug || "",
     });
@@ -92,6 +94,7 @@ export function CreateRaffleForm({
         maxTicketsPerUser: data.maxTicketsPerUser,
         paymentGateway: data.paymentGateway,
         coverUrl: data.coverUrl || "",
+        lotteryName: data.lotteryName || "",
         themeColor: data.themeColor || "#4f46e5",
         slug: data.slug,
         id: crypto.randomUUID(),
@@ -298,77 +301,100 @@ export function CreateRaffleForm({
             <p className="mt-1 text-sm text-red-600">{errors.slug.message}</p>
           )}
         </div>
-        <div>
-          <label
-            htmlFor="paymentGateway"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Pasarela de Pago
-          </label>
-          <select
-            id="paymentGateway"
-            {...register("paymentGateway")}
-            className={`block w-full px-2 py-2 rounded-lg border ${
-              errors.paymentGateway ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-          >
-            <option value={PaymentGateway.BOLD}>BOLD</option>
-            <option value={PaymentGateway.NONE}>NINGUNA</option>
-          </select>
-          {errors.paymentGateway && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.paymentGateway.message}
-            </p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label
-              htmlFor="coverUrl"
+              htmlFor="paymentGateway"
               className="block text-sm font-medium text-gray-700"
             >
-              URL de la imagen de portada
+              Pasarela de Pago
             </label>
-            <input
-              type="url"
-              id="coverUrl"
-              {...register("coverUrl")}
+            <select
+              id="paymentGateway"
+              {...register("paymentGateway")}
               className={`block w-full px-2 py-2 rounded-lg border ${
-                errors.coverUrl ? "border-red-500" : "border-gray-300"
+                errors.paymentGateway ? "border-red-500" : "border-gray-300"
               } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Formatos aceptados: PNG, JPG, JPEG, WEBP
-            </p>
-            {errors.coverUrl && (
+            >
+              <option value={PaymentGateway.EPAYCO}>EPAYCO</option>
+              <option value={PaymentGateway.MERCADO_PAGO}>MERCADO PAGO</option>
+              <option value={PaymentGateway.BOLD}>BOLD</option>
+              <option value={PaymentGateway.NONE}>NINGUNA</option>
+            </select>
+            {errors.paymentGateway && (
               <p className="mt-1 text-sm text-red-600">
-                {errors.coverUrl.message}
+                {errors.paymentGateway.message}
               </p>
             )}
           </div>
-          <div className="flex items-center justify-center">
-            {watch("coverUrl") && (
-              <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
-                <img
-                  src={watch("coverUrl")}
-                  alt="Vista previa de la portada"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src =
-                      "https://placehold.co/600x400?text=Error+al+cargar+imagen";
-                  }}
-                />
-              </div>
-            )}
-            {!watch("coverUrl") && (
-              <div className="w-full aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
-                <span className="text-gray-400">Vista previa de la imagen</span>
-              </div>
+          <div>
+            <label
+              htmlFor="lotteryName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Nombre de Lotería
+            </label>
+            <input
+              type="text"
+              id="lotteryName"
+              {...register("lotteryName")}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.lotteryName ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              placeholder="Ej: Sinuano noche"
+            />
+            {errors.lotteryName && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.lotteryName.message}
+              </p>
             )}
           </div>
+        </div>
+        <div>
+          <label
+            htmlFor="coverUrl"
+            className="block text-sm font-medium text-gray-700"
+          >
+            URL de la imagen de portada
+          </label>
+          <input
+            type="url"
+            id="coverUrl"
+            {...register("coverUrl")}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.coverUrl ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            placeholder="https://ejemplo.com/imagen.jpg"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Formatos aceptados: PNG, JPG, JPEG, WEBP
+          </p>
+          {errors.coverUrl && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.coverUrl.message}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center justify-center">
+          {watch("coverUrl") && (
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
+              <img
+                src={watch("coverUrl")}
+                alt="Vista previa de la portada"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src =
+                    "https://placehold.co/600x400?text=Error+al+cargar+imagen";
+                }}
+              />
+            </div>
+          )}
+          {!watch("coverUrl") && (
+            <div className="w-full aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
+              <span className="text-gray-400">Vista previa de la imagen</span>
+            </div>
+          )}
         </div>
         <div>
           <ColorPickerInput

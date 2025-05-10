@@ -26,5 +26,6 @@ export interface Raffle {
   coverUrl: string;
   themeColor?: string; // Optional theme color for UI customization
   slug: string; // URL-friendly unique identifier
+  lotteryName: string; // Name of the lottery used for this raffle
   awardedNumbers: number[]; // Numbers that have been awarded prizes
 }

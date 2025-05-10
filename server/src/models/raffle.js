@@ -39,6 +39,10 @@ const raffleSchema = new mongoose.Schema({
   coverUrl: {
     type: String,
     default: ''
+  },
+  lotteryName: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 

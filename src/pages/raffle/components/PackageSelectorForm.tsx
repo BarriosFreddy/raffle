@@ -111,7 +111,7 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           </span>
 
           <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
-            Juega con: Sinuano noche
+            Juega con: {raffle.lotteryName}
           </span>
         </div>
 
