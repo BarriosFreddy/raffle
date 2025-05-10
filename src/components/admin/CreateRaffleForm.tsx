@@ -316,8 +316,6 @@ export function CreateRaffleForm({
                 errors.paymentGateway ? "border-red-500" : "border-gray-300"
               } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             >
-              <option value={PaymentGateway.EPAYCO}>EPAYCO</option>
-              <option value={PaymentGateway.MERCADO_PAGO}>MERCADO PAGO</option>
               <option value={PaymentGateway.BOLD}>BOLD</option>
               <option value={PaymentGateway.NONE}>NINGUNA</option>
             </select>
