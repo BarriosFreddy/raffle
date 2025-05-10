@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PurchasesList } from "./PurchasesList";
 import { AdminStats } from "./AdminStats";
 import { findAll } from "@/services/payments.service";
-import { getRaffles } from "@/services/raffle.service";
+import { getRaffles, getLiveRaffleById } from "@/services/raffle.service";
 import { AdminLogin } from "../AdminLogin";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useRaffleStore } from "@/store/raffleStore";
@@ -24,12 +24,52 @@ export function AdminPanel() {
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Initial fetch of raffle data
   useEffect(() => {
-    (async () => {
-      const rafflesData = await getRaffles({ status: "active" });
-      setRaffles(rafflesData);
-    })();
-  }, []);
+    const fetchRaffles = async () => {
+      try {
+        const rafflesData = await getRaffles({ status: "active" });
+        setRaffles(rafflesData);
+      } catch (error) {
+        console.error("Error fetching raffles:", error);
+      }
+    };
+    
+    fetchRaffles();
+  }, [setRaffles]);
+  
+  // Poll for raffle updates every 15 seconds
+  useEffect(() => {
+    // Only start polling if user is logged in
+    if (!isLoggedIn) return;
+    
+    const updateRaffles = async () => {
+      try {
+        // Get fresh list of raffles
+        const rafflesData = await getRaffles({ status: "active" });
+        setRaffles(rafflesData);
+        
+        // If a raffle is selected, get its latest data directly from live endpoint
+        if (selectedRaffle) {
+          try {
+            // Use the live endpoint to bypass cache
+            const liveRaffleData = await getLiveRaffleById(selectedRaffle._id);
+            if (liveRaffleData) {
+              setSelectedRaffle(liveRaffleData);
+            }
+          } catch (selectedRaffleError) {
+            console.error("Error fetching live data for selected raffle:", selectedRaffleError);
+          }
+        }
+      } catch (error) {
+        console.error("Error polling for raffle updates:", error);
+      }
+    };
+    
+    const intervalId = setInterval(updateRaffles, 15000); // Poll every 15 seconds
+    
+    return () => clearInterval(intervalId); // Clean up on unmount
+  }, [isLoggedIn, raffles, selectedRaffle, setRaffles]);
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated);

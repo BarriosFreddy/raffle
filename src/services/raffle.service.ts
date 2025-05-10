@@ -26,6 +26,29 @@ export async function getRaffleBySlug(slug: string) {
   }
 }
 
+// New method to get live raffle data by slug (bypasses cache)
+export async function getLiveRaffleBySlug(slug: string) {
+  try {
+    const response = await axios.get(`${API_URL}/api/raffles/live/slug/${slug}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    if (!response.data || !response.data._id) {
+      throw new Error("Invalid raffle response");
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get live raffle by slug: ${error.message}`);
+    }
+    throw new Error("Failed to get live raffle by slug");
+  }
+}
+
 export async function getRaffleById(raffleId: string) {
   try {
     const response = await axios.get(`${API_URL}/api/raffles/${raffleId}`, {
@@ -45,6 +68,29 @@ export async function getRaffleById(raffleId: string) {
       throw new Error(`Failed to get raffle: ${error.message}`);
     }
     throw new Error("Failed to get raffle");
+  }
+}
+
+// New method to get live raffle data by ID (bypasses cache)
+export async function getLiveRaffleById(raffleId: string) {
+  try {
+    const response = await axios.get(`${API_URL}/api/raffles/live/${raffleId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    if (!response.data || !response.data._id) {
+      throw new Error("Invalid raffle response");
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to get live raffle: ${error.message}`);
+    }
+    throw new Error("Failed to get live raffle");
   }
 }
 export async function getRaffles(query?: { status?: string, page?: number, size?: number }) {

@@ -7,6 +7,41 @@ import * as RaffleService from "../services/raffle.service.js";
 import { logger } from "../utils/logger.js";
 
 export const raffleController = {
+  async getLiveRaffleById(req, res, next) {
+    try {
+      const { id } = req.params;
+      
+      // Skip cache and get directly from database
+      const raffle = await Raffle.findById(id);
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+
+      res.json(raffle);
+      logger.info(`Retrieved live raffle data with ID: ${id}`);
+    } catch (error) {
+      logger.error(`Error getting live raffle data with ID ${req.params.id}:`, error);
+      next(new ApiError(400, "Failed to get live raffle data"));
+    }
+  },
+
+  async getLiveRaffleBySlug(req, res, next) {
+    try {
+      const { slug } = req.params;
+      
+      // Skip cache and get directly from database
+      const raffle = await Raffle.findOne({ slug }).exec();
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+
+      res.json(raffle);
+      logger.info(`Retrieved live raffle data with slug: ${slug}`);
+    } catch (error) {
+      logger.error(`Error getting live raffle data with slug ${req.params.slug}:`, error);
+      next(error instanceof ApiError ? error : new ApiError(400, "Failed to get live raffle data"));
+    }
+  },
   async createRaffle(req, res, next) {
     try {
       const raffleData = req.body;

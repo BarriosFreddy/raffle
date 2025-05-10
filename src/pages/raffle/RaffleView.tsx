@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useRaffleStore } from "../../store/raffleStore";
-import { getRaffleById, getRaffleBySlug } from "@/services/raffle.service";
+import { getRaffleById, getRaffleBySlug, getLiveRaffleById, getLiveRaffleBySlug } from "@/services/raffle.service";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { PackageSelectorForm } from './components/PackageSelectorForm';
@@ -10,26 +10,56 @@ export function RaffleView() {
   const { raffleId } = useParams<{ raffleId: string }>();
   const { raffle, setRaffle } = useRaffleStore();
 
+  // Initial fetch of raffle data
   useEffect(() => {
-    (async () => {
-      if (raffleId) {
+    const fetchRaffleData = async () => {
+      if (!raffleId) return;
+      
+      try {
+        // First try to get raffle by slug
+        const raffleData = await getRaffleBySlug(raffleId);
+        setRaffle(raffleData);
+      } catch (slugError) {
         try {
-          // First try to get raffle by slug
-          const raffleData = await getRaffleBySlug(raffleId);
+          // Fallback to get by ID for backward compatibility
+          const raffleData = await getRaffleById(raffleId);
           setRaffle(raffleData);
-        } catch (slugError) {
-          try {
-            // Fallback to get by ID for backward compatibility
-            const raffleData = await getRaffleById(raffleId);
-            setRaffle(raffleData);
-          } catch (idError) {
-            console.error("Failed to fetch raffle by ID:", idError);
-            console.error("Original slug error:", slugError);
-          }
+        } catch (idError) {
+          console.error("Failed to fetch raffle by ID:", idError);
+          console.error("Original slug error:", slugError);
         }
       }
-    })();
-  }, [raffleId]);
+    };
+
+    fetchRaffleData();
+  }, [raffleId, setRaffle]);
+  
+  // Poll for updates every 10 seconds
+  useEffect(() => {
+    // Don't start polling until we have the initial raffle data
+    if (!raffle || !raffleId) return;
+    
+    const updateRaffleData = async () => {
+      try {
+        // Use the appropriate live data method based on what we initially used
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raffleId);
+        
+        // Use the live data endpoints that bypass cache
+        const updatedRaffle = isUuid
+          ? await getLiveRaffleById(raffleId)
+          : await getLiveRaffleBySlug(raffleId);
+          
+        // Always update since we're getting fresh data that bypasses cache
+        setRaffle(updatedRaffle);
+      } catch (error) {
+        console.error("Error polling for live raffle updates:", error);
+      }
+    };
+
+    const intervalId = setInterval(updateRaffleData, 8000); // Poll every 8 seconds
+    
+    return () => clearInterval(intervalId); // Clean up on unmount
+  }, [raffle, raffleId, setRaffle]);
 
   if (raffle?.status !== "active") {
     return (
