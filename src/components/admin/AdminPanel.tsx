@@ -129,6 +129,15 @@ export function AdminPanel() {
     setShowForm(true);
   };
 
+  const handleSelectRaffle = async (raffle: Raffle) => {
+    setSelectedRaffle(raffle);
+    const liveRaffleData = await getLiveRaffleById(raffle._id);
+    if (liveRaffleData) {
+      setSelectedRaffle(liveRaffleData);
+    }
+    setShowForm(false);
+  };
+
   if (!isLoggedIn) return <AdminLogin onLogin={handleLogin} />;
 
   if (isLoggedIn)
@@ -169,7 +178,7 @@ export function AdminPanel() {
                   {raffles.map((raffle) => (
                     <div
                       key={raffle._id}
-                      onClick={() => setSelectedRaffle(raffle)}
+                      onClick={() => handleSelectRaffle(raffle)}
                       className="cursor-pointer touch-manipulation"
                     >
                       <RaffleCard raffle={raffle} />
