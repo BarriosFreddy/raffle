@@ -44,6 +44,7 @@ export function CreateRaffleForm({
       coverUrl: "",
       slug: "",
       lotteryName: "",
+      supportPhoneNumber: "",
       themeColor: "#4f46e5", // Default theme color (indigo-600)
     },
   });
@@ -76,6 +77,7 @@ export function CreateRaffleForm({
         PaymentGateway.BOLD,
       coverUrl: selectedRaffle.coverUrl || "",
       lotteryName: selectedRaffle.lotteryName || "",
+      supportPhoneNumber: selectedRaffle.supportPhoneNumber || "",
       themeColor: selectedRaffle.themeColor || "#4f46e5",
       slug: selectedRaffle.slug || "",
     });
@@ -95,6 +97,7 @@ export function CreateRaffleForm({
         paymentGateway: data.paymentGateway,
         coverUrl: data.coverUrl || "",
         lotteryName: data.lotteryName || "",
+        supportPhoneNumber: data.supportPhoneNumber || "",
         themeColor: data.themeColor || "#4f46e5",
         slug: data.slug,
         id: crypto.randomUUID(),
@@ -347,6 +350,32 @@ export function CreateRaffleForm({
               </p>
             )}
           </div>
+        </div>
+        
+        <div>
+          <label
+            htmlFor="supportPhoneNumber"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Teléfono de Soporte (WhatsApp)
+          </label>
+          <input
+            type="tel"
+            id="supportPhoneNumber"
+            {...register("supportPhoneNumber")}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.supportPhoneNumber ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            placeholder="+573XXXXXXXXX"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Número de teléfono con código de país (Ej: +573XXXXXXXXX)
+          </p>
+          {errors.supportPhoneNumber && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.supportPhoneNumber.message}
+            </p>
+          )}
         </div>
         <div>
           <label

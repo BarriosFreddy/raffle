@@ -18,6 +18,9 @@ export const raffleSchema = z.object({
     errorMap: () => ({ message: 'Seleccione un método de pago válido' }),
   }).default(PaymentGateway.BOLD),
   lotteryName: z.string().min(1, 'El nombre de la lotería es requerido'),
+  supportPhoneNumber: z.string()
+    .regex(/^\+?[0-9]{10,15}$/, 'El número de teléfono debe tener entre 10 y 15 dígitos')
+    .optional(),
   slug: z.string()
     .min(3, 'El slug debe tener al menos 3 caracteres')
     .regex(/^[a-zA-Z0-9-]+$/, 'El slug solo puede contener letras, números y guiones')

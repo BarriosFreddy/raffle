@@ -82,6 +82,7 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           />
         </div>
         <AwardedNumbersList raffle={raffle} />
+        
       </div>
       <div className="flex flex-col">
         <div className="items-center hidden sm:flex mb-4">
@@ -229,6 +230,22 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           >
             {raffle.description}
           </p>
+        </div>
+
+        {/* Technical Support Component */}
+        <div className="bg-white p-6 rounded-lg shadow-sm mt-8">
+          <h3 className="text-xl font-bold mb-2">Soporte técnico especializado</h3>
+          <p className="text-gray-600 mb-4">
+            Resolveremos cualquier duda que puedas tener sobre nuestras ventas online.
+          </p>
+          <a
+            href={`https://wa.me/${raffle.supportPhoneNumber || '+573XXXXXXXXX'}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3 px-4 rounded-lg border border-green-400 text-green-400 font-medium hover:bg-green-50 transition-colors"
+          >
+            Soporte WhatsApp
+          </a>
         </div>
       </div>
     </div>

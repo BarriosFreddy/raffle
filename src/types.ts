@@ -28,4 +28,5 @@ export interface Raffle {
   slug: string; // URL-friendly unique identifier
   lotteryName: string; // Name of the lottery used for this raffle
   awardedNumbers: number[]; // Numbers that have been awarded prizes
+  supportPhoneNumber?: string; // Support phone number for WhatsApp contact
 }

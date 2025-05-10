@@ -43,6 +43,11 @@ const raffleSchema = new mongoose.Schema({
   lotteryName: {
     type: String,
     default: ''
+  },
+  supportPhoneNumber: {
+    type: String,
+    match: /^\+?[0-9]{10,15}$/, // Phone number with optional + prefix, 10-15 digits
+    default: ''
   }
 }, { timestamps: true });
 

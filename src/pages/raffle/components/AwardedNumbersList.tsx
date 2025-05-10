@@ -28,7 +28,7 @@ export function AwardedNumbersList({ raffle }: AwardedNumbersListProps) {
         pago es inmediato.
       </p>
 
-      <div className="flex flex-wrap gap-2 mt-3">
+      <div className="flex flex-wrap gap-2 mt-3 justify-center">
         {sortedNumbers.map((number) => (
           <TicketContainer
             key={number}
