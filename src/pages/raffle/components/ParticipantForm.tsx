@@ -19,18 +19,18 @@ import { Raffle } from "@/types";
 import { PaymentGateway } from "@/enums/PaymentGateway.enum";
 const { VITE_ENV } = import.meta.env;
 
-interface ParticipantDetailsFormProps {
+interface ParticipantFormProps {
   quantity: number;
   raffle: Raffle;
   onBack: () => void;
 }
 
-export function ParticipantDetailsForm({
+export function ParticipantForm({
   quantity,
   raffle,
   onBack,
-}: ParticipantDetailsFormProps) {
-  const themeColor = raffle.themeColor || '#4f46e5'; // Default to indigo if not set
+}: ParticipantFormProps) {
+  const themeColor = raffle.themeColor || "#4f46e5"; // Default to indigo if not set
   const [paymentData, setPaymentData] = useState<PaymentDataDTO>();
 
   const {
@@ -83,7 +83,11 @@ export function ParticipantDetailsForm({
       });
       data.preferenceId = preference.id;
     }
-    if (raffle.paymentGateway === PaymentGateway.BOLD) {
+    if (
+      [PaymentGateway.BOLD, PaymentGateway.NONE].includes(
+        raffle.paymentGateway as PaymentGateway
+      )
+    ) {
       const orderId = crypto.randomUUID();
       data.orderId = orderId;
     }
@@ -97,10 +101,13 @@ export function ParticipantDetailsForm({
       quantity,
       payer: formData,
     });
+    if (raffle.paymentGateway === PaymentGateway.NONE) {
+      window.location.href = `/response?bold-order-id=${data.orderId}&bold-tx-status=approved`;
+    }
   };
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 max-w-xl mx-auto">
       {/* Back Button */}
       <div className="flex items-center gap-4 text-gray-800 mb-6">
         <button
@@ -116,7 +123,10 @@ export function ParticipantDetailsForm({
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <ShoppingCart className="h-6 w-6 mr-2" style={{ color: themeColor }} />
+            <ShoppingCart
+              className="h-6 w-6 mr-2"
+              style={{ color: themeColor }}
+            />
             <h3 className="text-lg font-semibold text-gray-900">
               Resumen de la compra
             </h3>

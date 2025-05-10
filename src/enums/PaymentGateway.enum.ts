@@ -1,5 +1,6 @@
 export enum PaymentGateway {
     EPAYCO = 'EPAYCO',
     MERCADO_PAGO = 'MP',
-    BOLD = 'BOLD'
+    BOLD = 'BOLD',
+    NONE = 'NONE'
 }

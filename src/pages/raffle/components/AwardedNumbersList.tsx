@@ -16,14 +16,14 @@ export function AwardedNumbersList({ raffle }: AwardedNumbersListProps) {
   const sortedNumbers = [...raffle.awardedNumbers].sort((a, b) => a - b);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 my-6">
+    <div className="bg-white rounded-lg shadow-md p-6 mt-6 mb-3">
       <div className="flex items-center mb-4">
         <Award className="h-6 w-6 text-yellow-500 mr-2" />
         <h3 className="text-lg font-bold text-gray-800">Números premiados</h3>
       </div>
       
       <p className="text-gray-600 mb-4">
-        Consulta aquí los números premiados que se entregan de forma aleatoria y su pago es inmediato.
+        Aquí están los números premiados que se entregan de forma aleatoria y su pago es inmediato.
       </p>
       
       <div className="flex flex-wrap gap-2 mt-3">

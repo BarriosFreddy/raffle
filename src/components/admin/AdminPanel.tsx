@@ -72,8 +72,13 @@ export function AdminPanel() {
     setShowForm(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     handleBack();
+    const paymentsData = await findAll({
+      status: APPROVED,
+      page: 1,
+    });
+    setPayments(paymentsData);
   };
 
   const handleLogin = (success: boolean) => {

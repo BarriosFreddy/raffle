@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useRaffleStore } from "../../store/raffleStore";
-import { AddParticipantForm } from "./components/AddParticipantForm";
-import { AwardedNumbersList } from "./components/AwardedNumbersList";
 import { getRaffleById, getRaffleBySlug } from "@/services/raffle.service";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { PackageSelectorForm } from './components/PackageSelectorForm';
 
 export function RaffleView() {
   const { raffleId } = useParams<{ raffleId: string }>();
@@ -44,11 +43,9 @@ export function RaffleView() {
   return (
     <>
       <Header themeColor={raffle.themeColor} />
-      <div className="max-w-lg mx-auto">
-        <div className="mt-8 mb-8">
-          <AddParticipantForm raffle={raffle} />
-          {/* Display awarded numbers if available */}
-          <AwardedNumbersList raffle={raffle} />
+      <div className="max-w-7xl mx-auto">
+        <div className="m-8">
+          <PackageSelectorForm raffle={raffle} />
         </div>
       </div>
       <Footer />

@@ -11,7 +11,7 @@ export const raffleSchema = z.object({
   minNumber: z.number().int().min(0, 'El número mínimo debe ser al menos 0'),
   maxNumber: z.number().int().min(1, 'El número máximo debe ser al menos 1'),
   prize: z.string().min(1, 'El premio es requerida'),
-  ticketPrice: z.number().int().min(1, 'El precio del ticket debe ser al menos 1'),
+  ticketPrice: z.number().int().min(0, 'El precio del ticket debe ser mayor o igual a 0'),
   slug: z.string()
     .min(3, 'El slug debe tener al menos 3 caracteres')
     .regex(/^[a-zA-Z0-9-]+$/, 'El slug solo puede contener letras, números y guiones')
