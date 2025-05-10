@@ -1,6 +1,7 @@
-import React from 'react';
-import type { Raffle } from '@/types';
-import { Award } from 'lucide-react';
+import React from "react";
+import type { Raffle } from "@/types";
+import { Award } from "lucide-react";
+import { TicketContainer } from "@/components/TicketContainer";
 
 interface AwardedNumbersListProps {
   raffle: Raffle;
@@ -21,19 +22,19 @@ export function AwardedNumbersList({ raffle }: AwardedNumbersListProps) {
         <Award className="h-6 w-6 text-yellow-500 mr-2" />
         <h3 className="text-lg font-bold text-gray-800">Números premiados</h3>
       </div>
-      
+
       <p className="text-gray-600 mb-4">
-        Aquí están los números premiados que se entregan de forma aleatoria y su pago es inmediato.
+        Aquí están los números premiados que se entregan de forma aleatoria y su
+        pago es inmediato.
       </p>
-      
+
       <div className="flex flex-wrap gap-2 mt-3">
-        {sortedNumbers.map(number => (
-          <div 
-            key={number} 
-            className="flex items-center justify-center h-10 min-w-10 px-3 rounded-full bg-yellow-100 text-yellow-800 font-bold"
-          >
-            {number}
-          </div>
+        {sortedNumbers.map((number) => (
+          <TicketContainer
+            key={number}
+            ticketNumber={number}
+            digits={raffle.maxNumber.toString().length - 1}
+          />
         ))}
       </div>
     </div>

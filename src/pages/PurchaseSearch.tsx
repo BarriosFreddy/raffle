@@ -5,13 +5,15 @@ import { formatMoney } from "../utils/formatNumber";
 import { assignTicketNumbers, findAll } from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
+import { getRaffleById } from "@/services/raffle.service";
 
-const APPROVED = 'approved'
+const APPROVED = "approved";
 
 export function PurchaseSearch() {
   const [email, setEmail] = useState("");
   const [fetching, setFetching] = useState(false);
   const [send, setSend] = useState(false);
+  const [raffle, setRaffle] = useState<Raffle>();
 
   const [searchResults, setSearchResults] = useState<
     {
@@ -24,6 +26,10 @@ export function PurchaseSearch() {
     e?.preventDefault();
     setFetching(true);
     const payments = await findAll({ email, status: PaymentStatus.APPROVED });
+    if (payments.length) {
+      const raffleRes = await getRaffleById(payments[0].raffleId);
+      setRaffle(raffleRes);
+    }
     setSearchResults(payments);
     setFetching(false);
     setSend(true);
@@ -32,7 +38,7 @@ export function PurchaseSearch() {
   const handleShowNumbers = async (preferenceId: string) => {
     if (preferenceId) {
       await assignTicketNumbers({ preferenceId });
-      await handleSearch()
+      await handleSearch();
     }
   };
 
@@ -67,7 +73,10 @@ export function PurchaseSearch() {
       <div className="mt-8">
         <div className="space-y-6">
           {searchResults.map(
-            ({ payer, ticketNumbers, status, amount, quantity, preferenceId }, index) => (
+            (
+              { payer, ticketNumbers, status, amount, quantity, preferenceId },
+              index
+            ) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-900">
                   Correo electrónico:{" "}
@@ -78,9 +87,7 @@ export function PurchaseSearch() {
                   Usuario de instagram: {payer.instagram}
                 </p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
-                <p className="text-gray-900">
-                  {quantity} Números
-                </p>
+                <p className="text-gray-900">{quantity} Números</p>
                 <div className="space-y-2 mt-2">
                   {ticketNumbers.length === 0 && status === APPROVED && (
                     <button
@@ -95,7 +102,13 @@ export function PurchaseSearch() {
                     {ticketNumbers
                       .sort((a, b) => a - b)
                       .map((number) => (
-                        <TicketContainer key={number} ticketNumber={number} />
+                        <TicketContainer
+                          key={number}
+                          ticketNumber={number}
+                          digits={
+                            raffle ? raffle.maxNumber.toString().length - 1 : 0
+                          }
+                        />
                       ))}
                   </div>
                 </div>

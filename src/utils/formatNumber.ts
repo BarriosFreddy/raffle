@@ -1,6 +1,11 @@
-export function formatTicketNumber(number: number, maxNumber: number): string {
-  const maxDigits = maxNumber.toString().length;
-  return number.toString().padStart(maxDigits, '0');
+/**
+ * 
+ * @param number 
+ * @param digits Number of Digits
+ * @returns 
+ */
+export function formatTicketNumber(number: number, digits: number = 0): string {
+  return number.toString().padStart(digits, '0');
 }
 
 export function formatMoney(number: number): string {

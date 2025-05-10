@@ -152,6 +152,7 @@ export function AdminPanel() {
                     onEdit={handleEditRaffle}
                   />
                   <PurchasesList
+                    raffle={selectedRaffle}
                     payments={payments}
                     page={page}
                     onNext={handleNextPage}

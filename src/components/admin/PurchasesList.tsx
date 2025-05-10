@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { formatTicketNumber } from '../../utils/formatNumber';
+import React, { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { TicketContainer } from "../TicketContainer";
+import { Raffle } from "@/types";
 
 interface PurchasesListProps {
   payments: any;
   onNext: () => void;
   onPrev: () => void;
   page: number;
+  raffle: Raffle;
 }
 
-export function PurchasesList({ payments, onNext, onPrev, page }: PurchasesListProps) {
+export function PurchasesList({
+  payments,
+  onNext,
+  onPrev,
+  page,
+  raffle,
+}: PurchasesListProps) {
   const [expandedPurchase, setExpandedPurchase] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
-    setExpandedPurchase(current => current === id ? null : id);
+    setExpandedPurchase((current) => (current === id ? null : id));
   };
 
   const handlePrevPage = async () => onPrev && onPrev();
@@ -27,15 +35,12 @@ export function PurchasesList({ payments, onNext, onPrev, page }: PurchasesListP
           Compras recientes
         </h2>
         <div className="space-y-4">
-          {
-            payments.length === 0 &&
-            (
-              <div className="text-center py-8 text-gray-600">
-                No hay compras aún.
-              </div>
-            )
-          }
-          {payments.map(payment => {
+          {payments.length === 0 && (
+            <div className="text-center py-8 text-gray-600">
+              No hay compras aún.
+            </div>
+          )}
+          {payments.map((payment) => {
             const isExpanded = expandedPurchase === payment._id;
             return (
               <div
@@ -48,7 +53,9 @@ export function PurchasesList({ payments, onNext, onPrev, page }: PurchasesListP
                 >
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-medium text-gray-900">{payment.payer.name}</span>
+                      <span className="font-medium text-gray-900">
+                        {payment.payer.name}
+                      </span>
                       <span className="text-sm text-gray-600">
                         {payment.ticketNumbers.length} tickets
                       </span>
@@ -56,9 +63,9 @@ export function PurchasesList({ payments, onNext, onPrev, page }: PurchasesListP
                     <div className="flex justify-between items-center text-sm text-gray-600">
                       <span>{payment.raffleTitle}</span>
                       <span>
-                        {new Intl.NumberFormat('es-CO', {
-                          style: 'currency',
-                          currency: 'COP'
+                        {new Intl.NumberFormat("es-CO", {
+                          style: "currency",
+                          currency: "COP",
                         }).format(payment.amount)}
                       </span>
                     </div>
@@ -83,22 +90,29 @@ export function PurchasesList({ payments, onNext, onPrev, page }: PurchasesListP
                       </div>
                       <div className="flex justify-between">
                         <dt className="text-gray-600">Instagram:</dt>
-                        <dd className="text-gray-900">{payment.payer.instagram}</dd>
+                        <dd className="text-gray-900">
+                          {payment.payer.instagram}
+                        </dd>
                       </div>
                       <div className="flex justify-between">
                         <dt className="text-gray-600">National ID:</dt>
-                        <dd className="text-gray-900">{payment.payer.nationalId}</dd>
+                        <dd className="text-gray-900">
+                          {payment.payer.nationalId}
+                        </dd>
                       </div>
                       <div>
                         <dt className="text-gray-600 mb-2">Ticket Numbers:</dt>
                         <dd className="flex flex-wrap gap-2">
-                          {payment.ticketNumbers.map(number => (
-                            <span
+                          {payment.ticketNumbers.map((number) => (
+                            <TicketContainer
                               key={number}
-                              className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm"
-                            >
-                              {formatTicketNumber(number, 99999)}
-                            </span>
+                              ticketNumber={number}
+                              digits={
+                                raffle
+                                  ? raffle.maxNumber.toString().length - 1
+                                  : 0
+                              }
+                            />
                           ))}
                         </dd>
                       </div>

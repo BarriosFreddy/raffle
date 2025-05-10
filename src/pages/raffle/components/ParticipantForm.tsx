@@ -17,6 +17,7 @@ import type { ParticipantFormData } from "../../../types/ParticipantFormData";
 import { PaymentDataDTO } from "@/types/paymentDataDTO";
 import { Raffle } from "@/types";
 import { PaymentGateway } from "@/enums/PaymentGateway.enum";
+import { notify } from "@/services/notifications";
 const { VITE_ENV } = import.meta.env;
 
 interface ParticipantFormProps {
@@ -32,6 +33,7 @@ export function ParticipantForm({
 }: ParticipantFormProps) {
   const themeColor = raffle.themeColor || "#4f46e5"; // Default to indigo if not set
   const [paymentData, setPaymentData] = useState<PaymentDataDTO>();
+  const [ticketsExceeded, setTicketsExceeded] = useState(false);
 
   const {
     register,
@@ -58,6 +60,7 @@ export function ParticipantForm({
   const formattedPrice = formatMoney(totalPrice);
 
   const onFormSubmit = async (formData: ParticipantFormData) => {
+    setTicketsExceeded(false);
     const data: PaymentDataDTO = {
       formData,
       amount: totalPrice,
@@ -93,7 +96,7 @@ export function ParticipantForm({
     }
     setPaymentData(data);
 
-    await createPayment({
+    const payment = await createPayment({
       raffleId: raffle._id,
       preferenceId: data.preferenceId,
       orderId: data.orderId,
@@ -101,8 +104,15 @@ export function ParticipantForm({
       quantity,
       payer: formData,
     });
-    if (raffle.paymentGateway === PaymentGateway.NONE) {
-      window.location.href = `/response?bold-order-id=${data.orderId}&bold-tx-status=approved`;
+    if (payment) {
+      if (raffle.paymentGateway === PaymentGateway.NONE) {
+        window.location.href = `/response?bold-order-id=${data.orderId}&bold-tx-status=approved`;
+      }
+    } else {
+      setPaymentData(undefined);
+      setTicketsExceeded(true);
+      console.info("Se ha excedido el número de tikcets por persona");
+      notify.warning("Has excedido el número de tikcets por persona");
     }
   };
 
@@ -285,7 +295,11 @@ export function ParticipantForm({
           )}
         </div>
       </div>
-
+      {ticketsExceeded && (
+        <div className="text-red-500">
+          <span>Has excedido el número de tickets por persona</span>
+        </div>
+      )}
       {/* Submit Button */}
       {!paymentData ? (
         <button

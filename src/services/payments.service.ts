@@ -47,10 +47,8 @@ export async function createPayment(data: PaymentData) {
 
     return response.data;
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Failed to create preference: ${error.message}`);
-    }
-    throw new Error("Failed to create preference");
+    console.error(error);
+    return null;
   }
 }
 

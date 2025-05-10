@@ -6,6 +6,7 @@ import { useRaffleStore } from "./store/raffleStore";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   const { raffles, setRaffles } = useRaffleStore();
@@ -40,6 +41,7 @@ export default function App() {
           </div>
         </main>
       </div>
+      <ToastContainer />
       <Footer />
     </ErrorBoundary>
   );

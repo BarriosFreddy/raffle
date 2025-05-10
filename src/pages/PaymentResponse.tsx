@@ -8,11 +8,14 @@ import {
 } from "@/services/payments.service";
 import { TicketContainer } from "@/components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
+import { getRaffleById } from "@/services/raffle.service";
+import { Raffle } from "@/types";
 
 export function PaymentResponse() {
   const [loading, setLoading] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
   const [searchParams] = useSearchParams();
+  const [raffle, setRaffle] = useState<Raffle>();
 
   const paymentResponse = Object.fromEntries(new URLSearchParams(searchParams));
   const refPayco = paymentResponse.ref_payco;
@@ -27,6 +30,8 @@ export function PaymentResponse() {
         const { data } = paymentEpaycoResponse;
         const paymentDataRes = await processPaymentResponse(data);
         setPaymentData(paymentDataRes);
+        const raffleRes = await getRaffleById(paymentDataRes.raffleId);
+        setRaffle(raffleRes);
       }
       setLoading(false);
     })();
@@ -103,7 +108,11 @@ export function PaymentResponse() {
               )}
             <section className="grid grid-cols-2 gap-4">
               {ticketNumbers.map((number) => (
-                <TicketContainer key={number} ticketNumber={number} />
+                <TicketContainer
+                  key={number}
+                  ticketNumber={number}
+                  digits={raffle ? raffle.maxNumber.toString().length - 1 : 0}
+                />
               ))}
             </section>
 
