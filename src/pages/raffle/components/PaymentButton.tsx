@@ -11,7 +11,7 @@ interface PaymentButtonProps {
 
 export function PaymentButton({
   paymentData,
-  paymentGateway = PaymentGateway.EPAYCO,
+  paymentGateway = PaymentGateway.BOLD,
 }: PaymentButtonProps) {
   if (paymentGateway === PaymentGateway.EPAYCO) {
     return <EPayCoButton paymentData={paymentData} />;

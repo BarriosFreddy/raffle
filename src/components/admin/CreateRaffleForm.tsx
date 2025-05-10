@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { ColorPickerInput } from './ColorPickerInput';
-import type { Raffle } from '../../types';
-import { saveRaffle, updateRaffle } from '@/services/raffle.service';
-import { useRaffleStore } from '@/store/raffleStore';
-import { raffleSchema } from '@/schemas/validation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
+import React, { useEffect, useState } from "react";
+import { ColorPickerInput } from "./ColorPickerInput";
+import type { Raffle } from "../../types";
+import { saveRaffle, updateRaffle } from "@/services/raffle.service";
+import { useRaffleStore } from "@/store/raffleStore";
+import { raffleSchema } from "@/schemas/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { PaymentGateway } from "@/enums/PaymentGateway.enum";
+import type { z } from "zod";
 
 type CreateRaffleFormProps = {
-  onSave: () => void
-  selectedRaffle: Raffle | undefined
-}
+  onSave: () => void;
+  selectedRaffle: Raffle | undefined;
+};
 
 type FormData = z.infer<typeof raffleSchema>;
 
-export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormProps) {
+export function CreateRaffleForm({
+  onSave,
+  selectedRaffle,
+}: CreateRaffleFormProps) {
   const { raffles, setRaffles } = useRaffleStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,30 +31,31 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
     watch,
     setValue,
   } = useForm<FormData>({
-    resolver: zodResolver(raffleSchema),
+    resolver: zodResolver(raffleSchema) as never,
     defaultValues: {
-      name: '',
-      description: '',
+      name: "",
+      description: "",
       minNumber: 0,
       maxNumber: 100,
-      prize: '',
+      prize: "",
       ticketPrice: 0,
-      coverUrl: '',
-      slug: '',
-      themeColor: '#4f46e5', // Default theme color (indigo-600)
-    }
+      paymentGateway: PaymentGateway.BOLD,
+      coverUrl: "",
+      slug: "",
+      themeColor: "#4f46e5", // Default theme color (indigo-600)
+    },
   });
-  
+
   // Generate slug from the name
-  const watchName = watch('name');
+  const watchName = watch("name");
   useEffect(() => {
     if (watchName && !selectedRaffle) {
       const generatedSlug = watchName
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      setValue('slug', generatedSlug);
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      setValue("slug", generatedSlug);
     }
   }, [watchName, setValue, selectedRaffle]);
 
@@ -63,13 +68,16 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       maxNumber: selectedRaffle.maxNumber,
       prize: selectedRaffle.prize,
       ticketPrice: selectedRaffle.ticketPrice,
-      coverUrl: selectedRaffle.coverUrl || '',
-      themeColor: selectedRaffle.themeColor || '#4f46e5',
-      slug: selectedRaffle.slug || '',
-    })
-  }, [reset, selectedRaffle])
+      paymentGateway:
+        (selectedRaffle.paymentGateway as PaymentGateway) ||
+        PaymentGateway.BOLD,
+      coverUrl: selectedRaffle.coverUrl || "",
+      themeColor: selectedRaffle.themeColor || "#4f46e5",
+      slug: selectedRaffle.slug || "",
+    });
+  }, [reset, selectedRaffle]);
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
       setIsLoading(true);
       const newRaffle = {
@@ -79,8 +87,9 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
         maxNumber: data.maxNumber,
         prize: data.prize,
         ticketPrice: data.ticketPrice,
-        coverUrl: data.coverUrl,
-        themeColor: data.themeColor,
+        paymentGateway: data.paymentGateway,
+        coverUrl: data.coverUrl || "",
+        themeColor: data.themeColor || "#4f46e5",
         slug: data.slug,
         id: crypto.randomUUID(),
         status: "active",
@@ -97,7 +106,7 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
       reset();
       if (onSave) onSave();
     } catch (error) {
-      console.error('Error creating raffle:', error);
+      console.error("Error creating raffle:", error);
       // Here you could add a toast notification for error handling
     } finally {
       setIsLoading(false);
@@ -110,15 +119,19 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Título de la Rifa
           </label>
           <input
             type="text"
             id="name"
-            {...register('name')}
-            className={`block w-full px-2 py-2 rounded-lg border ${errors.name ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            {...register("name")}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.name ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -126,30 +139,40 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
             Descripción
           </label>
           <textarea
             id="description"
-            {...register('description')}
-            className={`block w-full px-2 py-2 rounded-lg border ${errors.description ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            {...register("description")}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.description ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             rows={3}
           />
           {errors.description && (
-            <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.description.message}
+            </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="prize" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="prize"
+            className="block text-sm font-medium text-gray-700"
+          >
             Premio
           </label>
           <textarea
             id="prize"
-            {...register('prize')}
-            className={`block w-full px-2 py-2 rounded-lg border ${errors.prize ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            {...register("prize")}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.prize ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             rows={2}
           />
           {errors.prize && (
@@ -159,117 +182,173 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="minNumber" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="minNumber"
+              className="block text-sm font-medium text-gray-700"
+            >
               Número Mínimo
             </label>
             <input
               type="number"
               id="minNumber"
-              {...register('minNumber', { valueAsNumber: true })}
-              className={`block w-full px-2 py-2 rounded-lg border ${errors.minNumber ? "border-red-500" : "border-gray-300"
-                } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              {...register("minNumber", { valueAsNumber: true })}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.minNumber ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
             {errors.minNumber && (
-              <p className="mt-1 text-sm text-red-600">{errors.minNumber.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.minNumber.message}
+              </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="maxNumber" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="maxNumber"
+              className="block text-sm font-medium text-gray-700"
+            >
               Número Máximo
             </label>
             <input
               type="number"
               id="maxNumber"
-              {...register('maxNumber', { valueAsNumber: true })}
-              className={`block w-full px-2 py-2 rounded-lg border ${errors.maxNumber ? "border-red-500" : "border-gray-300"
-                } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`} />
+              {...register("maxNumber", { valueAsNumber: true })}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.maxNumber ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            />
             {errors.maxNumber && (
-              <p className="mt-1 text-sm text-red-600">{errors.maxNumber.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.maxNumber.message}
+              </p>
             )}
           </div>
         </div>
 
         <div>
-          <label htmlFor="ticketPrice" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="ticketPrice"
+            className="block text-sm font-medium text-gray-700"
+          >
             Precio del Ticket
           </label>
           <input
             type="number"
             id="ticketPrice"
-            {...register('ticketPrice', { valueAsNumber: true })}
-            className={`block w-full px-2 py-2 rounded-lg border ${errors.ticketPrice ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            {...register("ticketPrice", { valueAsNumber: true })}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.ticketPrice ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
           {errors.ticketPrice && (
-            <p className="mt-1 text-sm text-red-600">{errors.ticketPrice.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.ticketPrice.message}
+            </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="slug"
+            className="block text-sm font-medium text-gray-700"
+          >
             Slug (URL amigable)
           </label>
           <input
             type="text"
             id="slug"
-            {...register('slug')}
-            className={`block w-full px-2 py-2 rounded-lg border ${errors.slug ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            {...register("slug")}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.slug ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
-          <p className="mt-1 text-xs text-gray-500">Solo letras, números y guiones. Debe ser único.</p>
+          <p className="mt-1 text-xs text-gray-500">
+            Solo letras, números y guiones. Debe ser único.
+          </p>
           {errors.slug && (
             <p className="mt-1 text-sm text-red-600">{errors.slug.message}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="paymentGateway"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Pasarela de Pago
+          </label>
+          <select
+            id="paymentGateway"
+            {...register("paymentGateway")}
+            className={`block w-full px-2 py-2 rounded-lg border ${
+              errors.paymentGateway ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          >
+            <option value={PaymentGateway.BOLD}>BOLD</option>
+            <option value={PaymentGateway.NONE}>NINGUNA</option>
+          </select>
+          {errors.paymentGateway && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.paymentGateway.message}
+            </p>
           )}
         </div>
 
         <div className="grid grid-cols-1 gap-4">
           <div>
-            <label htmlFor="coverUrl" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="coverUrl"
+              className="block text-sm font-medium text-gray-700"
+            >
               URL de la imagen de portada
             </label>
             <input
               type="url"
               id="coverUrl"
-              {...register('coverUrl')}
-              className={`block w-full px-2 py-2 rounded-lg border ${errors.coverUrl ? "border-red-500" : "border-gray-300"
-                } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              {...register("coverUrl")}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.coverUrl ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
               placeholder="https://ejemplo.com/imagen.jpg"
             />
-            <p className="mt-1 text-xs text-gray-500">Formatos aceptados: PNG, JPG, JPEG, WEBP</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Formatos aceptados: PNG, JPG, JPEG, WEBP
+            </p>
             {errors.coverUrl && (
-              <p className="mt-1 text-sm text-red-600">{errors.coverUrl.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.coverUrl.message}
+              </p>
             )}
           </div>
           <div className="flex items-center justify-center">
-            {watch('coverUrl') && (
+            {watch("coverUrl") && (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
                 <img
-                  src={watch('coverUrl')}
+                  src={watch("coverUrl")}
                   alt="Vista previa de la portada"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = 'https://placehold.co/600x400?text=Error+al+cargar+imagen';
+                    target.src =
+                      "https://placehold.co/600x400?text=Error+al+cargar+imagen";
                   }}
                 />
               </div>
             )}
-            {!watch('coverUrl') && (
+            {!watch("coverUrl") && (
               <div className="w-full aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
                 <span className="text-gray-400">Vista previa de la imagen</span>
               </div>
             )}
           </div>
         </div>
-        
         <div>
-          <ColorPickerInput 
-            value={watch('themeColor') || '#4f46e5'} 
+          <ColorPickerInput
+            value={watch("themeColor") || "#4f46e5"}
             onChange={(color) => {
               // Use register's onChange handler
-              register('themeColor').onChange({
-                target: { value: color, name: 'themeColor' }
+              register("themeColor").onChange({
+                target: { value: color, name: "themeColor" },
               });
             }}
             error={errors.themeColor?.message as string | undefined}
@@ -281,7 +360,13 @@ export function CreateRaffleForm({ onSave, selectedRaffle }: CreateRaffleFormPro
           disabled={isLoading}
           className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
         >
-          {selectedRaffle ? (isLoading ? 'EDITANDO...' : 'EDITAR RIFA') : (isLoading ? 'CREANDO...' : 'CREAR RIFA')}
+          {selectedRaffle
+            ? isLoading
+              ? "EDITANDO..."
+              : "EDITAR RIFA"
+            : isLoading
+            ? "CREANDO..."
+            : "CREAR RIFA"}
         </button>
       </form>
     </div>
