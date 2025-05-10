@@ -30,8 +30,10 @@ export function PaymentResponse() {
         const { data } = paymentEpaycoResponse;
         const paymentDataRes = await processPaymentResponse(data);
         setPaymentData(paymentDataRes);
-        const raffleRes = await getRaffleById(paymentDataRes.raffleId);
-        setRaffle(raffleRes);
+        if (paymentDataRes) {
+          const raffleRes = await getRaffleById(paymentDataRes.raffleId);
+          setRaffle(raffleRes);
+        }
       }
       setLoading(false);
     })();
@@ -46,6 +48,10 @@ export function PaymentResponse() {
           boldTXStatus,
         });
         setPaymentData(paymentDataRes);
+        if (paymentDataRes) {
+          const raffleRes = await getRaffleById(paymentDataRes.raffleId);
+          setRaffle(raffleRes);
+        }
       }
       setLoading(false);
     })();
