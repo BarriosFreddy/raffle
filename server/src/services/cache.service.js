@@ -1,6 +1,6 @@
 import NodeCache from "node-cache";
 
-const CACHE_TIME = 60 * 60 * 12 // 12 hpurs
+const CACHE_TIME = 60 * 60 * 1 // 1 hpur
 const myCache = new NodeCache({ stdTTL: CACHE_TIME });
 
 class CacheService {

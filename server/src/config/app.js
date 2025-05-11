@@ -7,6 +7,7 @@ import { mercadoPagoRoutes } from '../routes/mercadopago.routes.js';
 import { boldRoutes } from '../routes/bold.routes.js';
 import { logger } from '../utils/logger.js';
 import { authRoutes } from '../routes/auth.routes.js';
+import { cacheRoutes } from '../routes/cache.routes.js';
 
 export function createApp() {
   const app = express();
@@ -38,6 +39,7 @@ export function createApp() {
   app.use('/api', mercadoPagoRoutes);
   app.use('/api', boldRoutes);
   app.use('/api/auth', authRoutes);
+  app.use('/api', cacheRoutes);
 
   // Error handling
   app.use(notFound);
