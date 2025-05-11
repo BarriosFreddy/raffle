@@ -6,6 +6,7 @@ import { assignTicketNumbers, findAll } from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
 import { getRaffleById } from "@/services/raffle.service";
+import { PaymentDataDTO } from "@/types/paymentDataDTO";
 
 const APPROVED = "approved";
 
@@ -35,9 +36,11 @@ export function PurchaseSearch() {
     setSend(true);
   };
 
-  const handleShowNumbers = async (preferenceId: string) => {
-    if (preferenceId) {
-      await assignTicketNumbers({ preferenceId });
+  const handleShowNumbers = async (paymentData: Partial<PaymentDataDTO>) => {
+    if (paymentData && paymentData.payer?.email) {
+      await assignTicketNumbers({
+        email: paymentData.payer?.email,
+      });
       await handleSearch();
     }
   };
@@ -91,7 +94,7 @@ export function PurchaseSearch() {
                 <div className="space-y-2 mt-2">
                   {ticketNumbers.length === 0 && status === APPROVED && (
                     <button
-                      onClick={() => handleShowNumbers(preferenceId)}
+                      onClick={() => handleShowNumbers({ payer })}
                       className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
                     >
                       <Ticket className="h-5 w-5 mr-2" />
