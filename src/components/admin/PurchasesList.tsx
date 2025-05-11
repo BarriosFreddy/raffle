@@ -79,44 +79,38 @@ export function PurchasesList({
 
                 {isExpanded && (
                   <div className="px-4 pb-4 bg-gray-50">
-                    <dl className="space-y-2 text-sm">
-                      <div className="flex justify-between">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex gap-2">
                         <dt className="text-gray-600">Email:</dt>
                         <dd className="text-gray-900">{payment.payer.email}</dd>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex gap-2">
                         <dt className="text-gray-600">Phone:</dt>
                         <dd className="text-gray-900">{payment.payer.phone}</dd>
                       </div>
-                      <div className="flex justify-between">
-                        <dt className="text-gray-600">Instagram:</dt>
-                        <dd className="text-gray-900">
-                          {payment.payer.instagram}
-                        </dd>
-                      </div>
-                      <div className="flex justify-between">
+                      <div className="flex gap-2">
                         <dt className="text-gray-600">National ID:</dt>
                         <dd className="text-gray-900">
                           {payment.payer.nationalId}
                         </dd>
                       </div>
-                      <div>
-                        <dt className="text-gray-600 mb-2">Ticket Numbers:</dt>
-                        <dd className="flex flex-wrap gap-2">
-                          {payment.ticketNumbers.map((number) => (
-                            <TicketContainer
-                              key={number}
-                              ticketNumber={number}
-                              digits={
-                                raffle
-                                  ? raffle.maxNumber.toString().length - 1
-                                  : 0
-                              }
-                            />
-                          ))}
-                        </dd>
+                    </div>
+                    <div>
+                      <div className="text-gray-600 mb-2">Ticket Numbers:</div>
+                      <div className="flex flex-wrap gap-2">
+                        {payment.ticketNumbers.map((number) => (
+                          <TicketContainer
+                            key={number}
+                            ticketNumber={number}
+                            digits={
+                              raffle
+                                ? raffle.maxNumber.toString().length - 1
+                                : 0
+                            }
+                          />
+                        ))}
                       </div>
-                    </dl>
+                    </div>
                   </div>
                 )}
               </div>

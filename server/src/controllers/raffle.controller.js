@@ -4,6 +4,7 @@ import { TicketService } from "../services/ticket.service.js";
 import { AvailableNumbersService } from "../services/availableNumber.service.js";
 import cacheService, { CACHE_KEYS } from "../services/cache.service.js";
 import * as RaffleService from "../services/raffle.service.js";
+import { PaymentService } from "../services/payment.service.js"
 import { logger } from "../utils/logger.js";
 
 export const raffleController = {
@@ -287,6 +288,26 @@ export const raffleController = {
     } catch (error) {
       logger.error("Error updating awarded numbers:", error);
       next(new ApiError(400, "Failed to update awarded numbers"));
+    }
+  },
+  async getAwardedNumbersWinners(req, res, next) {
+    try {
+      const { raffleId } = req.params;
+      // Validate that all numbers are within the raffle range
+      const raffle = await Raffle.findById(raffleId);
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+
+      // Update the raffle with the awarded numbers
+      const winners = await PaymentService.getAwardedNumbersWinners(raffle.awardedNumbers);
+      
+      // Clear the cache for this raffle
+      res.status(200).json(winners);
+      logger.info(`Get awarded numbers winners for raffle ${raffleId}`);
+    } catch (error) {
+      logger.error("Error getting awarded numbers winners:", error);
+      next(new ApiError(400, "Failed to get awarded numbers winners"));
     }
   },
 };

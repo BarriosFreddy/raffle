@@ -13,7 +13,9 @@ export class PaymentService {
   static async findOneByEmail(email) {
     const payments = await Payment.findOne({
       "payer.email": email,
-    }).sort({ _id: -1 }).exec();
+    })
+      .sort({ _id: -1 })
+      .exec();
     return payments;
   }
   static async findAll(queryData) {
@@ -39,19 +41,24 @@ export class PaymentService {
     // Look for approved payments by this user (email or nationalId) for this raffle
     const userPayments = await Payment.find({
       raffleId,
-      status: 'approved',
-      $or: [
-        { 'payer.email': email },
-        { 'payer.nationalId': nationalId }
-      ]
+      status: "approved",
+      $or: [{ "payer.email": email }, { "payer.nationalId": nationalId }],
     }).exec();
-    
+
     // Calculate total tickets purchased
     let totalTickets = 0;
-    userPayments.forEach(payment => {
+    userPayments.forEach((payment) => {
       totalTickets += payment.quantity || 0;
     });
-    
+
     return totalTickets;
+  }
+  static async getAwardedNumbersWinners(awardedNumbers = []) {
+    const userPaymentsWinners = await Payment.find({
+      ticketNumbers: {
+        $in: awardedNumbers,
+      },
+    }).exec();
+    return userPaymentsWinners;
   }
 }

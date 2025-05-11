@@ -77,7 +77,7 @@ export function PurchaseSearch() {
         <div className="space-y-6">
           {searchResults.map(
             (
-              { payer, ticketNumbers, status, amount, quantity, preferenceId },
+              { payer, ticketNumbers, status, amount, quantity },
               index
             ) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
@@ -86,9 +86,8 @@ export function PurchaseSearch() {
                   <span className="font-semibold">{payer.email}</span>
                 </p>
                 <p className="text-gray-900">Nombre: {payer.name}</p>
-                <p className="text-gray-900">
-                  Usuario de instagram: {payer.instagram}
-                </p>
+                <p className="text-gray-900">Teléfono: {payer.phone}</p>
+                <p className="text-gray-900">Cédula: {payer.nationalId}</p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
                 <p className="text-gray-900">{quantity} Números</p>
                 <div className="space-y-2 mt-2">
