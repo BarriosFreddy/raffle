@@ -23,6 +23,7 @@ export function AdminPanel() {
   const [payments, setPayments] = useState([]);
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [intervalId, setIntervalId] = useState<number>();
 
   // Initial fetch of raffle data
   useEffect(() => {
@@ -66,9 +67,10 @@ export function AdminPanel() {
       }
     };
     
-    const intervalId = setInterval(updateRaffles, 15000); // Poll every 15 seconds
+    const intervalIdQuery = setInterval(updateRaffles, 15000); // Poll every 15 seconds
+    setIntervalId(intervalIdQuery);
     
-    return () => clearInterval(intervalId); // Clean up on unmount
+    return () => clearInterval(intervalIdQuery); // Clean up on unmount
   }, [isLoggedIn, raffles, selectedRaffle, setRaffles]);
 
   useEffect(() => {
@@ -127,6 +129,7 @@ export function AdminPanel() {
 
   const handleEditRaffle = () => {
     setShowForm(true);
+    clearInterval(intervalId);
   };
 
   const handleSelectRaffle = async (raffle: Raffle) => {
@@ -136,6 +139,11 @@ export function AdminPanel() {
       setSelectedRaffle(liveRaffleData);
     }
     setShowForm(false);
+  };
+
+  const handleCreateRaffle = () => {
+    setShowForm(true);
+    clearInterval(intervalId);
   };
 
   if (!isLoggedIn) return <AdminLogin onLogin={handleLogin} />;
@@ -150,7 +158,7 @@ export function AdminPanel() {
               {!selectedRaffle && !showForm && (
                 <div className="flex justify-between">
                   <button
-                    onClick={() => setShowForm(true)}
+                    onClick={handleCreateRaffle}
                     className="inline-flex items-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 transition-colors"
                   >
                     <Plus className="h-5 w-5 mr-1" />
