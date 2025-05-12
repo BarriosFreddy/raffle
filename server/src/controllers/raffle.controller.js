@@ -300,7 +300,7 @@ export const raffleController = {
       }
 
       // Update the raffle with the awarded numbers
-      const winners = await PaymentService.getAwardedNumbersWinners(raffle.awardedNumbers);
+      const winners = await PaymentService.getAwardedNumbersWinners(raffleId, raffle.awardedNumbers);
       
       // Clear the cache for this raffle
       res.status(200).json(winners);

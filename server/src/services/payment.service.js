@@ -53,8 +53,9 @@ export class PaymentService {
 
     return totalTickets;
   }
-  static async getAwardedNumbersWinners(awardedNumbers = []) {
+  static async getAwardedNumbersWinners(raffleId, awardedNumbers = []) {
     const userPaymentsWinners = await Payment.find({
+      raffleId,
       ticketNumbers: {
         $in: awardedNumbers,
       },

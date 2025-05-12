@@ -11,6 +11,7 @@ export function WinnerNumbersDetails({ raffle }: WinnerNumbersDetailsProps) {
 
   useEffect(() => {
     const fetchWinners = async () => {
+      if (!raffle._id) return;
       const awardedNumbersWinners = await getAwardedNumbersWinners(raffle._id);
       setAwardedNumbersWinners(awardedNumbersWinners);
     };
