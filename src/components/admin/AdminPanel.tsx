@@ -28,7 +28,7 @@ export function AdminPanel() {
   useEffect(() => {
     const fetchRaffles = async () => {
       try {
-        const rafflesData = await getRaffles({ status: "active" });
+        const rafflesData = await getRaffles();
         setRaffles(rafflesData);
       } catch (error) {
         console.error("Error fetching raffles:", error);
@@ -46,7 +46,7 @@ export function AdminPanel() {
     const updateRaffles = async () => {
       try {
         // Get fresh list of raffles
-        const rafflesData = await getRaffles({ status: "active" });
+        const rafflesData = await getRaffles();
         setRaffles(rafflesData);
         
         // If a raffle is selected, get its latest data directly from live endpoint
