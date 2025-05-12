@@ -19,7 +19,7 @@ export interface Raffle {
   maxNumber: number;
   ticketPrice: number;
   maxTicketsPerUser: number;
-  status: 'active' | 'completed';
+  status: 'active' | 'inactive';
   selectedNumbers: number[];
   selectedNumbersQuantity: number;
   paymentGateway: string;

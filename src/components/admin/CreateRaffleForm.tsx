@@ -46,6 +46,7 @@ export function CreateRaffleForm({
       lotteryName: "",
       supportPhoneNumber: "",
       themeColor: "#4f46e5", // Default theme color (indigo-600)
+      status: "active",
     },
   });
 
@@ -80,6 +81,7 @@ export function CreateRaffleForm({
       supportPhoneNumber: selectedRaffle.supportPhoneNumber || "",
       themeColor: selectedRaffle.themeColor || "#4f46e5",
       slug: selectedRaffle.slug || "",
+      status: selectedRaffle.status || "active",
     });
   }, [reset, selectedRaffle]);
 
@@ -101,7 +103,7 @@ export function CreateRaffleForm({
         themeColor: data.themeColor || "#4f46e5",
         slug: data.slug,
         id: crypto.randomUUID(),
-        status: "active",
+        status: data.status,
       };
 
       if (selectedRaffle) {
@@ -325,6 +327,29 @@ export function CreateRaffleForm({
             {errors.paymentGateway && (
               <p className="mt-1 text-sm text-red-600">
                 {errors.paymentGateway.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label
+              htmlFor="status"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Estado
+            </label>
+            <select
+              id="status"
+              {...register("status")}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.status ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            >
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select>
+            {errors.status && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.status.message}
               </p>
             )}
           </div>

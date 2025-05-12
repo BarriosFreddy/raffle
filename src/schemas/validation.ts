@@ -27,6 +27,7 @@ export const raffleSchema = z.object({
     .refine(val => !val.endsWith('-') && !val.startsWith('-'), {
       message: 'El slug no puede comenzar ni terminar con guión',
     }),
+  status: z.enum(['active', 'inactive']).default('active'),
   coverUrl: z.string()
     .url('La URL de la imagen debe ser válida')
 /*     .refine(

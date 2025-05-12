@@ -17,7 +17,7 @@ const raffleSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'completed'],
+    enum: ['active', 'inactive'],
     default: 'active'
   },
   paymentGateway: {
