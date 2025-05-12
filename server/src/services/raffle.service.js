@@ -68,7 +68,9 @@ export async function createRaffle(data) {
 
 export async function getRaffles({page = 1, size = 10, ...query} = {}) {
   const skip = (page - 1) * size;
-  return await Raffle.find(query).skip(skip).limit(size).exec();
+  const params = {};
+  if (query.status) params.status = query.status;
+  return await Raffle.find(params).skip(skip).limit(size).exec();
 }
 
 export async function getRaffleById(id) {
