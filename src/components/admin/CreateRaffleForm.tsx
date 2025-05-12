@@ -40,6 +40,7 @@ export function CreateRaffleForm({
       maxNumber: 100,
       prize: "",
       ticketPrice: 0,
+      minTicketsPerUser: 1,
       maxTicketsPerUser: 100,
       paymentGateway: PaymentGateway.BOLD,
       coverUrl: "",
@@ -73,6 +74,7 @@ export function CreateRaffleForm({
       maxNumber: selectedRaffle.maxNumber,
       prize: selectedRaffle.prize,
       ticketPrice: selectedRaffle.ticketPrice,
+      minTicketsPerUser: selectedRaffle.minTicketsPerUser || 1,
       maxTicketsPerUser: selectedRaffle.maxTicketsPerUser || 100,
       paymentGateway:
         (selectedRaffle.paymentGateway as PaymentGateway) ||
@@ -96,6 +98,7 @@ export function CreateRaffleForm({
         maxNumber: data.maxNumber,
         prize: data.prize,
         ticketPrice: data.ticketPrice,
+        minTicketsPerUser: data.minTicketsPerUser,
         maxTicketsPerUser: data.maxTicketsPerUser,
         paymentGateway: data.paymentGateway,
         coverUrl: data.coverUrl || "",
@@ -263,6 +266,31 @@ export function CreateRaffleForm({
 
           <div>
             <label
+              htmlFor="minTicketsPerUser"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Mínimo tickets por usuario
+            </label>
+            <input
+              type="number"
+              id="minTicketsPerUser"
+              min="1"
+              {...register("minTicketsPerUser", { valueAsNumber: true })}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.minTicketsPerUser ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            />
+            {errors.minTicketsPerUser && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.minTicketsPerUser.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label
               htmlFor="maxTicketsPerUser"
               className="block text-sm font-medium text-gray-700"
             >
@@ -282,6 +310,13 @@ export function CreateRaffleForm({
                 {errors.maxTicketsPerUser.message}
               </p>
             )}
+          </div>
+
+          <div>
+            <div className="h-9"></div>
+            <p className="text-sm text-gray-500 mt-2">
+              El número máximo debe ser mayor o igual al mínimo.
+            </p>
           </div>
         </div>
 

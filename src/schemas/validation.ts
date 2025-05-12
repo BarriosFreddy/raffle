@@ -13,6 +13,7 @@ export const raffleSchema = z.object({
   maxNumber: z.number().int().min(1, 'El número máximo debe ser al menos 1'),
   prize: z.string().min(1, 'El premio es requerida'),
   ticketPrice: z.number().int().min(0, 'El precio del ticket debe ser mayor o igual a 0'),
+  minTicketsPerUser: z.number().int().min(1, 'El número mínimo de tickets por usuario debe ser al menos 1').default(1),
   maxTicketsPerUser: z.number().int().min(1, 'El número máximo de tickets por usuario debe ser al menos 1').default(100),
   paymentGateway: z.nativeEnum(PaymentGateway, {
     errorMap: () => ({ message: 'Seleccione un método de pago válido' }),
@@ -42,6 +43,9 @@ export const raffleSchema = z.object({
 }).refine(data => data.maxNumber > data.minNumber, {
   message: "El número máximo debe ser mayor que el número mínimo",
   path: ["maxNumber"],
+}).refine(data => data.maxTicketsPerUser >= data.minTicketsPerUser, {
+  message: "El número máximo de tickets por usuario debe ser mayor o igual al mínimo",
+  path: ["maxTicketsPerUser"],
 });
 
 export const participantSchema = z.object({

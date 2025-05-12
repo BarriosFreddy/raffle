@@ -18,6 +18,7 @@ export interface Raffle {
   minNumber: number;
   maxNumber: number;
   ticketPrice: number;
+  minTicketsPerUser: number;
   maxTicketsPerUser: number;
   status: 'active' | 'inactive';
   selectedNumbers: number[];

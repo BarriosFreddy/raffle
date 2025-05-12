@@ -10,7 +10,6 @@ interface PackageSelectorFormProps {
 }
 
 const TICKET_PACKAGES = [
-  { amount: 1, label: "X1" },
   { amount: 2, label: "X2" },
   { amount: 4, label: "X4" },
   { amount: 6, label: "X6" },
@@ -19,7 +18,9 @@ const TICKET_PACKAGES = [
 ];
 
 export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
-  const [selectedPackage, setSelectedPackage] = useState<number>(1);
+  // Initialize with minimum required tickets
+  const minTickets = raffle.minTicketsPerUser || 1;
+  const [selectedPackage, setSelectedPackage] = useState<number>(minTickets);
   const [showDetails, setShowDetails] = useState(false);
   const { maxNumber, selectedNumbersQuantity } = raffle;
   const themeColor = raffle.themeColor || "#4f46e5"; // Default to indigo if not set
@@ -30,7 +31,9 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
   const leftNumbers = maxNumber - selectedNumbersQuantity;
 
   const handlePrevPage = async () => {
-    const prev = selectedPackage === 1 ? 1 : selectedPackage - 1;
+    // Don't go below minimum required tickets
+    const prev =
+      selectedPackage <= minTickets ? minTickets : selectedPackage - 1;
     setSelectedPackage(prev);
   };
 
@@ -44,7 +47,8 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
   }: {
     target: { value: string };
   }) => {
-    setSelectedPackage(+value <= 0 ? 1 : +value);
+    // Ensure value is at least the minimum required tickets
+    setSelectedPackage(+value < minTickets ? minTickets : +value);
   };
 
   if (showDetails) {
@@ -82,7 +86,6 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           />
         </div>
         <AwardedNumbersList raffle={raffle} />
-        
       </div>
       <div className="flex flex-col">
         <div className="items-center hidden sm:flex mb-4">
@@ -107,18 +110,25 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           </div>
         </div>
         <div className="flex items-center my-4">
-          {raffle.maxTicketsPerUser < raffle.maxNumber && <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
-            Máximo {raffle.maxTicketsPerUser} números por persona
-          </span>}
-
           <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
             Juega con: {raffle.lotteryName}
           </span>
+          {minTickets > 1 && (
+            <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
+              Mínimo {minTickets} números por compra.
+            </span>
+          )}
+          {raffle.maxTicketsPerUser < raffle.maxNumber && (
+            <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
+              Máximo {raffle.maxTicketsPerUser} números por persona
+            </span>
+          )}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-8">
           {TICKET_PACKAGES.filter(({ amount }) => amount <= leftNumbers)
             .filter(({ amount }) => amount <= raffle.maxTicketsPerUser)
+            .filter(({ amount }) => amount >= minTickets)
             .map(({ amount, label }) => {
               const packagePrice = amount * raffle.ticketPrice;
               const formattedPackagePrice = formatMoney(packagePrice);
@@ -234,12 +244,17 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
 
         {/* Technical Support Component */}
         <div className="bg-white p-6 rounded-lg shadow-sm mt-8">
-          <h3 className="text-xl font-bold mb-2">Soporte técnico especializado</h3>
+          <h3 className="text-xl font-bold mb-2">
+            Soporte técnico especializado
+          </h3>
           <p className="text-gray-600 mb-4">
-            Resolveremos cualquier duda que puedas tener sobre nuestras ventas online.
+            Resolveremos cualquier duda que puedas tener sobre nuestras ventas
+            online.
           </p>
           <a
-            href={`https://wa.me/${raffle.supportPhoneNumber || '+573XXXXXXXXX'}`}
+            href={`https://wa.me/${
+              raffle.supportPhoneNumber || "+573XXXXXXXXX"
+            }`}
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full text-center py-3 px-4 rounded-lg border border-green-400 text-green-400 font-medium hover:bg-green-50 transition-colors"
