@@ -7,8 +7,8 @@ interface RaffleProgressProps {
 
 export function RaffleProgress({ raffle }: RaffleProgressProps) {
   const totalTickets = (raffle?.maxNumber || 0) - (raffle?.minNumber || 0);
-  const soldTickets = raffle?.selectedNumbersQuantity;
-  const progress = ((soldTickets || 0) / totalTickets) * 100;
+  const soldTickets = raffle?.selectedNumbersQuantity || 0;
+  const soldTicketsPercentage = Math.floor((soldTickets * 100) / totalTickets);
 
   return (
     <div className="space-y-3">
@@ -22,13 +22,13 @@ export function RaffleProgress({ raffle }: RaffleProgressProps) {
       <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden">
         <div
           className="absolute left-0 top-0 h-full bg-blue-600 transition-all duration-500"
-          style={{ width: `${progress}%` }}
+          style={{ width: `${soldTicketsPercentage}%` }}
         />
       </div>
 
       <div className="flex justify-between text-sm text-gray-600">
-        <span>{Math.round(progress)}% vendidos</span>
-        <span>{totalTickets - (soldTickets || 0)} disponibles</span>
+        <span>{soldTicketsPercentage}% vendidos</span>
+        <span>{totalTickets - soldTickets} disponibles</span>
       </div>
     </div>
   );
