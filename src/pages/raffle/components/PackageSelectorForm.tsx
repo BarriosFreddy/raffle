@@ -107,9 +107,9 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
           </div>
         </div>
         <div className="flex items-center my-4">
-          <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
+          {raffle.maxTicketsPerUser < raffle.maxNumber && <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
             Máximo {raffle.maxTicketsPerUser} números por persona
-          </span>
+          </span>}
 
           <span className="bg-gray-200 border-radius-full mx-2 text-sm text-gray-600 px-2 py-1 rounded-full">
             Juega con: {raffle.lotteryName}
