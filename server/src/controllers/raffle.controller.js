@@ -114,7 +114,7 @@ export const raffleController = {
 
   async getRaffles(req, res, next) {
     try {
-      const { status = "active", page, size } = req.query;
+      const { status, page, size } = req.query;
       let raffles = [];
       
       // Try to get from cache first
