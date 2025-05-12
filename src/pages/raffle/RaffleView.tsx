@@ -63,9 +63,9 @@ export function RaffleView() {
 
   if (raffle?.status !== "active") {
     return (
-      <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg">
-        <h2 className="text-xl font-bold mb-4">Raffle</h2>
-        <p className="text-gray-600">Cargando....</p>
+      <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg m-7">
+        <h2 className="text-xl font-bold mb-4">Evento Finalizado!</h2>
+        <p className="text-gray-600">Gracias por tu compra, puedes consultar tus números en la sección de Mis Compras</p>
       </div>
     );
   }

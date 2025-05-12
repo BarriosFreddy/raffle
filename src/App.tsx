@@ -34,7 +34,7 @@ export default function App() {
             {raffles.length === 0 && (
               <div className="col-span-full text-center py-12">
                 <h3 className="text-lg font-medium text-gray-900">
-                  No hay rifas aún
+                  No hay eventos activos
                 </h3>
               </div>
             )}
