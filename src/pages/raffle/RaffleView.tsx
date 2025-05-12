@@ -61,6 +61,14 @@ export function RaffleView() {
     return () => clearInterval(intervalId); // Clean up on unmount
   }, [raffle, raffleId, setRaffle]);
 
+  if (!raffle) {
+    return (
+      <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg m-7">
+        <h2 className="text-xl font-bold mb-4">Cargando...</h2>
+      </div>
+    );
+  }
+
   if (raffle?.status !== "active") {
     return (
       <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg m-7">
