@@ -3,8 +3,6 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { TicketContainer } from "../TicketContainer";
 import { Raffle } from "@/types";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
 
 
 interface PurchasesListProps {
@@ -101,7 +99,7 @@ export function PurchasesList({
                       <div className="flex gap-2">
                         <dt className="text-gray-600">Fecha:</dt>
                         <dd className="text-gray-900">
-                          {dayjs.utc(payment.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+                          {dayjs(payment.createdAt).format("DD/MM/YYYY HH:mm:ss")}
                         </dd>
                       </div>
                     </div>

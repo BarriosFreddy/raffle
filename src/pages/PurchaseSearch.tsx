@@ -90,7 +90,7 @@ export function PurchaseSearch() {
                 <p className="text-gray-900">Cédula: {payer.nationalId}</p>
                 <p className="text-gray-900">
                   Fecha:{" "}
-                  {dayjs.utc(payer.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+                  {dayjs(payer.createdAt).format("DD/MM/YYYY HH:mm:ss")}
                 </p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
                 <p className="text-gray-900">{quantity} Números</p>
