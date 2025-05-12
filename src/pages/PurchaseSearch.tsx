@@ -7,6 +7,9 @@ import { TicketContainer } from "../components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
 import { getRaffleById } from "@/services/raffle.service";
 import { PaymentDataDTO } from "@/types/paymentDataDTO";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const APPROVED = "approved";
 
@@ -76,10 +79,7 @@ export function PurchaseSearch() {
       <div className="mt-8">
         <div className="space-y-6">
           {searchResults.map(
-            (
-              { payer, ticketNumbers, status, amount, quantity },
-              index
-            ) => (
+            ({ payer, ticketNumbers, status, amount, quantity }, index) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-900">
                   Correo electrónico:{" "}
@@ -88,6 +88,10 @@ export function PurchaseSearch() {
                 <p className="text-gray-900">Nombre: {payer.name}</p>
                 <p className="text-gray-900">Teléfono: {payer.phone}</p>
                 <p className="text-gray-900">Cédula: {payer.nationalId}</p>
+                <p className="text-gray-900">
+                  Fecha:{" "}
+                  {dayjs.utc(payer.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+                </p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
                 <p className="text-gray-900">{quantity} Números</p>
                 <div className="space-y-2 mt-2">
