@@ -5,11 +5,11 @@ import { RaffleProgress } from "./RaffleProgress";
 import { Link } from "react-router-dom";
 import { formatMoney } from '@/utils/formatNumber';
 import { assignAvailableNumbers, checkAvailableNumbers } from "@/services/raffle.service";
-import { AwardedNumbersManager } from "./AwardedNumbersManager";
+import { WinnerNumbersDetails } from './WinnerNumbersDetails';
 
 interface AdminStatsProps {
   raffle: Raffle | undefined;
-  onEdit: () => void;
+  onEdit: () => void; 
 }
 
 export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
@@ -72,10 +72,6 @@ export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
     }
   };
 
-  const handleRaffleUpdate = (updatedRaffleData: Raffle) => {
-    setUpdatedRaffle(updatedRaffleData);
-  };
-
   return (<>
     <div className="flex">
       <span className="mr-4">
@@ -136,10 +132,7 @@ export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
     {/* Awarded Numbers Manager */}
     {updatedRaffle && (
       <div className="mt-6">
-        <AwardedNumbersManager 
-          raffle={updatedRaffle} 
-          onUpdate={handleRaffleUpdate} 
-        />
+        <WinnerNumbersDetails raffle={updatedRaffle} />
       </div>
     )}
   </>

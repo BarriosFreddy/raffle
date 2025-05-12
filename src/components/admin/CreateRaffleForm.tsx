@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PaymentGateway } from "@/enums/PaymentGateway.enum";
 import type { z } from "zod";
+import { AwardedNumbersManager } from "./AwardedNumbersManager";
 
 type CreateRaffleFormProps = {
   onSave: () => void;
@@ -402,6 +403,9 @@ export function CreateRaffleForm({
             </p>
           )}
         </div>
+        <AwardedNumbersManager 
+          raffle={selectedRaffle} 
+        />
         <div>
           <label
             htmlFor="coverUrl"

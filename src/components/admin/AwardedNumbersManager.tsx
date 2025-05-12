@@ -1,22 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  updateAwardedNumbers,
-  getAwardedNumbersWinners,
-} from "@/services/raffle.service";
+import { updateAwardedNumbers } from "@/services/raffle.service";
 import type { Raffle } from "@/types";
 import { Save, X } from "lucide-react";
 
 interface AwardedNumbersManagerProps {
-  raffle: Raffle;
-  onUpdate: (updatedRaffle: Raffle) => void;
+  raffle?: Raffle;
 }
 
-export function AwardedNumbersManager({
-  raffle,
-  onUpdate,
-}: AwardedNumbersManagerProps) {
+export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
-  const [awardedPayments, setAwardedNumbers] = useState([]);
 
   const [number, setNumber] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,30 +17,18 @@ export function AwardedNumbersManager({
   // Store original awarded numbers for comparison
   const originalNumbers = useMemo(
     () =>
-      raffle.awardedNumbers
+      raffle?.awardedNumbers
         ? [...raffle.awardedNumbers].sort((a, b) => a - b)
         : [],
-    [raffle.awardedNumbers]
+    [raffle?.awardedNumbers]
   );
 
   // Initialize with existing awarded numbers
   useEffect(() => {
-    if (raffle.awardedNumbers) {
+    if (raffle?.awardedNumbers) {
       setSelectedNumbers([...raffle.awardedNumbers]);
     }
-  }, [raffle.awardedNumbers]);
-
-  useEffect(() => {
-    const fetchWinners = async () => {
-      const awardedNUmbersWinners = await getAwardedNumbersWinners(raffle._id);
-      setAwardedNumbers(awardedNUmbersWinners);
-    };
-    fetchWinners()
-    const intervalId = setInterval(fetchWinners, 10000);
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [raffle._id]);
+  }, [raffle?.awardedNumbers]);
 
   // Check if there are any changes to the awarded numbers
   const hasChanges = useMemo(() => {
@@ -69,9 +49,9 @@ export function AwardedNumbersManager({
     }
 
     // Validate number is within raffle range
-    if (parsedNumber < raffle.minNumber || parsedNumber > raffle.maxNumber) {
+    if (parsedNumber < raffle?.minNumber || parsedNumber > raffle?.maxNumber) {
       setError(
-        `El número debe estar entre ${raffle.minNumber} y ${raffle.maxNumber}`
+        `El número debe estar entre ${raffle?.minNumber} y ${raffle?.maxNumber}`
       );
       return;
     }
@@ -99,11 +79,7 @@ export function AwardedNumbersManager({
       // Sort numbers for better display
       const sortedNumbers = [...selectedNumbers].sort((a, b) => a - b);
 
-      const updatedRaffle = await updateAwardedNumbers(
-        raffle._id,
-        sortedNumbers
-      );
-      onUpdate(updatedRaffle);
+      await updateAwardedNumbers(raffle._id, sortedNumbers);
     } catch (err) {
       console.error("Error updating awarded numbers:", err);
       setError("Error al guardar los números premiados");
@@ -134,6 +110,7 @@ export function AwardedNumbersManager({
             placeholder="Ingresa un número"
           />
           <button
+          disabled={!raffle}
             onClick={handleAddNumber}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
             type="button"
@@ -172,7 +149,7 @@ export function AwardedNumbersManager({
       <div className="mt-5">
         <button
           onClick={handleSubmit}
-          disabled={isSubmitting || !hasChanges}
+          disabled={isSubmitting || !hasChanges || !raffle}
           className="flex items-center justify-center w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-green-300 transition-colors"
           type="button"
           title={!hasChanges ? "No hay cambios que guardar" : ""}
@@ -187,29 +164,6 @@ export function AwardedNumbersManager({
           )}
         </button>
       </div>
-      {awardedPayments?.length > 0 && (
-        <div className="mt-4">
-          <h4 className="text-md font-medium mb-2">Números premiados:</h4>
-          <div className="flex flex-wrap gap-2">
-            {awardedPayments?.map(({ payer, ticketNumbers }, index) => (
-              <div
-                key={index}
-                className="flex items-center bg-gray-100 p-2 rounded"
-              >
-                {ticketNumbers?.map((number) => (
-                  <div
-                    key={number}
-                    className="flex items-center bg-yellow-100 m-1 px-1 py-1 rounded border-gray-300 border"
-                  >
-                    <span className="m-1">{number}</span>
-                  </div>
-                ))}
-                <span className="mr-2">{payer.email}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
