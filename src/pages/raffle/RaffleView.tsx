@@ -70,10 +70,15 @@ export function RaffleView() {
   }
 
   if (raffle?.status !== "active") {
+    const statusTitle = raffle.status === "completed" ? "Evento Finalizado!" : "Evento Inactivo";
     return (
       <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg m-7">
-        <h2 className="text-xl font-bold mb-4">Evento Finalizado!</h2>
-        <p className="text-gray-600">Gracias por tu compra, puedes consultar tus números en la sección de Mis Compras</p>
+        <h2 className="text-xl font-bold mb-4">{statusTitle}</h2>
+        {raffle.statusMessage ? (
+          <p className="text-gray-600">{raffle.statusMessage}</p>
+        ) : (
+          <p className="text-gray-600">Gracias por tu compra, puedes consultar tus números en la sección de Mis Compras</p>
+        )}
       </div>
     );
   }

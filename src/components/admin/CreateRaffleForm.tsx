@@ -49,6 +49,7 @@ export function CreateRaffleForm({
       supportPhoneNumber: "",
       themeColor: "#4f46e5", // Default theme color (indigo-600)
       status: "active",
+      statusMessage: "",
     },
   });
 
@@ -85,6 +86,7 @@ export function CreateRaffleForm({
       themeColor: selectedRaffle.themeColor || "#4f46e5",
       slug: selectedRaffle.slug || "",
       status: selectedRaffle.status || "active",
+      statusMessage: selectedRaffle.statusMessage || "",
     });
   }, [reset, selectedRaffle]);
 
@@ -108,6 +110,7 @@ export function CreateRaffleForm({
         slug: data.slug,
         id: crypto.randomUUID(),
         status: data.status,
+        statusMessage: data.statusMessage || "",
       };
 
       if (selectedRaffle) {
@@ -382,6 +385,7 @@ export function CreateRaffleForm({
             >
               <option value="active">Activo</option>
               <option value="inactive">Inactivo</option>
+              <option value="completed">Completado</option>
             </select>
             {errors.status && (
               <p className="mt-1 text-sm text-red-600">
@@ -412,6 +416,34 @@ export function CreateRaffleForm({
             )}
           </div>
         </div>
+        
+        {(watch("status") === "inactive" || watch("status") === "completed") && (
+          <div className="mb-4">
+            <label
+              htmlFor="statusMessage"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Mensaje de Estado
+            </label>
+            <textarea
+              id="statusMessage"
+              {...register("statusMessage")}
+              className={`block w-full px-2 py-2 rounded-lg border ${
+                errors.statusMessage ? "border-red-500" : "border-gray-300"
+              } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              placeholder="Mensaje para mostrar cuando la rifa está inactiva o completada"
+              rows={2}
+            />
+            {errors.statusMessage && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.statusMessage.message}
+              </p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              Este mensaje se mostrará a los usuarios cuando la rifa esté {watch("status") === "inactive" ? "inactiva" : "completada"}
+            </p>
+          </div>
+        )}
         
         <div>
           <label
