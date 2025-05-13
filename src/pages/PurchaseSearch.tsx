@@ -82,6 +82,7 @@ export function PurchaseSearch() {
   const handleShowNumbers = async (paymentData: Partial<PaymentDataDTO>) => {
     if (paymentData && paymentData.payer?.email) {
       await assignTicketNumbers({
+        paymentId: paymentData._id,
         email: paymentData.payer?.email,
       });
       await handleSearch();
@@ -119,7 +120,7 @@ export function PurchaseSearch() {
       <div className="mt-8">
         <div className="space-y-6">
           {searchResults.map(
-            ({ payer, ticketNumbers, status, amount, quantity }, index) => (
+            ({ _id, payer, ticketNumbers, status, amount, quantity }, index) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-900">
                   Correo electrónico:{" "}
@@ -136,7 +137,7 @@ export function PurchaseSearch() {
                 <div className="space-y-2 mt-2">
                   {ticketNumbers.length === 0 && status === APPROVED && (
                     <button
-                      onClick={() => handleShowNumbers({ payer })}
+                      onClick={() => handleShowNumbers({ _id, payer })}
                       className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
                     >
                       <Ticket className="h-5 w-5 mr-2" />

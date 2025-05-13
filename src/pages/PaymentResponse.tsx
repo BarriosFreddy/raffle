@@ -62,6 +62,7 @@ export function PaymentResponse() {
   const handleShowNumbers = async () => {
     if (paymentData) {
       const paymentDataResponse = await assignTicketNumbers({
+        paymentId: paymentData._id,
         email: paymentData.payer.email,
       });
       setPaymentData(paymentDataResponse);

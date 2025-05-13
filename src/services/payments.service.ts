@@ -133,11 +133,13 @@ export async function findAll(params: { [key: string]: any }) {
 }
 
 export async function assignTicketNumbers({
+  paymentId,
   preferenceId,
   email,
 }: AssignTicketParams) {
   try {
     const data: AssignTicketParams = {};
+    if (paymentId) data.paymentId = paymentId;
     if (preferenceId) data.preferenceId = preferenceId;
     if (email) data.email = email;
 
@@ -184,4 +186,4 @@ export async function getBoldRecordByOrderId(orderId: string) {
   }
 }
 
-type AssignTicketParams = { preferenceId?: string; email?: string };
+type AssignTicketParams = { paymentId?: string; preferenceId?: string; email?: string };
