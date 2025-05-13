@@ -166,10 +166,10 @@ export const paymentController = {
   },
   async handleAssignTicketNumbers(req, res, next) {
     try {
-      const { preferenceId, email, paymentId } = req.body;
+      const { preferenceId, paymentId } = req.body;
       let payment =
         preferenceId && (await PaymentService.findByPreferenceId(preferenceId));
-      if (email && paymentId) payment = await PaymentService.findOne({ email, _id: paymentId });
+      if (paymentId) payment = await PaymentService.findOne({ _id: paymentId });
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }

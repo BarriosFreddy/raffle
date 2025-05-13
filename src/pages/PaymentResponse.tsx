@@ -60,10 +60,9 @@ export function PaymentResponse() {
   const ticketNumbers: Array<number> = paymentData?.ticketNumbers || [];
 
   const handleShowNumbers = async () => {
-    if (paymentData) {
+    if (paymentData && paymentData._id) {
       const paymentDataResponse = await assignTicketNumbers({
         paymentId: paymentData._id,
-        email: paymentData.payer.email,
       });
       setPaymentData(paymentDataResponse);
     }

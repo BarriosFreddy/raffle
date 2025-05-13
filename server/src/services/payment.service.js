@@ -19,7 +19,6 @@ export class PaymentService {
     const payments = await Payment.findOne({
       "payer.email": email,
     })
-      .sort({ _id: -1 })
       .exec();
     return payments;
   }
