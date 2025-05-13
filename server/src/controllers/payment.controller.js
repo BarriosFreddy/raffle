@@ -151,6 +151,13 @@ export const paymentController = {
     try {
       const { boldOrderId } = req.params;
       const boldRecord = await PaymentService.getBoldRecordByOrderId(boldOrderId);
+      if (!boldRecord) {
+        return res.status(200).json({
+          errors: [{
+            message: "Bold record not found",
+          }],
+        });
+      }
       res.status(200).json(boldRecord);
     } catch (e) {
       console.error(e);

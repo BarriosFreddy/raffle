@@ -166,7 +166,7 @@ export async function getBoldRecordByOrderId(orderId: string) {
     if (!orderId) return;
 
     const response = await axios.get(
-      `${API_URL}/payments/bold/status/${orderId}`,
+      `${API_URL}/api/payments/bold/status/${orderId}`,
       {
         headers: {
           "Content-Type": "application/json",

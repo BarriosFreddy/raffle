@@ -82,11 +82,9 @@ export class PaymentService {
       );
   
       return response.data;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to find bold payment response: ${error.message}`);
-      }
-      throw new Error("Failed to find bold payment");
+    } catch (e) {
+      console.error(e);
+      return null;
     }
   }
 }
