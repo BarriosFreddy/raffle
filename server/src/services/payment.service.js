@@ -18,8 +18,7 @@ export class PaymentService {
   static async findOneByEmail(email) {
     const payments = await Payment.findOne({
       "payer.email": email,
-    })
-      .exec();
+    }).exec();
     return payments;
   }
   static async findAll(queryData) {
@@ -69,7 +68,7 @@ export class PaymentService {
   static async getBoldRecordByOrderId(orderId) {
     try {
       if (!orderId) return;
-  
+
       const response = await axios.get(
         `https://payments.api.bold.co/v2/payment-voucher/${orderId}`,
         {
@@ -79,8 +78,9 @@ export class PaymentService {
           },
         }
       );
-  
-      return response.data;
+      const { data, status } = response;
+      console.info("Bold Record Response", { status, data });
+      return data;
     } catch (e) {
       console.error(e);
       return null;
