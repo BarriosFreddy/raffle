@@ -40,32 +40,39 @@ export function PurchaseSearch() {
       setRaffle(raffleRes);
     }
 
-    const paymentsPending = await findAll({
-      email,
-      status: PaymentStatus.PENDING,
-    });
+    try {
+      const paymentsPending = await findAll({
+        email,
+        status: PaymentStatus.PENDING,
+      });
 
-    for await (const payment of paymentsPending) {
-      const boldRecord = await getBoldRecordByOrderId(payment.orderId);
-      if (boldRecord.errors) {
-        console.error(boldRecord);
-        continue;
-      }
-      const { payment_status } = boldRecord;
-      if (
-        payment_status &&
-        payment_status.toLowerCase() === PaymentStatus.APPROVED
-      ) {
-        const paymentData = await processPaymentResponse({
-          boldOrderId: payment.orderId,
-          boldTXStatus: PaymentStatus.APPROVED,
-        });
-        if (paymentData) {
-          setSearchResults((prev) => [...prev, { ...payment, ...paymentData }]);
-          const raffleRes = await getRaffleById(paymentData.raffleId);
-          setRaffle(raffleRes);
+      for await (const payment of paymentsPending) {
+        const boldRecord = await getBoldRecordByOrderId(payment.orderId);
+        if (boldRecord.errors) {
+          console.error(boldRecord);
+          continue;
+        }
+        const { payment_status } = boldRecord;
+        if (
+          payment_status &&
+          payment_status.toLowerCase() === PaymentStatus.APPROVED
+        ) {
+          const paymentData = await processPaymentResponse({
+            boldOrderId: payment.orderId,
+            boldTXStatus: PaymentStatus.APPROVED,
+          });
+          if (paymentData) {
+            setSearchResults((prev) => [
+              ...prev,
+              { ...payment, ...paymentData },
+            ]);
+            const raffleRes = await getRaffleById(paymentData.raffleId);
+            setRaffle(raffleRes);
+          }
         }
       }
+    } catch (e) {
+      console.error(e);
     }
     setSearchResults(payments);
     setFetching(false);
