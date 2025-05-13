@@ -8,7 +8,9 @@ interface RaffleProgressProps {
 export function RaffleProgress({ raffle }: RaffleProgressProps) {
   const totalTickets = (raffle?.maxNumber || 0) - (raffle?.minNumber || 0);
   const soldTickets = raffle?.selectedNumbersQuantity || 0;
-  const soldTicketsPercentage = Math.floor((soldTickets * 100) / totalTickets);
+  const soldTicketsPercentage = Number(
+    (soldTickets * 100) / totalTickets
+  ).toFixed(2);
 
   return (
     <div className="space-y-3">

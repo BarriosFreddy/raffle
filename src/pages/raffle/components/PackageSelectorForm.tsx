@@ -24,10 +24,9 @@ export function PackageSelectorForm({ raffle }: PackageSelectorFormProps) {
   const [showDetails, setShowDetails] = useState(false);
   const { maxNumber, selectedNumbersQuantity } = raffle;
   const themeColor = raffle.themeColor || "#4f46e5"; // Default to indigo if not set
-  const soldTicketsPercentage = Math.floor(
+  const soldTicketsPercentage = Number(
     (selectedNumbersQuantity * 100) / maxNumber
-  );
-
+  ).toFixed(2);
   const leftNumbers = maxNumber - selectedNumbersQuantity;
 
   const handlePrevPage = async () => {
