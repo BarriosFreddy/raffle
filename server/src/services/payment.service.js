@@ -1,4 +1,9 @@
 import { Payment } from "../models/payment.js";
+import axios from "axios";
+import dotenv from "dotenv";
+// Load environment variables
+dotenv.config();
+const BOLD_API_KEY = process.env.BOLD_API_KEY;
 
 export class PaymentService {
   static async create(paymentData) {
@@ -61,5 +66,27 @@ export class PaymentService {
       },
     }).exec();
     return userPaymentsWinners;
+  }
+  static async getBoldRecordByOrderId(orderId) {
+    try {
+      if (!orderId) return;
+  
+      const response = await axios.get(
+        `https://payments.api.bold.co/v2/payment-voucher/${orderId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `x-api-key ${BOLD_API_KEY}`,
+          },
+        }
+      );
+  
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to find bold payment response: ${error.message}`);
+      }
+      throw new Error("Failed to find bold payment");
+    }
   }
 }

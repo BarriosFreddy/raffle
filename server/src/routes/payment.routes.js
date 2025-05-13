@@ -9,6 +9,7 @@ router.get('/payments', isAuthenticated, paymentController.findAll);
 router.post('/payments', isAuthenticated, paymentController.createPayment);
 router.get('/payments/email/:email', isAuthenticated, paymentController.findByEmail);
 router.post('/payments/webhook', isAuthenticated, paymentController.handlePaymentWebhook);
+router.get('/payments/bold/status/:boldOrderId', isAuthenticated, paymentController.getBoldRecordByOrderId);
 router.post('/payments/assign', isAuthenticated, paymentController.handleAssignTicketNumbers);
 router.get('/payments/:preferenceId/status', isAuthenticated, paymentController.getPaymentStatus);
 

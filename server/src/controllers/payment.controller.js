@@ -147,6 +147,16 @@ export const paymentController = {
       next(new ApiError(400, "Failed to process payment webhook"));
     }
   },
+  async getBoldRecordByOrderId(req, res, next) {
+    try {
+      const { boldOrderId } = req.params;
+      const boldRecord = await PaymentService.getBoldRecordByOrderId(boldOrderId);
+      res.status(200).json(boldRecord);
+    } catch (e) {
+      console.error(e);
+      next(new ApiError(400, "Failed to get bold record by order id"));
+    }
+  },
   async handleAssignTicketNumbers(req, res, next) {
     try {
       const { preferenceId, email } = req.body;
