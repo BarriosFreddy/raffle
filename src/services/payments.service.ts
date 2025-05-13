@@ -2,6 +2,8 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const API_TOKEN = import.meta.env.VITE_API_TOKEN;
+const BOLD_API_KEY = import.meta.env.VITE_BOLD_API_KEY;
+
 
 interface PaymentData {
   raffleId: string;
@@ -158,6 +160,29 @@ export async function assignTicketNumbers({
       throw new Error(`Failed to save payment response: ${error.message}`);
     }
     throw new Error("Failed to save payment response");
+  }
+}
+
+export async function getBoldRecordByOrderId(orderId: string) {
+  try {
+    if (!orderId) return;
+
+    const response = await axios.get(
+      `https://payments.api.bold.co/v2/payment-voucher/${orderId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `x-api-key ${BOLD_API_KEY}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to find bold payment response: ${error.message}`);
+    }
+    throw new Error("Failed to find bold payment");
   }
 }
 

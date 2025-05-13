@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { Search, Ticket } from "lucide-react";
 import type { Participant, Raffle } from "../types";
 import { formatMoney } from "../utils/formatNumber";
-import { assignTicketNumbers, findAll } from "@/services/payments.service";
+import {
+  assignTicketNumbers,
+  findAll,
+  getBoldRecordByOrderId,
+  processPaymentResponse,
+} from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
 import { getRaffleById } from "@/services/raffle.service";
@@ -33,6 +38,34 @@ export function PurchaseSearch() {
     if (payments.length) {
       const raffleRes = await getRaffleById(payments[0].raffleId);
       setRaffle(raffleRes);
+    }
+
+    const paymentsPending = await findAll({
+      email,
+      status: PaymentStatus.PENDING,
+    });
+
+    for await (const payment of paymentsPending) {
+      const boldRecord = await getBoldRecordByOrderId(payment.orderId);
+      if (boldRecord.errors) {
+        console.error(boldRecord);
+        continue;
+      }
+      const { payment_status } = boldRecord;
+      if (
+        payment_status &&
+        payment_status.toLowerCase() === PaymentStatus.APPROVED
+      ) {
+        const paymentData = await processPaymentResponse({
+          boldOrderId: payment.orderId,
+          boldTXStatus: PaymentStatus.APPROVED,
+        });
+        if (paymentData) {
+          setSearchResults((prev) => [...prev, { ...payment, ...paymentData }]);
+          const raffleRes = await getRaffleById(paymentData.raffleId);
+          setRaffle(raffleRes);
+        }
+      }
     }
     setSearchResults(payments);
     setFetching(false);
@@ -89,8 +122,7 @@ export function PurchaseSearch() {
                 <p className="text-gray-900">Teléfono: {payer.phone}</p>
                 <p className="text-gray-900">Cédula: {payer.nationalId}</p>
                 <p className="text-gray-900">
-                  Fecha:{" "}
-                  {dayjs(payer.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+                  Fecha: {dayjs(payer.createdAt).format("DD/MM/YYYY HH:mm:ss")}
                 </p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
                 <p className="text-gray-900">{quantity} Números</p>
