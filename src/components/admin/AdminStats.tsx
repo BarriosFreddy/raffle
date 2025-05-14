@@ -96,6 +96,10 @@ export function AdminStats({ raffle, onEdit }: AdminStatsProps) {
         <p className="font-bold">Precio del ticket</p>
         <p>{updatedRaffle?.ticketPrice && formatMoney(updatedRaffle?.ticketPrice)}</p>
       </div>
+      <div>
+        <p className="font-bold">Id del evento</p>
+        <p>{updatedRaffle?._id.substring(0, 6)}</p>
+      </div>
       <div className="flex items-center justify-end col-span-2 gap-2">
         <button
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors disabled:bg-green-300"
