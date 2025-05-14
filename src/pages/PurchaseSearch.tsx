@@ -163,7 +163,7 @@ export function PurchaseSearch() {
           type="submit"
           className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
         >
-          BUSCAR
+          {fetching ? "BUSCANDO..." : "BUSCAR"}
         </button>
       </form>
 
