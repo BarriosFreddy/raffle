@@ -27,8 +27,8 @@ const raffleSchema = new mongoose.Schema({
   },
   paymentGateway: {
     type: String,
-    enum: ['EPAYCO', 'MP', 'BOLD', 'NONE'],
-    default: 'EPAYCO',
+    enum: ['EPAYCO', 'MP', 'BOLD', 'NONE', 'OPEN_PAY'],
+    default: 'BOLD',
     required: true
   },
   selectedNumbers: [{ type: Number }], //deprecated

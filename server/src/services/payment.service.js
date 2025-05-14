@@ -3,7 +3,13 @@ import axios from "axios";
 import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
-const {BOLD_API_KEY, MP_ACCESS_TOKEN} = process.env;
+const {
+  BOLD_API_KEY,
+  MP_ACCESS_TOKEN,
+  OPENPAY_MERCHANT_ID,
+  OPENPAY_API_SECRET,
+  OPENPAY_API_URL,
+} = process.env;
 
 export class PaymentService {
   static async create(paymentData) {
@@ -80,6 +86,30 @@ export class PaymentService {
       );
       const { data, status } = response;
       console.info("Bold Record Response", { status, data });
+      return data;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  static async getOpenPayRecordByOrderId(orderId) {
+    try {
+      if (!orderId) return;
+
+      const url = `${OPENPAY_API_URL}/${OPENPAY_MERCHANT_ID}/charges?order_id=${orderId}`;
+
+      const response = await axios.get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        auth: {
+          username: OPENPAY_API_SECRET,
+          password: "",
+        },
+      });
+      const { data, status } = response;
+      console.info("OpenPay Record Response", { status, data });
       return data;
     } catch (e) {
       console.error(e);

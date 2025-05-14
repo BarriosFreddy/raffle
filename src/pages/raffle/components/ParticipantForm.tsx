@@ -50,7 +50,7 @@ export function ParticipantForm({
         phone: "3211231231",
       } as ParticipantFormData);
     }
-  }, []);
+  }, [reset]);
 
   // ===========================
 
@@ -88,9 +88,11 @@ export function ParticipantForm({
       data.preferenceId = preference.id;
     }
     if (
-      [PaymentGateway.BOLD, PaymentGateway.NONE].includes(
-        raffle.paymentGateway as PaymentGateway
-      )
+      [
+        PaymentGateway.BOLD,
+        PaymentGateway.NONE,
+        PaymentGateway.OPEN_PAY,
+      ].includes(raffle.paymentGateway as PaymentGateway)
     ) {
       data.orderId = crypto.randomUUID();
     }
@@ -109,7 +111,7 @@ export function ParticipantForm({
       setTicketsExceeded(true);
       console.info("Se ha excedido el número de tikcets por persona");
       notify.warning("Has excedido el número de tikcets por persona");
-      return
+      return;
     }
     if (raffle.paymentGateway === PaymentGateway.NONE) {
       window.location.href = `/response?bold-order-id=${data.orderId}&bold-tx-status=approved`;

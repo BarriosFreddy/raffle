@@ -5,6 +5,7 @@ import { raffleRoutes } from '../routes/raffle.routes.js';
 import { paymentRoutes } from '../routes/payment.routes.js';
 import { mercadoPagoRoutes } from '../routes/mercadopago.routes.js';
 import { boldRoutes } from '../routes/bold.routes.js';
+import openPayRoutes from '../routes/openpay.routes.js';
 import { logger } from '../utils/logger.js';
 import { authRoutes } from '../routes/auth.routes.js';
 import { cacheRoutes } from '../routes/cache.routes.js';
@@ -38,6 +39,7 @@ export function createApp() {
   app.use('/api', paymentRoutes);
   app.use('/api', mercadoPagoRoutes);
   app.use('/api', boldRoutes);
+  app.use('/api', openPayRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api', cacheRoutes);
 

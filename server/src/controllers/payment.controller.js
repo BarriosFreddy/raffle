@@ -87,7 +87,8 @@ export const paymentController = {
       let payment;
       let newStatus;
       let paymentDetails;
-
+      
+      //Mercado Pago
       if (payment_id && !preference_id) {
         const mpPayment = await MercadoPagoService.findPaymentById(payment_id);
         const {
@@ -111,21 +112,24 @@ export const paymentController = {
           paymentDetails = mpPayment;
           payment.mpPaymentId = mpPaymentId.toString();
         }
+        //Mercado Pago also can send the preference_id
       } else if (preference_id) {
         payment = await PaymentService.findOne({
           preferenceId: preference_id,
         });
         newStatus = paymentInfo.status;
         paymentDetails = paymentInfo;
+        //Mercado Pago also can send the x_customer_email
       } else if (x_customer_email) {
         payment = await PaymentService.findOneByEmail(x_customer_email);
         newStatus = paymentInfo.x_cod_response === 1 ? APPROVED : REJECTED;
         paymentDetails = paymentInfo;
+        //Bold and OpenPay also can send the orderId
       } else if (boldOrderId && boldTXStatus) {
         payment = await PaymentService.findOne({
           orderId: boldOrderId,
         });
-        newStatus = boldTXStatus === "approved" ? APPROVED : REJECTED;
+        newStatus = ["approved", "completed"].includes(boldTXStatus) ? APPROVED : REJECTED;
         paymentDetails = paymentInfo;
       }
       if (!payment) {
@@ -162,6 +166,24 @@ export const paymentController = {
     } catch (e) {
       console.error(e);
       next(new ApiError(400, "Failed to get bold record by order id"));
+    }
+  },
+
+  async getOpenPayRecordByOrderId(req, res, next) {
+    try {
+      const { orderId } = req.params;
+      const openPayRecord = await PaymentService.getOpenPayRecordByOrderId(orderId);
+      if (openPayRecord && openPayRecord.length === 0) {
+        return res.status(200).json({
+          errors: [{
+            message: "OpenPay record not found",
+          }],
+        });
+      }
+      res.status(200).json(openPayRecord);
+    } catch (e) {
+      console.error(e);
+      next(new ApiError(400, "Failed to get openpay record by order id"));
     }
   },
 

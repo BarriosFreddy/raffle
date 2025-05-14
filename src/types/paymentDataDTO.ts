@@ -25,5 +25,5 @@ export type PaymentDataDTO = {
   };
   quantity?: number;
   preferenceId?: string; // Mercado Pago
-  orderId?: string; // Bold
+  orderId?: string; // Bold/OpenPay
 };

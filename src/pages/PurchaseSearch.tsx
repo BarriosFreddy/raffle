@@ -7,6 +7,7 @@ import {
   findAll,
   getBoldRecordByOrderId,
   getMercadoPagoPaymentByOrderId,
+  getOpenPayRecordByOrderId,
   processPaymentResponse,
 } from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
@@ -36,12 +37,12 @@ export function PurchaseSearch() {
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setFetching(true);
-    const payments = await findAll({ email, status: PaymentStatus.APPROVED });
+    let payments = await findAll({ email, status: PaymentStatus.APPROVED });
     if (payments.length) {
       const raffleRes = await getRaffleById(payments[0].raffleId);
       setRaffle(raffleRes);
     }
-
+    
     try {
       const paymentsPending = await findAll({
         email,
@@ -57,8 +58,14 @@ export function PurchaseSearch() {
         if (paymentRaffle.paymentGateway === PaymentGateway.MERCADO_PAGO) {
           paymentData = await validateMercadoPagoPayment(payment);
         }
+        if (paymentRaffle.paymentGateway === PaymentGateway.OPEN_PAY) {
+          paymentData = await validateOpenPayPayment(payment);
+          payments = await findAll({
+            email,
+            status: PaymentStatus.APPROVED,
+          });
+        }
         if (!paymentData) continue;
-        setSearchResults((prev) => [...prev, { ...payment, ...paymentData }]);
         setRaffle(paymentRaffle);
       }
     } catch (e) {
@@ -106,6 +113,21 @@ export function PurchaseSearch() {
       });
       return paymentData;
     }
+  };
+
+  const validateOpenPayPayment = async (payment: any) => {
+    const openPayPayments = await getOpenPayRecordByOrderId(payment.orderId);
+    if (openPayPayments.errors) {
+      console.error(openPayPayments);
+      return;
+    }
+    const openPayPayment = openPayPayments.pop();
+    const paymentData = await processPaymentResponse({
+      ...openPayPayment,
+      boldOrderId: payment.orderId,
+      boldTXStatus: openPayPayment.status,
+    });
+    return paymentData;
   };
 
   const handleShowNumbers = async (paymentData: Partial<PaymentDataDTO>) => {

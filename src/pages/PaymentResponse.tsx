@@ -5,6 +5,7 @@ import {
   processPaymentResponse,
   assignTicketNumbers,
   processPaymentEPayco,
+  getOpenPayRecordByOrderId,
 } from "@/services/payments.service";
 import { TicketContainer } from "@/components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
@@ -42,6 +43,7 @@ export function PaymentResponse() {
   useEffect(() => {
     (async () => {
       setLoading(true);
+      // BOLD gateway support
       if (boldOrderId && boldTXStatus) {
         const paymentDataRes = await processPaymentResponse({
           boldOrderId,
@@ -52,8 +54,32 @@ export function PaymentResponse() {
           const raffleRes = await getRaffleById(paymentDataRes.raffleId);
           setRaffle(raffleRes);
         }
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+      const openPayOrderId = boldOrderId;
+      //OpenPay gateway support
+      if (openPayOrderId) {
+        const openPayPayments = await getOpenPayRecordByOrderId(openPayOrderId);
+        if (openPayPayments.errors) {
+          console.error(openPayPayments);
+          setLoading(false);
+          return;
+        }
+        const openPayPayment = openPayPayments.pop();
+        const paymentDataRes = await processPaymentResponse({
+          ...openPayPayment,
+          boldOrderId: openPayOrderId,
+          boldTXStatus: openPayPayment.status,
+        });
+        setPaymentData(paymentDataRes);
+        if (paymentDataRes) {
+          const raffleRes = await getRaffleById(paymentDataRes.raffleId);
+          setRaffle(raffleRes);
+        }
+        setLoading(false);
+        return;
+      }
     })();
   }, [boldOrderId, boldTXStatus]);
 

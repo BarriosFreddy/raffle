@@ -11,6 +11,7 @@ router.get('/payments/email/:email', isAuthenticated, paymentController.findByEm
 router.post('/payments/webhook', isAuthenticated, paymentController.handlePaymentWebhook);
 router.get('/payments/bold/status/:boldOrderId', isAuthenticated, paymentController.getBoldRecordByOrderId);
 router.get('/payments/mercado-pago/status/:orderId', isAuthenticated, paymentController.getMercadoPagoPaymentByOrderId);
+router.get('/payments/openpay/status/:orderId', isAuthenticated, paymentController.getOpenPayRecordByOrderId);
 router.post('/payments/assign', isAuthenticated, paymentController.handleAssignTicketNumbers);
 router.get('/payments/:preferenceId/status', isAuthenticated, paymentController.getPaymentStatus);
 
