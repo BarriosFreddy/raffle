@@ -6,6 +6,7 @@ import {
   assignTicketNumbers,
   findAll,
   getBoldRecordByOrderId,
+  getMercadoPagoPaymentByOrderId,
   processPaymentResponse,
 } from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
@@ -14,6 +15,7 @@ import { getRaffleById } from "@/services/raffle.service";
 import { PaymentDataDTO } from "@/types/paymentDataDTO";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { PaymentGateway } from "@/enums/PaymentGateway.enum";
 dayjs.extend(utc);
 
 const APPROVED = "approved";
@@ -47,29 +49,17 @@ export function PurchaseSearch() {
       });
 
       for await (const payment of paymentsPending) {
-        const boldRecord = await getBoldRecordByOrderId(payment.orderId);
-        if (boldRecord.errors) {
-          console.error(boldRecord);
-          continue;
+        const paymentRaffle = await getRaffleById(payment.raffleId);
+        let paymentData: PaymentDataDTO | undefined;
+        if (paymentRaffle.paymentGateway === PaymentGateway.BOLD) {
+          paymentData = await validateBoldPayment(payment);
         }
-        const { payment_status } = boldRecord;
-        if (
-          payment_status &&
-          payment_status.toLowerCase() === PaymentStatus.APPROVED
-        ) {
-          const paymentData = await processPaymentResponse({
-            boldOrderId: payment.orderId,
-            boldTXStatus: PaymentStatus.APPROVED,
-          });
-          if (paymentData) {
-            setSearchResults((prev) => [
-              ...prev,
-              { ...payment, ...paymentData },
-            ]);
-            const raffleRes = await getRaffleById(paymentData.raffleId);
-            setRaffle(raffleRes);
-          }
+        if (paymentRaffle.paymentGateway === PaymentGateway.MERCADO_PAGO) {
+          paymentData = await validateMercadoPagoPayment(payment);
         }
+        if (!paymentData) continue;
+        setSearchResults((prev) => [...prev, { ...payment, ...paymentData }]);
+        setRaffle(paymentRaffle);
       }
     } catch (e) {
       console.error(e);
@@ -77,6 +67,45 @@ export function PurchaseSearch() {
     setSearchResults(payments);
     setFetching(false);
     setSend(true);
+  };
+
+  const validateBoldPayment = async (payment: any) => {
+    const boldRecord = await getBoldRecordByOrderId(payment.orderId);
+    if (boldRecord.errors) {
+      console.error(boldRecord);
+      return;
+    }
+    const { payment_status } = boldRecord;
+    if (
+      payment_status &&
+      payment_status.toLowerCase() === PaymentStatus.APPROVED
+    ) {
+      const paymentData = await processPaymentResponse({
+        boldOrderId: payment.orderId,
+        boldTXStatus: PaymentStatus.APPROVED,
+      });
+      return paymentData;
+    }
+  };
+
+  const validateMercadoPagoPayment = async (payment: any) => {
+    const mercadoPagoPayment = await getMercadoPagoPaymentByOrderId(
+      payment.orderId
+    );
+    if (mercadoPagoPayment.errors) {
+      console.error(mercadoPagoPayment);
+      return;
+    }
+    if (
+      mercadoPagoPayment &&
+      mercadoPagoPayment.status.toLowerCase() === PaymentStatus.APPROVED
+    ) {
+      const paymentData = await processPaymentResponse({
+        ...mercadoPagoPayment,
+        payment_id: mercadoPagoPayment.id,
+      });
+      return paymentData;
+    }
   };
 
   const handleShowNumbers = async (paymentData: Partial<PaymentDataDTO>) => {
@@ -119,7 +148,10 @@ export function PurchaseSearch() {
       <div className="mt-8">
         <div className="space-y-6">
           {searchResults.map(
-            ({ _id, payer, ticketNumbers, status, amount, quantity }, index) => (
+            (
+              { _id, payer, ticketNumbers, status, amount, quantity },
+              index
+            ) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-900">
                   Correo electrónico:{" "}

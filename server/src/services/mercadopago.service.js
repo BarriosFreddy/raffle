@@ -2,7 +2,7 @@ import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 import { ApiError } from '../utils/ApiError.js';
 
 export class MercadoPagoService {
-  static async createPreference({ items, payer }) {
+  static async createPreference({ items, payer, external_reference }) {
     try {
       if (!items?.length || !payer) {
         throw new ApiError(400, "Invalid request data");
@@ -33,6 +33,7 @@ export class MercadoPagoService {
         statement_descriptor: "Raffle",
         expires: true,
         expiration_date_to: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
+        external_reference,
       };
 
       const result = await preference.create({ body });

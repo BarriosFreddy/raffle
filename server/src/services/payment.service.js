@@ -3,7 +3,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
-const BOLD_API_KEY = process.env.BOLD_API_KEY;
+const {BOLD_API_KEY, MP_ACCESS_TOKEN} = process.env;
 
 export class PaymentService {
   static async create(paymentData) {
@@ -80,6 +80,28 @@ export class PaymentService {
       );
       const { data, status } = response;
       console.info("Bold Record Response", { status, data });
+      return data;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  static async getMercadoPagoPaymentByOrderId(orderId) {
+    try {
+      if (!orderId) return;
+
+      const response = await axios.get(
+        `https://api.mercadopago.com/v1/payments/search?external_reference=${orderId}&sort=date_approved&criteria=desc&range=date_created`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
+          },
+        }
+      );
+      const { data, status } = response;
+      console.info("Mercado Pago Payment Response", { status, data });
       return data;
     } catch (e) {
       console.error(e);

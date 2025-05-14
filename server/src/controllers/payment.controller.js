@@ -164,6 +164,25 @@ export const paymentController = {
       next(new ApiError(400, "Failed to get bold record by order id"));
     }
   },
+
+  async getMercadoPagoPaymentByOrderId(req, res, next) {
+    try {
+      const { orderId } = req.params;
+      const mercadoPagoPayment = await PaymentService.getMercadoPagoPaymentByOrderId(orderId);
+      if (mercadoPagoPayment.results.length === 0) {
+        return res.status(200).json({
+          errors: [{
+            message: "Mercado Pago payment not found",
+          }],
+        });
+      }
+      res.status(200).json(mercadoPagoPayment.results[0]);
+    } catch (e) {
+      console.error(e);
+      next(new ApiError(400, "Failed to get mercado pago payment by order id"));
+    }
+  },
+
   async handleAssignTicketNumbers(req, res, next) {
     try {
       const { preferenceId, paymentId } = req.body;

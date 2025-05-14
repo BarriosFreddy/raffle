@@ -73,8 +73,10 @@ export function ParticipantForm({
     };
 
     if (raffle.paymentGateway === PaymentGateway.MERCADO_PAGO) {
+      const orderId = crypto.randomUUID();
       const preference = await createPreference({
         items: data.items,
+        external_reference: orderId,
         payer: {
           name: formData.name,
           email: formData.email,
@@ -82,6 +84,7 @@ export function ParticipantForm({
           identification: { number: formData.nationalId },
         },
       });
+      data.orderId = orderId;
       data.preferenceId = preference.id;
     }
     if (
@@ -89,8 +92,7 @@ export function ParticipantForm({
         raffle.paymentGateway as PaymentGateway
       )
     ) {
-      const orderId = crypto.randomUUID();
-      data.orderId = orderId;
+      data.orderId = crypto.randomUUID();
     }
     setPaymentData(data);
 

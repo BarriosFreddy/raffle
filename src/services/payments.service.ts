@@ -186,4 +186,27 @@ export async function getBoldRecordByOrderId(orderId: string) {
   }
 }
 
+export async function getMercadoPagoPaymentByOrderId(orderId: string) {
+  try {
+    if (!orderId) return;
+
+    const response = await axios.get(
+      `${API_URL}/api/payments/mercado-pago/status/${orderId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_TOKEN}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to find mercado pago payment response: ${error.message}`);
+    }
+    throw new Error("Failed to find mercado pago payment");
+  }
+}
+
 type AssignTicketParams = { paymentId?: string; preferenceId?: string; email?: string };
