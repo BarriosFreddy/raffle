@@ -105,7 +105,7 @@ export function PurchasesList({
                       <div className="flex gap-2">
                         <dt className="text-gray-600">Id del evento:</dt>
                         <dd className="text-gray-900">
-                          {payment.raffle._id.substring(0, 6)}
+                          {payment.raffleId.substring(0, 6)}
                         </dd>
                       </div>
                     </div>

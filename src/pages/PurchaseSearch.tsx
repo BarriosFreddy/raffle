@@ -42,7 +42,7 @@ export function PurchaseSearch() {
       const raffleRes = await getRaffleById(payments[0].raffleId);
       setRaffle(raffleRes);
     }
-    
+
     try {
       const paymentsPending = await findAll({
         email,
@@ -171,7 +171,7 @@ export function PurchaseSearch() {
         <div className="space-y-6">
           {searchResults.map(
             (
-              { _id, payer, ticketNumbers, status, amount, quantity },
+              { _id, payer, ticketNumbers, status, amount, quantity, raffleId },
               index
             ) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
@@ -184,6 +184,9 @@ export function PurchaseSearch() {
                 <p className="text-gray-900">Cédula: {payer.nationalId}</p>
                 <p className="text-gray-900">
                   Fecha: {dayjs(payer.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+                </p>
+                <p className="text-gray-900">
+                  Id del Evento: {raffleId.substring(0, 6)}
                 </p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
                 <p className="text-gray-900">{quantity} Números</p>
