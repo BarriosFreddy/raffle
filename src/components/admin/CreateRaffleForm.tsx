@@ -361,6 +361,7 @@ export function CreateRaffleForm({
               } shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             >
               <option value={PaymentGateway.BOLD}>BOLD</option>
+              <option value={PaymentGateway.MERCADO_PAGO}>MERCADO PAGO</option>
               <option value={PaymentGateway.NONE}>NINGUNA</option>
             </select>
             {errors.paymentGateway && (

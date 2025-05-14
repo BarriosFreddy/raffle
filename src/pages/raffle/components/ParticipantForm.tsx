@@ -102,15 +102,15 @@ export function ParticipantForm({
       quantity,
       payer: formData,
     });
-    if (payment) {
-      if (raffle.paymentGateway === PaymentGateway.NONE) {
-        window.location.href = `/response?bold-order-id=${data.orderId}&bold-tx-status=approved`;
-      }
-    } else {
+    if (!payment) {
       setPaymentData(undefined);
       setTicketsExceeded(true);
       console.info("Se ha excedido el número de tikcets por persona");
       notify.warning("Has excedido el número de tikcets por persona");
+      return
+    }
+    if (raffle.paymentGateway === PaymentGateway.NONE) {
+      window.location.href = `/response?bold-order-id=${data.orderId}&bold-tx-status=approved`;
     }
   };
 
