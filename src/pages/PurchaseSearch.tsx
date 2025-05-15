@@ -121,7 +121,13 @@ export function PurchaseSearch() {
       console.error(openPayPayments);
       return;
     }
-    const openPayPayment = openPayPayments.pop();
+    const openPayPayment = openPayPayments.filter(
+      (opPayment: any) => opPayment.status === PaymentStatus.COMPLETED
+    )[0];
+    if (!openPayPayment) {
+      console.error("No se encontro un pago completado para el orderId", payment.orderId);
+      return;
+    }
     const paymentData = await processPaymentResponse({
       ...openPayPayment,
       boldOrderId: payment.orderId,
