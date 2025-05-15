@@ -28,11 +28,11 @@ export class PaymentService {
     return payments;
   }
   static async findAll(queryData) {
-    console.log({ queryData });
     const { page, size, ...query } = queryData;
     const queryParams = {};
     if (query.email) queryParams["payer.email"] = query.email;
-    if (query.status) queryParams.status = query.status;
+    if (Array.isArray(query.status)) queryParams.status = { $in: query.status };
+    if (!Array.isArray(query.status)) queryParams.status = query.status;
     if (query.raffleId) queryParams.raffleId = query.raffleId;
     const payments = await Payment.find(queryParams)
       .sort({ _id: -1 })

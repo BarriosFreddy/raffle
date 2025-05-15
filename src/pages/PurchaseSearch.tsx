@@ -46,7 +46,7 @@ export function PurchaseSearch() {
     try {
       const paymentsPending = await findAll({
         email,
-        status: PaymentStatus.PENDING,
+        status: [PaymentStatus.PENDING, PaymentStatus.REJECTED],
       });
 
       for await (const payment of paymentsPending) {
