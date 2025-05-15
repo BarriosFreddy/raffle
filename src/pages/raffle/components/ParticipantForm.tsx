@@ -190,8 +190,8 @@ export function ParticipantForm({
             {...register("email", {
               required: "Correo es requerido",
               pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Correo no es válido",
+                value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/,
+                message: "Formato de correo no válido y/o Utiliza minúsculas",
               },
             })}
             id="email"
