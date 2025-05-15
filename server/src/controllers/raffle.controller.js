@@ -290,6 +290,54 @@ export const raffleController = {
       next(new ApiError(400, "Failed to update awarded numbers"));
     }
   },
+  async updateBlockedNumbers(req, res, next) {
+    try {
+      const { raffleId } = req.params;
+      const { blockedNumbers } = req.body;
+      
+      if (!Array.isArray(blockedNumbers)) {
+        return next(new ApiError(400, "blockedNumbers must be an array of numbers"));
+      }
+
+      // Validate that all numbers are within the raffle range
+      const raffle = await Raffle.findById(raffleId);
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+
+      // Check if all numbers are in the valid range
+      const validNumbers = blockedNumbers.every(num => 
+        num >= raffle.minNumber && num <= raffle.maxNumber
+      );
+
+      if (!validNumbers) {
+        return next(new ApiError(400, "All blocked numbers must be within the raffle's number range"));
+      }
+      
+      // Make sure all blocked numbers are also in the awarded numbers list
+      const allAreAwarded = blockedNumbers.every(num => 
+        raffle.awardedNumbers.includes(num)
+      );
+      
+      if (!allAreAwarded) {
+        return next(new ApiError(400, "All blocked numbers must be awarded numbers"));
+      }
+
+      // Update the raffle with the blocked numbers
+      const updatedRaffle = await RaffleService.updateBlockedNumbers(raffleId, blockedNumbers);
+      
+      // Clear the cache for this raffle
+      cacheService.delete(`${CACHE_KEYS.RAFFLE}:${raffleId}`);
+      cacheService.delete(`${CACHE_KEYS.RAFFLE_SLUG}:${updatedRaffle.slug}`);
+      
+      res.status(200).json(updatedRaffle);
+      logger.info(`Updated blocked numbers for raffle ${raffleId}: ${blockedNumbers.join(', ')}`);
+    } catch (error) {
+      logger.error("Error updating blocked numbers:", error);
+      next(new ApiError(400, "Failed to update blocked numbers"));
+    }
+  },
+
   async getAwardedNumbersWinners(req, res, next) {
     try {
       const { raffleId } = req.params;

@@ -22,6 +22,7 @@ router.get('/raffles/:raffleId/available-numbers', isAuthenticated, raffleContro
 // Specific action routes
 router.post('/raffles/numbers/assign', isAuthenticated, raffleController.saveAvailableNumbers);
 router.put('/raffles/:raffleId/awarded-numbers', isAuthenticated, raffleController.updateAwardedNumbers);
+router.put('/raffles/:raffleId/blocked-numbers', isAuthenticated, raffleController.updateBlockedNumbers);
 router.get('/raffles/:raffleId/awarded-numbers/winners', isAuthenticated, raffleController.getAwardedNumbersWinners);
 
 // Generic parameter routes (must be last)

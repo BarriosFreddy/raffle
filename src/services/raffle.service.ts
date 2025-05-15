@@ -198,6 +198,28 @@ export async function updateAwardedNumbers(raffleId: string, awardedNumbers: num
   }
 }
 
+export async function updateBlockedNumbers(raffleId: string, blockedNumbers: number[]) {
+  try {
+    const response = await axios.put(`${API_URL}/api/raffles/${raffleId}/blocked-numbers`, { blockedNumbers }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    if (!response.data || !response.data._id) {
+      throw new Error("Invalid raffle response");
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to update blocked numbers: ${error.message}`);
+    }
+    throw new Error("Failed to update blocked numbers");
+  }
+}
+
 export async function getAwardedNumbersWinners(raffleId: string) {
   try {
     const response = await axios.get(`${API_URL}/api/raffles/${raffleId}/awarded-numbers/winners`, {

@@ -30,5 +30,7 @@ export interface Raffle {
   slug: string; // URL-friendly unique identifier
   lotteryName: string; // Name of the lottery used for this raffle
   awardedNumbers: number[]; // Numbers that have been awarded prizes
+  blockedNumbers: number[]; // Numbers that are blocked from being assigned
+  unblockedAwardedNumbers: number[]; // Awarded numbers that are unblocked and ready to be assigned
   supportPhoneNumber?: string; // Support phone number for WhatsApp contact
 }
