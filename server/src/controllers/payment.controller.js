@@ -135,7 +135,7 @@ export const paymentController = {
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }
-      if ([APPROVED, REJECTED].includes(payment.status)) {
+      if ([APPROVED].includes(payment.status)) {
         console.info("El pago ya fue procesado!");
         return res.status(200).json(payment);
       }
