@@ -104,26 +104,3 @@ export async function deleteRaffle(id) {
   }
   return raffle;
 }
-
-export async function updateBlockedNumbers(id, blockedNumbers) {
-  try {
-    const raffle = await Raffle.findById(id);
-    if (!raffle) {
-      throw new ApiError(404, 'Raffle not found');
-    }
-
-    // Update blocked numbers
-    raffle.blockedNumbers = blockedNumbers;
-    
-    // Automatically update unblockedAwardedNumbers based on what's awarded but not blocked
-    const unblockedAwardedNumbers = raffle.awardedNumbers.filter(
-      (num) => !blockedNumbers.includes(num)
-    );
-    raffle.unblockedAwardedNumbers = unblockedAwardedNumbers;
-
-    await raffle.save();
-    return raffle;
-  } catch (error) {
-    throw error;
-  }
-}

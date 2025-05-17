@@ -176,9 +176,9 @@ export async function assignAvailableNumbers(raffleId: string) {
   }
 }
 
-export async function updateAwardedNumbers(raffleId: string, awardedNumbers: number[]) {
+export async function updateAwardedNumbers(raffleId: string, rafflePartial: Partial<Raffle>) {
   try {
-    const response = await axios.put(`${API_URL}/api/raffles/${raffleId}/awarded-numbers`, { awardedNumbers }, {
+    const response = await axios.put(`${API_URL}/api/raffles/${raffleId}/awarded-numbers`, rafflePartial, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${API_TOKEN}`,
@@ -195,28 +195,6 @@ export async function updateAwardedNumbers(raffleId: string, awardedNumbers: num
       throw new Error(`Failed to update awarded numbers: ${error.message}`);
     }
     throw new Error("Failed to update awarded numbers");
-  }
-}
-
-export async function updateBlockedNumbers(raffleId: string, blockedNumbers: number[]) {
-  try {
-    const response = await axios.put(`${API_URL}/api/raffles/${raffleId}/blocked-numbers`, { blockedNumbers }, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_TOKEN}`,
-      },
-    });
-
-    if (!response.data || !response.data._id) {
-      throw new Error("Invalid raffle response");
-    }
-
-    return response.data;
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Failed to update blocked numbers: ${error.message}`);
-    }
-    throw new Error("Failed to update blocked numbers");
   }
 }
 

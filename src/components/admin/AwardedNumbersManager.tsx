@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { updateAwardedNumbers, updateBlockedNumbers } from "@/services/raffle.service";
+import { updateAwardedNumbers } from "@/services/raffle.service";
 import type { Raffle } from "@/types";
 import { Save, X, Lock, Unlock } from "lucide-react";
 
@@ -7,9 +7,12 @@ interface AwardedNumbersManagerProps {
   raffle?: Raffle;
 }
 
-export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
+export function AwardedNumbersManager({
+  raffle,
+}: AwardedNumbersManagerProps) {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [blockedNumbers, setBlockedNumbers] = useState<number[]>([]);
+  const [raffleLocal, setRaffleLocal] = useState<Raffle | undefined>(raffle);
 
   const [number, setNumber] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,30 +21,38 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
   // Store original awarded and blocked numbers for comparison
   const originalNumbers = useMemo(
     () =>
-      raffle?.awardedNumbers
-        ? [...raffle.awardedNumbers].sort((a, b) => a - b)
+      raffleLocal?.awardedNumbers
+        ? [...raffleLocal.awardedNumbers].sort((a, b) => a - b)
         : [],
-    [raffle?.awardedNumbers]
+    [raffleLocal?.awardedNumbers]
   );
 
   const originalBlockedNumbers = useMemo(
     () =>
-      raffle?.blockedNumbers
-        ? [...raffle.blockedNumbers].sort((a, b) => a - b)
+      raffleLocal?.blockedNumbers
+        ? [...raffleLocal.blockedNumbers].sort((a, b) => a - b)
         : [],
-    [raffle?.blockedNumbers]
+    [raffleLocal?.blockedNumbers]
+  );
+
+  const priorityNumbers = useMemo(
+    () =>
+      raffleLocal?.priorityAwardedNumbers
+        ? [...raffleLocal.priorityAwardedNumbers].sort((a, b) => a - b)
+        : [],
+    [raffleLocal?.priorityAwardedNumbers]
   );
 
   // Initialize with existing awarded and blocked numbers
   useEffect(() => {
-    if (raffle?.awardedNumbers) {
-      setSelectedNumbers([...raffle.awardedNumbers]);
+    if (raffleLocal?.awardedNumbers) {
+      setSelectedNumbers([...raffleLocal.awardedNumbers]);
     }
-    
-    if (raffle?.blockedNumbers) {
-      setBlockedNumbers([...raffle.blockedNumbers]);
+
+    if (raffleLocal?.blockedNumbers) {
+      setBlockedNumbers([...raffleLocal.blockedNumbers]);
     }
-  }, [raffle?.awardedNumbers, raffle?.blockedNumbers]);
+  }, [raffleLocal?.awardedNumbers, raffleLocal?.blockedNumbers]);
 
   // Check if there are any changes to the awarded or blocked numbers
   const hasChanges = useMemo(() => {
@@ -52,20 +63,29 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
     if (sortedSelected.length !== originalNumbers.length) {
       return true;
     }
-    
+
     // Check if blocked numbers changed
     if (sortedBlocked.length !== originalBlockedNumbers.length) {
       return true;
     }
 
     // Check if any awarded number changed
-    const awardedChanged = sortedSelected.some((num, index) => num !== originalNumbers[index]);
-    
+    const awardedChanged = sortedSelected.some(
+      (num, index) => num !== originalNumbers[index]
+    );
+
     // Check if any blocked number changed
-    const blockedChanged = sortedBlocked.some((num, index) => num !== originalBlockedNumbers[index]);
-    
+    const blockedChanged = sortedBlocked.some(
+      (num, index) => num !== originalBlockedNumbers[index]
+    );
+
     return awardedChanged || blockedChanged;
-  }, [selectedNumbers, originalNumbers, blockedNumbers, originalBlockedNumbers]);
+  }, [
+    selectedNumbers,
+    originalNumbers,
+    blockedNumbers,
+    originalBlockedNumbers,
+  ]);
 
   const handleAddNumber = () => {
     const parsedNumber = parseInt(number.trim());
@@ -75,9 +95,15 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
     }
 
     // Validate number is within raffle range
-    if (!raffle || parsedNumber < (raffle.minNumber || 0) || parsedNumber > (raffle.maxNumber || 999999)) {
+    if (
+      !raffleLocal ||
+      parsedNumber < (raffleLocal.minNumber || 0) ||
+      parsedNumber > (raffleLocal.maxNumber || 999999)
+    ) {
       setError(
-        `El número debe estar entre ${raffle?.minNumber || 0} y ${raffle?.maxNumber || 999999}`
+        `El número debe estar entre ${raffleLocal?.minNumber || 0} y ${
+          raffleLocal?.maxNumber || 999999
+        }`
       );
       return;
     }
@@ -89,6 +115,7 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
     }
 
     setSelectedNumbers([...selectedNumbers, parsedNumber]);
+    setBlockedNumbers([...blockedNumbers, parsedNumber]);
     setNumber("");
     setError(null);
   };
@@ -98,7 +125,7 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
     // Also remove from blocked numbers if it was blocked
     setBlockedNumbers(blockedNumbers.filter((num) => num !== numToRemove));
   };
-  
+
   const toggleBlockNumber = (numToToggle: number) => {
     if (blockedNumbers.includes(numToToggle)) {
       // Unblock the number
@@ -117,22 +144,23 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
       // Sort numbers for better display
       const sortedNumbers = [...selectedNumbers].sort((a, b) => a - b);
       const sortedBlockedNumbers = [...blockedNumbers].sort((a, b) => a - b);
-      
+
       // Make sure all blocked numbers are in the awarded numbers list
-      const validBlockedNumbers = sortedBlockedNumbers.filter(num => 
+      const validBlockedNumbers = sortedBlockedNumbers.filter((num) =>
         sortedNumbers.includes(num)
       );
-      
-      // First update the awarded numbers
-      await updateAwardedNumbers(raffle?._id || '', sortedNumbers);
-      
-      // Then update the blocked numbers
-      await updateBlockedNumbers(raffle?._id || '', validBlockedNumbers);
+      // Then update the awarded numbers
+      const updatedRaffle = await updateAwardedNumbers(raffleLocal?._id || "", {
+        awardedNumbers: sortedNumbers,
+        blockedNumbers: validBlockedNumbers,
+      });
+      if(updatedRaffle){
+        setRaffleLocal(updatedRaffle);
+      }
+      setIsSubmitting(false);
     } catch (err) {
       console.error("Error updating awarded or blocked numbers:", err);
       setError("Error al guardar los números premiados");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -141,34 +169,48 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
       <h3 className="text-lg font-semibold mb-4">
         Configurar Números Premiados
       </h3>
-      
+
       <div className="mb-4 text-sm">
         <p className="font-medium mb-2">Instrucciones:</p>
         <ul className="list-disc pl-5 space-y-1">
           <li>Agregue números premiados usando el campo de abajo.</li>
-          <li>Active la casilla de verificación para bloquear un número premiado.</li>
-          <li>Los números bloqueados (<span className="text-red-500">en rojo</span>) no serán asignados en nuevas participaciones.</li>
-          <li>Los números premiados desbloqueados se asignarán primero en nuevas participaciones.</li>
+          <li>
+            Active la casilla de verificación para bloquear un número premiado.
+          </li>
+          <li>
+            Los números bloqueados (
+            <span className="text-red-500">en rojo</span>) no serán asignados en
+            nuevas participaciones.
+          </li>
+          <li>
+            Los números premiados desbloqueados se asignarán primero en nuevas
+            participaciones.
+          </li>
         </ul>
       </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Agregar Número Premiado (Entre {raffle?.minNumber} y {raffle?.maxNumber}
-          )
+          Agregar Número Premiado (Entre {raffleLocal?.minNumber} y{" "}
+          {raffleLocal?.maxNumber})
         </label>
         <div className="flex space-x-2">
           <input
             type="number"
-            min={raffle?.minNumber || 0}
-            max={raffle?.maxNumber || 999999}
+            min={raffleLocal?.minNumber || 0}
+            max={raffleLocal?.maxNumber || 999999}
             value={number}
             onChange={(e) => setNumber(e.target.value)}
             className="flex-1 border border-gray-300 rounded-md px-3 py-2"
             placeholder="Ingresa un número"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAddNumber();
+              }
+            }}
           />
           <button
-          disabled={!raffle}
+            disabled={!raffleLocal}
             onClick={handleAddNumber}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
             type="button"
@@ -188,7 +230,9 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
               .map((num) => (
                 <div
                   key={num}
-                  className={`flex items-center ${blockedNumbers.includes(num) ? 'bg-red-100' : 'bg-gray-100'} px-3 py-1 rounded`}
+                  className={`flex items-center ${
+                    blockedNumbers.includes(num) ? "bg-red-100" : "bg-gray-100"
+                  } px-3 py-1 rounded`}
                 >
                   <div className="flex items-center mr-2">
                     <input
@@ -202,11 +246,23 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
                   <div className="flex">
                     <button
                       onClick={() => toggleBlockNumber(num)}
-                      className={`${blockedNumbers.includes(num) ? 'text-red-500 hover:text-red-700' : 'text-green-500 hover:text-green-700'} mr-2`}
+                      className={`${
+                        blockedNumbers.includes(num)
+                          ? "text-red-500 hover:text-red-700"
+                          : "text-green-500 hover:text-green-700"
+                      } mr-2`}
                       type="button"
-                      title={blockedNumbers.includes(num) ? 'Desbloquear número' : 'Bloquear número'}
+                      title={
+                        blockedNumbers.includes(num)
+                          ? "Desbloquear número"
+                          : "Bloquear número"
+                      }
                     >
-                      {blockedNumbers.includes(num) ? <Lock size={16} /> : <Unlock size={16} />}
+                      {blockedNumbers.includes(num) ? (
+                        <Lock size={16} />
+                      ) : (
+                        <Unlock size={16} />
+                      )}
                     </button>
                     <button
                       onClick={() => handleRemoveNumber(num)}
@@ -222,11 +278,28 @@ export function AwardedNumbersManager({ raffle }: AwardedNumbersManagerProps) {
           </div>
         </div>
       )}
+      {priorityNumbers.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-md font-medium mb-2">Números Priorizados:</h4>
+          <div className="flex flex-wrap gap-2">
+            {priorityNumbers
+              .sort((a, b) => a - b)
+              .map((num) => (
+                <div
+                  key={num}
+                  className={`flex items-center bg-green-100 px-3 py-1 rounded`}
+                >
+                  <span className="mr-2">{num}</span>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-5">
         <button
           onClick={handleSubmit}
-          disabled={isSubmitting || !hasChanges || !raffle}
+          disabled={isSubmitting || !hasChanges || !raffleLocal}
           className="flex items-center justify-center w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-green-300 transition-colors"
           type="button"
           title={!hasChanges ? "No hay cambios que guardar" : ""}

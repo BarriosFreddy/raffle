@@ -38,7 +38,7 @@ const raffleSchema = new mongoose.Schema({
   },
   awardedNumbers: [{ type: Number }], // Numbers that have been awarded prizes
   blockedNumbers: [{ type: Number }], // Numbers that are blocked from being assigned
-  unblockedAwardedNumbers: [{ type: Number }], // Awarded numbers that are unblocked and ready to be assigned
+  priorityAwardedNumbers: [{ type: Number }], // Awarded numbers that are prioritized for assignment
   themeColor: {
     type: String,
     default: '#4f46e5'

@@ -4,14 +4,14 @@ import { TicketService } from "../services/ticket.service.js";
 import { AvailableNumbersService } from "../services/availableNumber.service.js";
 import cacheService, { CACHE_KEYS } from "../services/cache.service.js";
 import * as RaffleService from "../services/raffle.service.js";
-import { PaymentService } from "../services/payment.service.js"
+import { PaymentService } from "../services/payment.service.js";
 import { logger } from "../utils/logger.js";
 
 export const raffleController = {
   async getLiveRaffleById(req, res, next) {
     try {
       const { id } = req.params;
-      
+
       // Skip cache and get directly from database
       const raffle = await Raffle.findById(id);
       if (!raffle) {
@@ -21,7 +21,10 @@ export const raffleController = {
       res.json(raffle);
       logger.info(`Retrieved live raffle data with ID: ${id}`);
     } catch (error) {
-      logger.error(`Error getting live raffle data with ID ${req.params.id}:`, error);
+      logger.error(
+        `Error getting live raffle data with ID ${req.params.id}:`,
+        error
+      );
       next(new ApiError(400, "Failed to get live raffle data"));
     }
   },
@@ -29,7 +32,7 @@ export const raffleController = {
   async getLiveRaffleBySlug(req, res, next) {
     try {
       const { slug } = req.params;
-      
+
       // Skip cache and get directly from database
       const raffle = await Raffle.findOne({ slug }).exec();
       if (!raffle) {
@@ -39,8 +42,15 @@ export const raffleController = {
       res.json(raffle);
       logger.info(`Retrieved live raffle data with slug: ${slug}`);
     } catch (error) {
-      logger.error(`Error getting live raffle data with slug ${req.params.slug}:`, error);
-      next(error instanceof ApiError ? error : new ApiError(400, "Failed to get live raffle data"));
+      logger.error(
+        `Error getting live raffle data with slug ${req.params.slug}:`,
+        error
+      );
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(400, "Failed to get live raffle data")
+      );
     }
   },
   async createRaffle(req, res, next) {
@@ -66,11 +76,11 @@ export const raffleController = {
     try {
       const raffleId = req.params.id;
       // Validate ticket range
-      TicketService.validateTicketRange(
-        req.body.minNumber,
-        req.body.maxNumber
+      TicketService.validateTicketRange(req.body.minNumber, req.body.maxNumber);
+      const updatedRaffle = await RaffleService.updateRaffle(
+        raffleId,
+        req.body
       );
-      const updatedRaffle = await RaffleService.updateRaffle(raffleId, req.body);
       cacheService.deleteAll();
       res.status(200).json(updatedRaffle);
       logger.info(`Raffle updated with ID: ${raffleId}`);
@@ -91,7 +101,10 @@ export const raffleController = {
       // Validate ticket range
       TicketService.validateTicketRange(raffle.minNumber, raffle.maxNumber);
       const shuffledNumbers =
-        await AvailableNumbersService.populateAndShuffleNumbers(raffle.minNumber, raffle.maxNumber);
+        await AvailableNumbersService.populateAndShuffleNumbers(
+          raffle.minNumber,
+          raffle.maxNumber
+        );
       const availableNumbersdocs =
         await AvailableNumbersService.generateAvailableNumberDocs(
           shuffledNumbers,
@@ -116,9 +129,11 @@ export const raffleController = {
     try {
       const { status, page, size } = req.query;
       let raffles = [];
-      
+
       // Try to get from cache first
-      const cacheKey = `${CACHE_KEYS.RAFFLES}:${[status, page, size].join("_")}`;
+      const cacheKey = `${CACHE_KEYS.RAFFLES}:${[status, page, size].join(
+        "_"
+      )}`;
       const cachedData = cacheService.get(cacheKey);
       if (cachedData) {
         raffles = cachedData;
@@ -128,7 +143,7 @@ export const raffleController = {
 
       // Get from database if not in cache
       raffles = await RaffleService.getRaffles({ status, page, size });
-      
+
       // Cache the results if there are any
       if (Array.isArray(raffles) && raffles.length > 0) {
         cacheService.set(cacheKey, raffles);
@@ -145,7 +160,7 @@ export const raffleController = {
   async getRaffleById(req, res, next) {
     try {
       const { id } = req.params;
-      
+
       // Try to get from cache first
       const cacheKey = `${CACHE_KEYS.RAFFLE}:${id}`;
       const cachedData = cacheService.get(cacheKey);
@@ -174,7 +189,7 @@ export const raffleController = {
   async getRaffleBySlug(req, res, next) {
     try {
       const { slug } = req.params;
-      
+
       // Try to get from cache first
       const cacheKey = `${CACHE_KEYS.RAFFLE_SLUG}:${slug}`;
       const cachedData = cacheService.get(cacheKey);
@@ -193,7 +208,11 @@ export const raffleController = {
       logger.info(`Retrieved raffle with slug: ${slug}`);
     } catch (error) {
       logger.error(`Error getting raffle with slug ${req.params.slug}:`, error);
-      next(error instanceof ApiError ? error : new ApiError(400, "Failed to get raffle"));
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(400, "Failed to get raffle")
+      );
     }
   },
 
@@ -243,7 +262,9 @@ export const raffleController = {
   async checkAvailableNumbers(req, res, next) {
     try {
       const { raffleId } = req.params;
-      const hasNumbers = await AvailableNumbersService.hasAvailableNumbers(raffleId);
+      const hasNumbers = await AvailableNumbersService.hasAvailableNumbers(
+        raffleId
+      );
       res.json({ hasNumbers });
       logger.info(`Checked available numbers for raffle ${raffleId}`);
     } catch (error) {
@@ -255,11 +276,10 @@ export const raffleController = {
   async updateAwardedNumbers(req, res, next) {
     try {
       const { raffleId } = req.params;
-      const { awardedNumbers } = req.body;
-      
-      if (!Array.isArray(awardedNumbers)) {
-        return next(new ApiError(400, "awardedNumbers must be an array of numbers"));
-      }
+      const { awardedNumbers, blockedNumbers } = req.body;
+
+      if (!Array.isArray(awardedNumbers)) return next(new ApiError(400, "awardedNumbers must be an array of numbers"));
+      if (!Array.isArray(blockedNumbers)) return next(new ApiError(400, "blockedNumbers must be an array of numbers"));
 
       // Validate that all numbers are within the raffle range
       const raffle = await Raffle.findById(raffleId);
@@ -268,73 +288,71 @@ export const raffleController = {
       }
 
       // Check if all numbers are in the valid range
-      const validNumbers = awardedNumbers.every(num => 
-        num >= raffle.minNumber && num <= raffle.maxNumber
+      const validNumbers = awardedNumbers.every(
+        (num) => num >= raffle.minNumber && num <= raffle.maxNumber
       );
 
-      if (!validNumbers) {
-        return next(new ApiError(400, "All awarded numbers must be within the raffle's number range"));
-      }
-
-      // Update the raffle with the awarded numbers
-      const updatedRaffle = await RaffleService.updateRaffle(raffleId, { awardedNumbers });
+      if (!validNumbers) return next(new ApiError(400, "All awarded numbers must be within the raffle's number range"));
+      // Check if all numbers are in the valid range
+      const validBlockedNumbers = blockedNumbers.every(
+        (num) => num >= raffle.minNumber && num <= raffle.maxNumber
+      );
       
+      if (!validBlockedNumbers) return next(new ApiError(400, "All blocked numbers must be within the raffle's number range"));
+      
+      // Make sure all blocked numbers are also in the awarded numbers list
+      const allAreAwarded = blockedNumbers.every((num) =>
+        awardedNumbers.includes(num)
+      );
+      
+      if (!allAreAwarded) return next(new ApiError(400, "All blocked numbers must be awarded numbers"));
+
+      // Find which awarded numbers are new (not in the current awardedNumbers list)
+      const currentAwardedNumbers = awardedNumbers || [];
+      const currentBlockedNumbers = blockedNumbers || [];
+      // Determine which numbers to add to priorityAwardedNumbers
+      // Only add numbers that are new and have never been assigned before
+      const assignedNumbers = await TicketService.getAssignedNumbers(raffleId);
+      const assignedNumbersArray = assignedNumbers.map(Number); // Convert to numbers
+      // Get unblocked numbers
+      const unblockedNumbers = currentAwardedNumbers.filter(
+        (num) => !currentBlockedNumbers.includes(num)
+      );
+      // Filter out any numbers that have already been assigned
+      const newPriorityNumbers = unblockedNumbers.filter(
+        (num) => !assignedNumbersArray.includes(num)
+      );
+      // Create the update object with awarded numbers and priorityAwardedNumbers
+      const updateData = {
+        awardedNumbers,
+        priorityAwardedNumbers: newPriorityNumbers,
+        blockedNumbers,
+      };
+      // Update the raffle with the awarded numbers and priorityAwardedNumbers
+      const updatedRaffle = await RaffleService.updateRaffle(
+        raffleId,
+        updateData
+      );
       // Clear the cache for this raffle
       cacheService.delete(`${CACHE_KEYS.RAFFLE}:${raffleId}`);
       cacheService.delete(`${CACHE_KEYS.RAFFLE_SLUG}:${updatedRaffle.slug}`);
-      
+
       res.status(200).json(updatedRaffle);
-      logger.info(`Updated awarded numbers for raffle ${raffleId}: ${awardedNumbers.join(', ')}`);
+      logger.info(
+        `Updated awarded numbers for raffle ${raffleId}: ${awardedNumbers.join(
+          ", "
+        )}`
+      );
+      if (newPriorityNumbers.length > 0) {
+        logger.info(
+          `Added new priority awarded numbers for raffle ${raffleId}: ${newPriorityNumbers.join(
+            ", "
+          )}`
+        );
+      }
     } catch (error) {
       logger.error("Error updating awarded numbers:", error);
       next(new ApiError(400, "Failed to update awarded numbers"));
-    }
-  },
-  async updateBlockedNumbers(req, res, next) {
-    try {
-      const { raffleId } = req.params;
-      const { blockedNumbers } = req.body;
-      
-      if (!Array.isArray(blockedNumbers)) {
-        return next(new ApiError(400, "blockedNumbers must be an array of numbers"));
-      }
-
-      // Validate that all numbers are within the raffle range
-      const raffle = await Raffle.findById(raffleId);
-      if (!raffle) {
-        return next(new ApiError(404, "Raffle not found"));
-      }
-
-      // Check if all numbers are in the valid range
-      const validNumbers = blockedNumbers.every(num => 
-        num >= raffle.minNumber && num <= raffle.maxNumber
-      );
-
-      if (!validNumbers) {
-        return next(new ApiError(400, "All blocked numbers must be within the raffle's number range"));
-      }
-      
-      // Make sure all blocked numbers are also in the awarded numbers list
-      const allAreAwarded = blockedNumbers.every(num => 
-        raffle.awardedNumbers.includes(num)
-      );
-      
-      if (!allAreAwarded) {
-        return next(new ApiError(400, "All blocked numbers must be awarded numbers"));
-      }
-
-      // Update the raffle with the blocked numbers
-      const updatedRaffle = await RaffleService.updateBlockedNumbers(raffleId, blockedNumbers);
-      
-      // Clear the cache for this raffle
-      cacheService.delete(`${CACHE_KEYS.RAFFLE}:${raffleId}`);
-      cacheService.delete(`${CACHE_KEYS.RAFFLE_SLUG}:${updatedRaffle.slug}`);
-      
-      res.status(200).json(updatedRaffle);
-      logger.info(`Updated blocked numbers for raffle ${raffleId}: ${blockedNumbers.join(', ')}`);
-    } catch (error) {
-      logger.error("Error updating blocked numbers:", error);
-      next(new ApiError(400, "Failed to update blocked numbers"));
     }
   },
 
@@ -348,8 +366,11 @@ export const raffleController = {
       }
 
       // Update the raffle with the awarded numbers
-      const winners = await PaymentService.getAwardedNumbersWinners(raffleId, raffle.awardedNumbers);
-      
+      const winners = await PaymentService.getAwardedNumbersWinners(
+        raffleId,
+        raffle.awardedNumbers
+      );
+
       // Clear the cache for this raffle
       res.status(200).json(winners);
       logger.info(`Get awarded numbers winners for raffle ${raffleId}`);

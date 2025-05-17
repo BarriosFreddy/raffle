@@ -30,18 +30,20 @@ export class TicketService {
       
       let selectedNumbers = [];
 
-      // First, check if there are any unblocked awarded numbers to prioritize
-      if (raffle.unblockedAwardedNumbers && raffle.unblockedAwardedNumbers.length > 0) {
-        // Use unblocked awarded numbers first
-        const unblockedCount = Math.min(raffle.unblockedAwardedNumbers.length, quantity);
-        selectedNumbers = raffle.unblockedAwardedNumbers.slice(0, unblockedCount);
+      // First, check if there are any prioritized awarded numbers to assign
+      if (raffle.priorityAwardedNumbers && raffle.priorityAwardedNumbers.length > 0) {
+        // Use prioritized awarded numbers first
+        const priorityCount = Math.min(raffle.priorityAwardedNumbers.length, quantity);
+        selectedNumbers = raffle.priorityAwardedNumbers.slice(0, priorityCount);
         
-        // Remove these numbers from unblockedAwardedNumbers
-        raffle.unblockedAwardedNumbers = raffle.unblockedAwardedNumbers.slice(unblockedCount);
+        // Remove these numbers from priorityAwardedNumbers
+        const priorityAwardedNumbersNew = [...raffle.priorityAwardedNumbers];
+        priorityAwardedNumbersNew.splice(0, priorityCount);
+        raffle.priorityAwardedNumbers = priorityAwardedNumbersNew;
         await raffle.save({ session });
         
         // If we've satisfied the quantity with unblocked awarded numbers, we're done
-        if (selectedNumbers.length === quantity) {
+        if (selectedNumbers.length <= quantity) {
           // Find and update the availableNumber records for these numbers
           await AvailableNumber.updateMany(
             { raffleId: payment.raffleId, number: { $in: selectedNumbers }, status: AVAILABLE_STATUS },
@@ -159,6 +161,27 @@ export class TicketService {
     }
 
     return selectedNumbers.sort((a, b) => a - b);
+  }
+  
+  /**
+   * Get all assigned numbers for a specific raffle
+   * @param {string} raffleId - The ID of the raffle
+   * @returns {Promise<number[]>} - Array of assigned ticket numbers
+   */
+  static async getAssignedNumbers(raffleId) {
+    try {
+      // Find all available numbers that are marked as 'taken'
+      const takenNumbers = await AvailableNumber.find(
+        { raffleId, status: TAKEN_STATUS },
+        'number' // only return the number field
+      ).exec();
+      
+      // Extract and return just the numbers
+      return takenNumbers.map(item => item.number);
+    } catch (error) {
+      console.error("Error getting assigned numbers:", error);
+      return [];
+    }
   }
 }
 
