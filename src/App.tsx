@@ -12,8 +12,8 @@ export default function App() {
   const { raffles, setRaffles } = useRaffleStore();
   useEffect(() => {
     (async () => {
-      const rafflesData = await getRaffles({ status: "active" });
-      setRaffles(rafflesData);
+      //const rafflesData = await getRaffles({ status: "active" });
+      //setRaffles(rafflesData);
     })();
   }, []);
 
