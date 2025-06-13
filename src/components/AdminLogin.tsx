@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import { Lock } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
-interface AdminLoginProps {
-  onLogin: (success: boolean) => void;
+type AdminLoginProps = {
+  onLogin: (success: boolean) => void
 }
 
 export function AdminLogin({ onLogin }: AdminLoginProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, this should be a secure authentication process
-    if (password === 'raffle321') {
-      onLogin(true);
-    } else {
-      setError('Invalid password');
-      onLogin(false);
-    }
+    const response = await login(password);
+    if (!response.token) setError('Invalid password');
+    onLogin(!!response.token);
+    if (response.token) window.location.href = "/admin"
   };
 
   return (
@@ -28,13 +27,13 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
         </div>
       </div>
       <h2 className="text-xl font-bold text-gray-900 text-center mb-6">
-        Administrator Login
+        Iniciar sesión como administrador
       </h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            Password
+            Contraseña
           </label>
           <input
             type="password"
@@ -53,12 +52,12 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
             </p>
           )}
         </div>
-        
+
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
         >
-          Login
+          Iniciar sesión
         </button>
       </form>
     </div>

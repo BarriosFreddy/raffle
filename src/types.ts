@@ -18,9 +18,17 @@ export interface Raffle {
   minNumber: number;
   maxNumber: number;
   ticketPrice: number;
-  participants: Participant[];
-  winners: Participant[];
-  status: 'active' | 'completed';
+  minTicketsPerUser: number;
+  maxTicketsPerUser: number;
+  status: 'active' | 'inactive' | 'completed';
+  statusMessage?: string;
   selectedNumbers: number[];
   selectedNumbersQuantity: number;
+  paymentGateway: string;
+  coverUrl: string;
+  themeColor?: string; // Optional theme color for UI customization
+  slug: string; // URL-friendly unique identifier
+  lotteryName: string; // Name of the lottery used for this raffle
+  awardedNumbers: number[]; // Numbers that have been awarded prizes
+  supportPhoneNumber?: string; // Support phone number for WhatsApp contact
 }

@@ -5,6 +5,7 @@ const API_TOKEN = import.meta.env.VITE_API_TOKEN
 
 
 export interface CreatePreferenceData {
+  external_reference: string;
   items: Array<{
     title: string;
     unit_price: number;

@@ -3,11 +3,11 @@ import App from './App';
 import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentFailure } from './pages/PaymentFailure';
 import { PaymentPending } from './pages/PaymentPending';
-import { RaffleView } from './pages/RaffleView';
+import { RaffleView } from './pages/raffle/RaffleView';
 import { RaffleLayout } from './layouts/RaffleLayout';
 import { PurchaseSearch } from './pages/PurchaseSearch';
 import { AdminPanel } from './components/admin/AdminPanel';
-import { AdminLogin } from './components/AdminLogin';
+import { PaymentResponse } from './pages/PaymentResponse';
 
 export const router = createBrowserRouter([
   {
@@ -20,15 +20,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'search',
-        element: <PurchaseSearch raffles={[]} />,
+        element: <PurchaseSearch />,
       },
       {
         path: 'admin',
-        element: <AdminLogin onLogin={() => {}} />,
-      },
-      {
-        path: 'dashboard',
-        element: <AdminPanel />,
+        element: <AdminPanel/>,
       },
       {
         path: 'raffle/:raffleId',
@@ -45,6 +41,10 @@ export const router = createBrowserRouter([
       {
         path: 'pending',
         element: <PaymentPending />,
+      },
+      {
+        path: 'response',
+        element: <PaymentResponse />,
       },
     ],
   },

@@ -29,7 +29,7 @@ export class TicketService {
       }).exec();
 
       const availableNumbers = await AvailableNumber.find(
-        { status: AVAILABLE_STATUS },
+        { raffleId: payment.raffleId, status: AVAILABLE_STATUS },
         null,
         {
           limit: quantity,

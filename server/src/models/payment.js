@@ -4,7 +4,7 @@ const payerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
-  instagram: { type: String, required: true },
+  instagram: { type: String, required: false },
   nationalId: { type: String },
 }, { timestamps: true });
 
@@ -16,8 +16,10 @@ const paymentSchema = new mongoose.Schema({
     required: true
   },
   preferenceId: {
-    type: String,
-    required: true
+    type: String
+  },
+  orderId: {
+    type: String
   },
   payer: payerSchema,
   ticketNumbers: [{ type: Number }],

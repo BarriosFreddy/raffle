@@ -27,7 +27,7 @@ export class Validators {
   }
 
   static validateParticipant(participant) {
-    const requiredFields = ['name', 'email', 'phone', 'instagram', 'nationalId'];
+    const requiredFields = ['name', 'email', 'phone', 'nationalId'];
     
     const missingFields = requiredFields.filter(
       field => !participant[field] || participant[field].trim() === ''

@@ -3,8 +3,8 @@ import { MercadoPagoService } from '../services/mercadopago.service.js';
 export const mercadoPagoController = {
   async createPreference(req, res, next) {
     try {
-      const { items, payer } = req.body;
-      const result = await MercadoPagoService.createPreference({ items, payer });
+      const {  items, payer, external_reference } = req.body;
+      const result = await MercadoPagoService.createPreference({ items, payer, external_reference });
       res.json(result);
     } catch (error) {
       console.error(error);

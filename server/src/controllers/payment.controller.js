@@ -12,6 +12,29 @@ export const paymentController = {
   async createPayment(req, res, next) {
     try {
       const payment = req.body;
+      const { raffleId, payer, quantity } = payment;
+      
+      // Get the raffle to check maxTicketsPerUser
+      const raffle = await Raffle.findById(raffleId);
+      if (!raffle) {
+        return next(new ApiError(404, "Raffle not found"));
+      }
+      
+      // Count existing tickets for this user
+      const existingTickets = await PaymentService.countUserTickets(
+        raffleId, 
+        payer.email, 
+        payer.nationalId
+      );
+      
+      // Check if user is trying to exceed maximum allowed tickets
+      const maxTicketsPerUser = raffle.maxTicketsPerUser || 100;
+      const totalTickets = existingTickets + quantity;
+      
+      if (totalTickets > maxTicketsPerUser) {
+        return next(new ApiError(400, `Excede el límite máximo de ${maxTicketsPerUser} tickets por usuario. Ya has comprado ${existingTickets} tickets.`));
+      }
+      
       const paymentSaved = await PaymentService.create(payment);
       res.status(201).json(paymentSaved);
     } catch (error) {
@@ -31,12 +54,15 @@ export const paymentController = {
   },
   async findAll(req, res, next) {
     try {
-      const { email, status, page = 1, size = 10 } = req.query;
+      const { email, status, raffleId, search, page = 1, size = 10 } = req.query;
       const payments = await PaymentService.findAll({
+        raffleId,
         email,
         status,
+        raffleId,
         page,
         size,
+        search
       });
       res.status(200).json(payments);
     } catch (error) {
@@ -47,7 +73,7 @@ export const paymentController = {
   async findByEmail(req, res, next) {
     try {
       const { email } = req.params;
-      const payments = await PaymentService.findByEmail(email);
+      const payments = await PaymentService.findAll({ email });
       res.status(200).json(payments);
     } catch (error) {
       console.error(error);
@@ -58,11 +84,12 @@ export const paymentController = {
   async handlePaymentWebhook(req, res, next) {
     try {
       const paymentInfo = req.body;
-      const { preference_id, payment_id } = paymentInfo;
+      const { preference_id, payment_id, x_customer_email, boldOrderId, boldTXStatus } = paymentInfo;
       let payment;
       let newStatus;
       let paymentDetails;
-
+      
+      //Mercado Pago
       if (payment_id && !preference_id) {
         const mpPayment = await MercadoPagoService.findPaymentById(payment_id);
         const {
@@ -86,17 +113,30 @@ export const paymentController = {
           paymentDetails = mpPayment;
           payment.mpPaymentId = mpPaymentId.toString();
         }
+        //Mercado Pago also can send the preference_id
       } else if (preference_id) {
         payment = await PaymentService.findOne({
           preferenceId: preference_id,
         });
         newStatus = paymentInfo.status;
         paymentDetails = paymentInfo;
+        //Mercado Pago also can send the x_customer_email
+      } else if (x_customer_email) {
+        payment = await PaymentService.findOneByEmail(x_customer_email);
+        newStatus = paymentInfo.x_cod_response === 1 ? APPROVED : REJECTED;
+        paymentDetails = paymentInfo;
+        //Bold and OpenPay also can send the orderId
+      } else if (boldOrderId && boldTXStatus) {
+        payment = await PaymentService.findOne({
+          orderId: boldOrderId,
+        });
+        newStatus = ["approved", "completed"].includes(boldTXStatus) ? APPROVED : REJECTED;
+        paymentDetails = paymentInfo;
       }
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }
-      if ([APPROVED, REJECTED].includes(payment.status)) {
+      if ([APPROVED].includes(payment.status)) {
         console.info("El pago ya fue procesado!");
         return res.status(200).json(payment);
       }
@@ -112,10 +152,66 @@ export const paymentController = {
       next(new ApiError(400, "Failed to process payment webhook"));
     }
   },
+  async getBoldRecordByOrderId(req, res, next) {
+    try {
+      const { boldOrderId } = req.params;
+      const boldRecord = await PaymentService.getBoldRecordByOrderId(boldOrderId);
+      if (!boldRecord) {
+        return res.status(200).json({
+          errors: [{
+            message: "Bold record not found",
+          }],
+        });
+      }
+      res.status(200).json(boldRecord);
+    } catch (e) {
+      console.error(e);
+      next(new ApiError(400, "Failed to get bold record by order id"));
+    }
+  },
+
+  async getOpenPayRecordByOrderId(req, res, next) {
+    try {
+      const { orderId } = req.params;
+      const openPayRecord = await PaymentService.getOpenPayRecordByOrderId(orderId);
+      if (openPayRecord && openPayRecord.length === 0) {
+        return res.status(200).json({
+          errors: [{
+            message: "OpenPay record not found",
+          }],
+        });
+      }
+      res.status(200).json(openPayRecord);
+    } catch (e) {
+      console.error(e);
+      next(new ApiError(400, "Failed to get openpay record by order id"));
+    }
+  },
+
+  async getMercadoPagoPaymentByOrderId(req, res, next) {
+    try {
+      const { orderId } = req.params;
+      const mercadoPagoPayment = await PaymentService.getMercadoPagoPaymentByOrderId(orderId);
+      if (mercadoPagoPayment.results.length === 0) {
+        return res.status(200).json({
+          errors: [{
+            message: "Mercado Pago payment not found",
+          }],
+        });
+      }
+      res.status(200).json(mercadoPagoPayment.results[0]);
+    } catch (e) {
+      console.error(e);
+      next(new ApiError(400, "Failed to get mercado pago payment by order id"));
+    }
+  },
+
   async handleAssignTicketNumbers(req, res, next) {
     try {
-      const { preferenceId } = req.params;
-      let payment = await PaymentService.findByPreferenceId(preferenceId);
+      const { preferenceId, paymentId } = req.body;
+      let payment =
+        preferenceId && (await PaymentService.findByPreferenceId(preferenceId));
+      if (paymentId) payment = await PaymentService.findOne({ _id: paymentId });
       if (!payment) {
         return next(new ApiError(404, "Payment record not found"));
       }

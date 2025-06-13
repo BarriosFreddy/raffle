@@ -2,20 +2,30 @@ import React, { useState } from "react";
 import { Search, Ticket } from "lucide-react";
 import type { Participant, Raffle } from "../types";
 import { formatMoney } from "../utils/formatNumber";
-import { assignTicketNumbers, findAll } from "@/services/payments.service";
+import {
+  assignTicketNumbers,
+  findAll,
+  getBoldRecordByOrderId,
+  getMercadoPagoPaymentByOrderId,
+  getOpenPayRecordByOrderId,
+  processPaymentResponse,
+} from "@/services/payments.service";
 import { TicketContainer } from "../components/TicketContainer";
 import PaymentStatus from "@/enums/PaymentStatus.enum";
+import { getRaffleById } from "@/services/raffle.service";
+import { PaymentDataDTO } from "@/types/paymentDataDTO";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { PaymentGateway } from "@/enums/PaymentGateway.enum";
+dayjs.extend(utc);
 
-interface PurchaseSearchProps {
-  raffles: Raffle[];
-}
+const APPROVED = "approved";
 
-const APPROVED = 'approved'
-
-export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
+export function PurchaseSearch() {
   const [email, setEmail] = useState("");
   const [fetching, setFetching] = useState(false);
   const [send, setSend] = useState(false);
+  const [raffle, setRaffle] = useState<Raffle>();
 
   const [searchResults, setSearchResults] = useState<
     {
@@ -27,21 +37,116 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setFetching(true);
-    const payments = await findAll({email, status: PaymentStatus.APPROVED});
+    let payments = await findAll({ email, status: PaymentStatus.APPROVED });
+    if (payments.length) {
+      const raffleRes = await getRaffleById(payments[0].raffleId);
+      setRaffle(raffleRes);
+    }
+
+    try {
+      const paymentsPending = await findAll({
+        email,
+        status: [PaymentStatus.PENDING, PaymentStatus.REJECTED],
+      });
+
+      for await (const payment of paymentsPending) {
+        const paymentRaffle = await getRaffleById(payment.raffleId);
+        let paymentData: PaymentDataDTO | undefined;
+        if (paymentRaffle.paymentGateway === PaymentGateway.BOLD) {
+          paymentData = await validateBoldPayment(payment);
+        }
+        if (paymentRaffle.paymentGateway === PaymentGateway.MERCADO_PAGO) {
+          paymentData = await validateMercadoPagoPayment(payment);
+        }
+        if (paymentRaffle.paymentGateway === PaymentGateway.OPEN_PAY) {
+          paymentData = await validateOpenPayPayment(payment);
+          payments = await findAll({
+            email,
+            status: PaymentStatus.APPROVED,
+          });
+        }
+        if (!paymentData) continue;
+        setRaffle(paymentRaffle);
+      }
+    } catch (e) {
+      console.error(e);
+    }
     setSearchResults(payments);
     setFetching(false);
     setSend(true);
   };
 
-  const handleShowNumbers = async (preferenceId: string) => {
-    if (preferenceId) {
-      await assignTicketNumbers(preferenceId);
-      await handleSearch()
+  const validateBoldPayment = async (payment: any) => {
+    const boldRecord = await getBoldRecordByOrderId(payment.orderId);
+    if (boldRecord.errors) {
+      console.error(boldRecord);
+      return;
+    }
+    const { payment_status } = boldRecord;
+    if (
+      payment_status &&
+      payment_status.toLowerCase() === PaymentStatus.APPROVED
+    ) {
+      const paymentData = await processPaymentResponse({
+        boldOrderId: payment.orderId,
+        boldTXStatus: PaymentStatus.APPROVED,
+      });
+      return paymentData;
+    }
+  };
+
+  const validateMercadoPagoPayment = async (payment: any) => {
+    const mercadoPagoPayment = await getMercadoPagoPaymentByOrderId(
+      payment.orderId
+    );
+    if (mercadoPagoPayment.errors) {
+      console.error(mercadoPagoPayment);
+      return;
+    }
+    if (
+      mercadoPagoPayment &&
+      mercadoPagoPayment.status.toLowerCase() === PaymentStatus.APPROVED
+    ) {
+      const paymentData = await processPaymentResponse({
+        ...mercadoPagoPayment,
+        payment_id: mercadoPagoPayment.id,
+      });
+      return paymentData;
+    }
+  };
+
+  const validateOpenPayPayment = async (payment: any) => {
+    const openPayPayments = await getOpenPayRecordByOrderId(payment.orderId);
+    if (openPayPayments.errors) {
+      console.error(openPayPayments);
+      return;
+    }
+    const openPayPayment = openPayPayments.filter(
+      (opPayment: any) => opPayment.status === PaymentStatus.COMPLETED
+    )[0];
+    if (!openPayPayment) {
+      console.error("No se encontro un pago completado para el orderId", payment.orderId);
+      return;
+    }
+    const paymentData = await processPaymentResponse({
+      ...openPayPayment,
+      boldOrderId: payment.orderId,
+      boldTXStatus: openPayPayment.status,
+    });
+    return paymentData;
+  };
+
+  const handleShowNumbers = async (paymentData: Partial<PaymentDataDTO>) => {
+    if (paymentData && paymentData._id) {
+      await assignTicketNumbers({
+        paymentId: paymentData._id,
+      });
+      await handleSearch();
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-6 mt-10">
       <h2 className="text-xl font-bold text-gray-900 mb-6">
         Encontrar mis números
       </h2>
@@ -60,34 +165,41 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
         </div>
 
         <button
+          disabled={fetching}
           type="submit"
           className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
         >
-          BUSCAR
+          {fetching ? "BUSCANDO..." : "BUSCAR"}
         </button>
       </form>
 
       <div className="mt-8">
         <div className="space-y-6">
           {searchResults.map(
-            ({ payer, ticketNumbers, status, amount, quantity, preferenceId }, index) => (
+            (
+              { _id, payer, ticketNumbers, status, amount, quantity, raffleId },
+              index
+            ) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-900">
                   Correo electrónico:{" "}
                   <span className="font-semibold">{payer.email}</span>
                 </p>
                 <p className="text-gray-900">Nombre: {payer.name}</p>
+                <p className="text-gray-900">Teléfono: {payer.phone}</p>
+                <p className="text-gray-900">Cédula: {payer.nationalId}</p>
                 <p className="text-gray-900">
-                  Usuario de instagram: {payer.instagram}
+                  Fecha: {dayjs(payer.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+                </p>
+                <p className="text-gray-900">
+                  Id del Evento: {raffleId.substring(0, 6)}
                 </p>
                 <p className="text-gray-900">Total: {formatMoney(amount)}</p>
-                <p className="text-gray-900">
-                  {quantity} Números
-                </p>
+                <p className="text-gray-900">{quantity} Números</p>
                 <div className="space-y-2 mt-2">
                   {ticketNumbers.length === 0 && status === APPROVED && (
                     <button
-                      onClick={() => handleShowNumbers(preferenceId)}
+                      onClick={() => handleShowNumbers({ _id })}
                       className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-lg text-base font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
                     >
                       <Ticket className="h-5 w-5 mr-2" />
@@ -98,7 +210,13 @@ export function PurchaseSearch({ raffles }: PurchaseSearchProps) {
                     {ticketNumbers
                       .sort((a, b) => a - b)
                       .map((number) => (
-                        <TicketContainer key={number} ticketNumber={number} />
+                        <TicketContainer
+                          key={number}
+                          ticketNumber={number}
+                          digits={
+                            raffle ? raffle.maxNumber.toString().length - 1 : 0
+                          }
+                        />
                       ))}
                   </div>
                 </div>

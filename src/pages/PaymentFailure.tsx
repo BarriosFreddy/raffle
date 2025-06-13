@@ -8,8 +8,6 @@ export function PaymentFailure() {
 
   const paymentResponse = Object.fromEntries(new URLSearchParams(searchParams));
 
-  console.log(JSON.stringify(paymentResponse, null, 2));
-
   useEffect(() => {
     (async () => {
       if (paymentResponse) {
