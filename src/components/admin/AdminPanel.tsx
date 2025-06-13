@@ -21,6 +21,7 @@ export function AdminPanel() {
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [payments, setPayments] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [intervalId, setIntervalId] = useState<number>();
@@ -84,17 +85,21 @@ export function AdminPanel() {
         raffleId: selectedRaffle._id,
         status: APPROVED,
         page: 1,
+        search: searchTerm,
       });
       setPayments(paymentsData);
+      setPage(1); // Reset to first page when raffle changes
     })();
-  }, [selectedRaffle]);
+  }, [selectedRaffle, searchTerm]);
 
   const handlePrevPage = async () => {
     const prev = page === 1 ? 1 : page - 1;
     setPage(prev);
     const paymentsData = await findAll({
+      raffleId: selectedRaffle?._id,
       status: APPROVED,
       page: prev,
+      search: searchTerm,
     });
     setPayments(paymentsData);
   };
@@ -103,8 +108,10 @@ export function AdminPanel() {
     const next = page + 1;
     setPage(next);
     const paymentsData = await findAll({
+      raffleId: selectedRaffle?._id,
       status: APPROVED,
       page: next,
+      search: searchTerm,
     });
     setPayments(paymentsData);
   };
@@ -119,6 +126,7 @@ export function AdminPanel() {
     const paymentsData = await findAll({
       status: APPROVED,
       page: 1,
+      search: searchTerm,
     });
     setPayments(paymentsData);
   };
@@ -144,6 +152,11 @@ export function AdminPanel() {
   const handleCreateRaffle = () => {
     setShowForm(true);
     clearInterval(intervalId);
+  };
+
+  const handleSearch = async (term: string) => {
+    setSearchTerm(term);
+    // The search will be executed by the useEffect that depends on searchTerm
   };
 
   if (!isLoggedIn) return <AdminLogin onLogin={handleLogin} />;
@@ -203,19 +216,25 @@ export function AdminPanel() {
               )}
 
               {selectedRaffle && !showForm && (
-                <>
-                  <AdminStats
-                    raffle={selectedRaffle}
-                    onEdit={handleEditRaffle}
-                  />
+                <div className="space-y-6">
+                  <div className="flex gap-6">
+                    <button
+                      onClick={handleEditRaffle}
+                      className="py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white transition-colors"
+                    >
+                      EDITAR RIFA
+                    </button>
+                  </div>
+                  <AdminStats raffle={selectedRaffle} onEdit={handleEditRaffle} />
                   <PurchasesList
-                    raffle={selectedRaffle}
                     payments={payments}
-                    page={page}
                     onNext={handleNextPage}
                     onPrev={handlePrevPage}
-                  />{" "}
-                </>
+                    page={page}
+                    raffle={selectedRaffle}
+                    onSearch={handleSearch}
+                  />
+                </div>
               )}
             </div>
           </div>

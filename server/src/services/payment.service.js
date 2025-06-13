@@ -28,12 +28,28 @@ export class PaymentService {
     return payments;
   }
   static async findAll(queryData) {
-    const { page, size, ...query } = queryData;
+    const { page, size, search, ...query } = queryData;
     const queryParams = {};
+    
+    // Standard filters
     if (query.email) queryParams["payer.email"] = query.email;
     if (Array.isArray(query.status)) queryParams.status = { $in: query.status };
     if (!Array.isArray(query.status)) queryParams.status = query.status;
     if (query.raffleId) queryParams.raffleId = query.raffleId;
+    
+    // Global case-insensitive search if provided
+    if (search) {
+      const searchRegex = new RegExp(`.*${search}.*`, 'i');
+      queryParams['$or'] = [  
+        { 'payer.email': searchRegex },
+        { 'payer.phone': searchRegex },
+        { 'payer.nationalId': searchRegex },
+        { 'payer.name': searchRegex },
+      ];
+      if(Number.isInteger(Number(search)))
+      { queryParams['$or'].push({ 'ticketNumbers': search }) }
+    }
+    
     const payments = await Payment.find(queryParams)
       .sort({ _id: -1 })
       .skip((page - 1) * size)
